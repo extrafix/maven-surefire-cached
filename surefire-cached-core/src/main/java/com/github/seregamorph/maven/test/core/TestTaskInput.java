@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
         "properties",
         "classesHashes",
         "testClassesHashes",
+        "pluginArtifactHashes",
         "moduleArtifactHashes",
         "libraryArtifactHashes",
         "excludes"
@@ -33,6 +34,12 @@ public final class TestTaskInput {
     private final SortedMap<String, String> ignoredProperties = new TreeMap<>();
 
     private final SortedMap<String, String> properties = new TreeMap<>();
+
+    /**
+     * "$groupId:$artifactId[:$classifier]:$version" (optional classifier) -> file hash
+     * Note: artifactName is not included in hash, only file hash with classpath sensitivity (ignore timestamp)
+     */
+    private final SortedMap<String, String> pluginArtifactHashes = new TreeMap<>();
 
     /**
      * "$groupId:$artifactId" (no version and no classifier) -> file hash
@@ -60,21 +67,47 @@ public final class TestTaskInput {
     public String hash() {
         var sw = new StringWriter();
         var pw = new PrintWriter(sw, true);
+        pw.println("# Properties");
         properties.forEach((key, value) -> pw.println(key + " -> " + value));
+        pw.println("# Plugins");
+        pluginArtifactHashes.forEach((key, value) -> pw.println(key + " -> " + value));
+        pw.println("# Dependencies");
         var artifactHashes = new TreeSet<>();
         artifactHashes.addAll(moduleArtifactHashes.values());
         artifactHashes.addAll(libraryArtifactHashes.values());
         artifactHashes.forEach(pw::println);
         if (classesHashes != null) {
+            pw.println("# Classes");
             classesHashes.forEach((key, value) -> pw.println(key + " -> " + value));
         }
         if (testClassesHashes != null) {
+            pw.println("# Test classes");
             testClassesHashes.forEach((key, value) -> pw.println(key + " -> " + value));
         }
+        pw.println("# Arg line");
         pw.println(argLine);
+        pw.println("# Test");
         pw.println(test);
+        pw.println("# Excludes");
         pw.println(excludes);
         return HashUtils.hashArray(sw.toString().getBytes(UTF_8));
+    }
+
+    public void addPluginArtifactHash(
+        GroupArtifactId groupArtifactId,
+        @Nullable String classifier,
+        String version,
+        @Nullable String hash
+    ) {
+        var key = groupArtifactId.toString();
+        if (classifier != null && !classifier.isEmpty()) {
+            key += ":" + classifier;
+        }
+        key += ":" + version;
+        if (pluginArtifactHashes.containsKey(key)) {
+            throw new IllegalStateException("Duplicate plugin classpath entry: " + key);
+        }
+        pluginArtifactHashes.put(key, hash);
     }
 
     public void setModuleName(String moduleName) {
@@ -134,6 +167,10 @@ public final class TestTaskInput {
 
     public String getModuleName() {
         return moduleName;
+    }
+
+    public Map<String, String> getPluginArtifactHashes() {
+        return pluginArtifactHashes;
     }
 
     public Map<String, String> getModuleArtifactHashes() {

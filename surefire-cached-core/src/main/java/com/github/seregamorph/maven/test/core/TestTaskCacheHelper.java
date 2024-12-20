@@ -22,6 +22,16 @@ public class TestTaskCacheHelper {
         testTaskInput.addIgnoredProperty("timestamp", Instant.now().toString());
         // todo git commit hash
 
+        var pluginArtifacts = task.getProject().getPluginArtifacts();
+        for (var pluginArtifact : pluginArtifacts) {
+            var file = pluginArtifact.getFile();
+            // now the file is always null, enhance the caching key on demand
+            var hash = file == null ? null : fileHashCache.getFileHash(file, FileSensitivity.CLASSPATH);
+            var groupArtifactId = GroupArtifactId.of(pluginArtifact);
+            testTaskInput.addPluginArtifactHash(groupArtifactId, pluginArtifact.getClassifier(),
+                pluginArtifact.getVersion(), hash);
+        }
+
         // todo add java version
         // todo system properties
 
