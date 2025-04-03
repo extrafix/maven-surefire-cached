@@ -15,6 +15,9 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import javax.annotation.Nullable;
 
+/**
+ * @author Sergey Chernov
+ */
 @JsonPropertyOrder({
         "moduleName",
         "timestamp",

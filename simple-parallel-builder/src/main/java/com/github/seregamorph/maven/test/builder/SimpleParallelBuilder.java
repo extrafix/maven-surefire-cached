@@ -39,6 +39,8 @@ import org.codehaus.plexus.logging.Logger;
  *
  * Executes the build with maximum parallelism, modules are not waiting for all dependencies to be resolved
  * as it's assumed they are already built in the previous execution.
+ *
+ * @author Sergey Chernov
  */
 @Singleton
 @Named("simple-parallel")

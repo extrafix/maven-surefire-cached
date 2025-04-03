@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import net.lingala.zip4j.ZipFile;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class ZipUtils {
 
     public static void zipDirectory(File sourceDirectory, File targetZipFile) {

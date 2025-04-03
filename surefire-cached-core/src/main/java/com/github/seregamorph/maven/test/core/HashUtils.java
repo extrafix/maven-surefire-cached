@@ -17,6 +17,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.jetbrains.annotations.Contract;
 
+/**
+ * @author Sergey Chernov
+ */
 final class HashUtils {
 
     @Contract(pure = true)

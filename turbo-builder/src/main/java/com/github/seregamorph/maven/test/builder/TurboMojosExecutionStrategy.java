@@ -11,6 +11,9 @@ import org.apache.maven.plugin.MojoExecutionRunner;
 import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.eclipse.sisu.Priority;
 
+/**
+ * @author Sergey Chernov
+ */
 @Named
 @Singleton
 @Priority(10)

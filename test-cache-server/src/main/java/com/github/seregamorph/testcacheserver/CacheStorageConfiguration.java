@@ -6,6 +6,9 @@ import java.io.File;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * @author Sergey Chernov
+ */
 @Configuration
 public class CacheStorageConfiguration {
 

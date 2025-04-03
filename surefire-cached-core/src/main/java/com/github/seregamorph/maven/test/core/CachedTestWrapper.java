@@ -29,6 +29,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.plugin.surefire.AbstractSurefireMojo;
 
+/**
+ * @author Sergey Chernov
+ */
 public class CachedTestWrapper {
 
     private final AbstractSurefireMojo self;

@@ -13,6 +13,9 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.plugins.annotations.ResolutionScope;
 
+/**
+ * @author Sergey Chernov
+ */
 @Mojo(
         name = "integration-test",
         requiresDependencyResolution = ResolutionScope.TEST,

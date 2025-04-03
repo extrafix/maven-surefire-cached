@@ -2,6 +2,9 @@ package com.github.seregamorph.maven.test.util;
 
 import java.math.BigDecimal;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class TimeFormatUtils {
 
     public static String formatTime(BigDecimal seconds) {

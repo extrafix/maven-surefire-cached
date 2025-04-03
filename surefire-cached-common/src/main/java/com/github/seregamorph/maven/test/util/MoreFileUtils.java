@@ -7,6 +7,9 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import org.apache.commons.io.FileUtils;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class MoreFileUtils {
 
     public static byte[] read(File file) {

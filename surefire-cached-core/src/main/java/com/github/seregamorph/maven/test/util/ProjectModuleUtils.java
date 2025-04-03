@@ -9,6 +9,9 @@ import java.util.TreeSet;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.project.MavenProject;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class ProjectModuleUtils {
 
     public static SortedSet<GroupArtifactId> getProjectModules(MavenProject project) {

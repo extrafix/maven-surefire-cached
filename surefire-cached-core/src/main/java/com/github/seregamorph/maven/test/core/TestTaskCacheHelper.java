@@ -10,6 +10,9 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.surefire.AbstractSurefireMojo;
 import org.apache.maven.project.MavenProject;
 
+/**
+ * @author Sergey Chernov
+ */
 @Singleton
 public class TestTaskCacheHelper {
 

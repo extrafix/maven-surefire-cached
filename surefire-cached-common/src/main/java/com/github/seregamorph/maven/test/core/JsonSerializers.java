@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class JsonSerializers {
 
     private static final ObjectMapper mapper = new ObjectMapper()

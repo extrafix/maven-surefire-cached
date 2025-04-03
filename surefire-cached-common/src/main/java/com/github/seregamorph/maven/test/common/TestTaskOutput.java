@@ -5,6 +5,9 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * @author Sergey Chernov
+ */
 public record TestTaskOutput(
     Instant beginTime,
     Instant endTime,

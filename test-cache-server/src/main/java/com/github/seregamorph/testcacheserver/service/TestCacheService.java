@@ -10,6 +10,9 @@ import java.util.List;
 import javax.annotation.Nullable;
 import org.springframework.stereotype.Service;
 
+/**
+ * @author Sergey Chernov
+ */
 @Service
 public class TestCacheService {
 

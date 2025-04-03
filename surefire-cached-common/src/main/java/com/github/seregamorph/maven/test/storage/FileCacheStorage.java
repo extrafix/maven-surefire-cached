@@ -8,6 +8,9 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Sergey Chernov
+ */
 public class FileCacheStorage implements CacheStorage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileCacheStorage.class);

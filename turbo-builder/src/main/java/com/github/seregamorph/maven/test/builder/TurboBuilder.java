@@ -27,6 +27,9 @@ import org.apache.maven.lifecycle.internal.builder.multithreaded.ConcurrencyDepe
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 
+/**
+ * @author Sergey Chernov
+ */
 @Singleton
 @Named("turbo")
 public class TurboBuilder implements Builder {

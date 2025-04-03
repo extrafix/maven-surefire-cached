@@ -2,6 +2,9 @@ package com.github.seregamorph.maven.test.common;
 
 import org.apache.maven.artifact.Artifact;
 
+/**
+ * @author Sergey Chernov
+ */
 public record GroupArtifactId(String groupId, String artifactId) {
 
     public static GroupArtifactId of(Artifact artifact) {

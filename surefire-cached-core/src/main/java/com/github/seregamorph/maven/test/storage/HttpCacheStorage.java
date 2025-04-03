@@ -13,6 +13,9 @@ import okhttp3.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Sergey Chernov
+ */
 public class HttpCacheStorage implements CacheStorage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpCacheStorage.class);

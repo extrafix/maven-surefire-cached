@@ -13,6 +13,9 @@ import java.util.concurrent.ExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Sergey Chernov
+ */
 public class FileHashCache {
 
     private static final Logger log = LoggerFactory.getLogger(FileHashCache.class);

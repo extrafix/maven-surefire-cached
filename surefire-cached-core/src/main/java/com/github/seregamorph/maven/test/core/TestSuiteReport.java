@@ -9,6 +9,8 @@ import org.xml.sax.SAXException;
 
 /**
  * surefire/failsafe report files TEST-*.xml ("testsuite" tag)
+ *
+ * @author Sergey Chernov
  */
 public record TestSuiteReport(String name, BigDecimal time, int tests, int errors, int failures) {
 

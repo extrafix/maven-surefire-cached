@@ -2,7 +2,11 @@ package com.github.seregamorph.maven.test.common;
 
 import javax.annotation.Nullable;
 
+/**
+ * @author Sergey Chernov
+ */
 public enum TaskOutcome {
+
     SKIPPED_CACHE(null),
     SUCCESS(null) {
         @Override

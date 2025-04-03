@@ -3,6 +3,9 @@ package com.github.seregamorph.maven.test.storage;
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import javax.annotation.Nullable;
 
+/**
+ * @author Sergey Chernov
+ */
 public interface CacheStorage {
 
     @Nullable

@@ -28,6 +28,9 @@ Hint: monitor values Dashboard
 * Data Received
 * Data Sent
  */
+/**
+ * @author Sergey Chernov
+ */
 @SessionScoped
 @Named
 public class CachedTestLifecycleParticipant extends AbstractMavenLifecycleParticipant {
