@@ -2,21 +2,15 @@ package com.github.seregamorph.maven.test.builder;
 
 import java.util.ArrayList;
 import java.util.List;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionRunner;
 import org.apache.maven.plugin.MojosExecutionStrategy;
-import org.eclipse.sisu.Priority;
 
 /**
  * @author Sergey Chernov
  */
-@Named
-@Singleton
-@Priority(10)
 public class TurboMojosExecutionStrategy implements MojosExecutionStrategy {
 
 /*

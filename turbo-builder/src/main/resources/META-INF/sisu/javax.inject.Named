@@ -1,2 +1,2 @@
 com.github.seregamorph.maven.test.builder.TurboBuilder
-com.github.seregamorph.maven.test.builder.TurboMojosExecutionStrategy
+com.github.seregamorph.maven.test.builder.DelegatingMojosExecutionStrategy

@@ -34,8 +34,10 @@ import org.codehaus.plexus.logging.Logger;
  * @author Sergey Chernov
  */
 @Singleton
-@Named("turbo")
+@Named(TurboBuilder.BUILDER_TURBO)
 public class TurboBuilder implements Builder {
+
+    public static final String BUILDER_TURBO = "turbo";
 
     private final LifecycleModuleBuilder lifecycleModuleBuilder;
     private final Logger logger;
