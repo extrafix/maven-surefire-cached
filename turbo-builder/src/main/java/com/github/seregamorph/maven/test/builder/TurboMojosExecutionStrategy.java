@@ -30,17 +30,18 @@ public class TurboMojosExecutionStrategy implements MojosExecutionStrategy {
         "compile",
         "process-classes",
 
-        "generate-test-sources",
-        "process-test-sources",
-        "generate-test-resources",
-        "process-test-resources",
-        "test-compile",
-        "process-test-classes",
-        "test",
-
-        // moved before "*test*" phases
-        "prepare-package",
-        "package",
+     |==>
+     |   "generate-test-sources",
+     |   "process-test-sources",
+     |   "generate-test-resources",
+     |   "process-test-resources",
+     |   "test-compile",
+     |   "process-test-classes",
+     |   "test",
+     |
+     |  // moved before "*test*" phases
+     |= "prepare-package",
+     |= "package",
 
         "pre-integration-test",
         "integration-test",
@@ -51,16 +52,19 @@ public class TurboMojosExecutionStrategy implements MojosExecutionStrategy {
     ]
 */
 
-    private static boolean isPackage(MojoExecution mojo) {
+    private static boolean isPackage(String lifecyclePhase) {
         return List.of("prepare-package", "package")
-            .contains(mojo.getLifecyclePhase());
+            .contains(lifecyclePhase);
     }
 
-    private static boolean isTest(MojoExecution mojo) {
+    private static boolean isTest(String lifecyclePhase) {
         // "generate-test-sources", "process-test-sources", "generate-test-resources", "process-test-resources",
         // "test-compile", "process-test-classes", "test", "pre-integration-test", "integration-test",
         // "post-integration-test"
-        return mojo.getLifecyclePhase().contains("test");
+        return "test".equals(lifecyclePhase)
+            || lifecyclePhase.contains("-test-")
+            || lifecyclePhase.startsWith("test-")
+            || lifecyclePhase.endsWith("-test");
     }
 
     @Override
@@ -70,11 +74,16 @@ public class TurboMojosExecutionStrategy implements MojosExecutionStrategy {
         MojoExecutionRunner mojoRunner
     ) throws LifecycleExecutionException {
         var packageMojos = mojos.stream()
-            .filter(TurboMojosExecutionStrategy::isPackage)
+            .filter(mojo -> {
+                String lifecyclePhase = mojo.getLifecyclePhase();
+                return lifecyclePhase != null && isPackage(lifecyclePhase);
+            })
             .toList();
         int firstTestMojoIndex = -1;
         for (int i = 0; i < mojos.size(); i++) {
-            if (isTest(mojos.get(i))) {
+            MojoExecution mojoExecution = mojos.get(i);
+            String lifecyclePhase = mojoExecution.getLifecyclePhase();
+            if (lifecyclePhase != null && isTest(lifecyclePhase)) {
                 firstTestMojoIndex = i;
                 break;
             }

@@ -28,6 +28,9 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 
 /**
+ * Custom maven project builder. Use "-b turbo" maven parameters like "mvn clean verify -b turbo" to activate.
+ * Schedules downstream dependencies right after package phase, but not all phases as default Builder does.
+ *
  * @author Sergey Chernov
  */
 @Singleton
