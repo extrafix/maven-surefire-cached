@@ -1,5 +1,9 @@
 # maven-surefire-cached
-Maven surefire/failsafe plugins supporting local and remote build caching.
+Maven surefire/failsafe plugins supporting local and remote build caching and custom build scheduler for multi-module builds.
+
+## Turbo reactor
+The default Maven multi-module build does not do an efficient multi-core CPU utilization.
+See [turbo-builder](turbo-builder/README.md) for more details.
 
 ## Comparison with Maven Build Cache Extension
 The [Maven Build Cache Extension](https://maven.apache.org/extensions/maven-build-cache-extension/) is an open-source
