@@ -49,7 +49,7 @@
         <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
         <maven.plugins.version>3.8.2</maven.plugins.version>
         <maven-plugin-tools.version>3.8.2</maven-plugin-tools.version>
-        <maven-surefire.version>3.2.5</maven-surefire.version>
+        <maven-surefire.version>3.5.3</maven-surefire.version>
         <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
@@ -317,7 +317,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>5.10.1</version>
+            <version>5.12.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

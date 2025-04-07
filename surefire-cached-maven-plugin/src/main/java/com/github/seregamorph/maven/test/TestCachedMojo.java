@@ -7,7 +7,7 @@ import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
 import javax.inject.Inject;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.surefire.SurefirePlugin;
+import org.apache.maven.plugin.surefire.SurefireMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -21,7 +21,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
         requiresDependencyResolution = ResolutionScope.TEST,
         defaultPhase = LifecyclePhase.TEST,
         threadSafe = true)
-public class TestCachedMojo extends SurefirePlugin {
+public class TestCachedMojo extends SurefireMojo {
 
     private final TestTaskCacheHelper testTaskCacheHelper;
 
