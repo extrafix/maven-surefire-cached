@@ -23,7 +23,7 @@ public enum TaskOutcome {
         }
     },
     EMPTY(null),
-    FROM_CACHE("saved") {
+    FROM_CACHE("serial time saved") {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(saved " + testTaskOutput.totalTime() + "s)";
