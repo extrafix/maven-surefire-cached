@@ -8,14 +8,14 @@ import javax.annotation.Nullable;
 public enum TaskOutcome {
 
     SKIPPED_CACHE(null),
-    SUCCESS(null) {
+    SUCCESS("serial time") {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(" + testTaskOutput.totalTests() + " tests"
                 + ", " + testTaskOutput.totalTime() + "s)";
         }
     },
-    FAILED(null) {
+    FAILED("serial time") {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(errors " + testTaskOutput.totalErrors()
