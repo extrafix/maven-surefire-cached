@@ -28,7 +28,11 @@ public class CachedDelegatingMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        String cacheStorage = System.getProperty("user.home") + "/.m2/test-cache";
+        String cacheStorage = project.getProperties().getProperty("cacheStorageUrl");
+        if (cacheStorage == null) {
+            cacheStorage = System.getProperty("user.home") + "/.m2/test-cache";
+        }
+        // TODO
         String[] cacheExcludes = {};
 
         var cachedTestWrapper = new CachedTestWrapper(session, project, delegate, testTaskCacheHelper,
