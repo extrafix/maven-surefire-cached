@@ -11,6 +11,8 @@ import org.apache.maven.project.MavenProject;
 
 public class CachedDelegatingMojo extends AbstractMojo {
 
+    private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
+
     private final MavenSession session;
     private final MavenProject project;
     private final Mojo delegate;
@@ -28,7 +30,10 @@ public class CachedDelegatingMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        String cacheStorage = project.getProperties().getProperty("cacheStorageUrl");
+        String cacheStorage = project.getProperties().getProperty(PROP_CACHE_STORAGE_URL);
+        if (cacheStorage == null) {
+            cacheStorage = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
+        }
         if (cacheStorage == null) {
             cacheStorage = System.getProperty("user.home") + "/.m2/test-cache";
         }
