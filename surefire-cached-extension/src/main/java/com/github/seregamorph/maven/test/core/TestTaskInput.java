@@ -117,8 +117,7 @@ public final class TestTaskInput {
         this.moduleName = moduleName;
     }
 
-    public void addModuleArtifactHash(GroupArtifactId groupArtifactId, String hash) {
-        var key = groupArtifactId.toString();
+    public void addModuleArtifactHash(String key, String hash) {
         if (moduleArtifactHashes.put(key, hash) != null) {
             throw new IllegalStateException("Duplicate classpath entry: " + key);
         }
