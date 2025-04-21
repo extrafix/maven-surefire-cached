@@ -17,7 +17,7 @@ import org.apache.maven.project.MavenProject;
  */
 class SignalingExecutorCompletionService {
 
-    private static final ThreadLocal<Consumer<MavenProject>> currentSignaler = new ThreadLocal<>();
+    static final ThreadLocal<Consumer<MavenProject>> currentSignaler = new ThreadLocal<>();
 
     private final ExecutorService executor;
     private final BlockingQueue<Try<MavenProject>> signaledQueue;

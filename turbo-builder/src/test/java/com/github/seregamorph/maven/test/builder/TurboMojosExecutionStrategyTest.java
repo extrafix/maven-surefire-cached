@@ -1,0 +1,108 @@
+package com.github.seregamorph.maven.test.builder;
+
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecutionRunner;
+import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.Test;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class TurboMojosExecutionStrategyTest {
+
+    @Test
+    public void shouldReorderAndSignalFullPhases() throws LifecycleExecutionException {
+        String[] phases = {
+            "validate",
+            "initialize",
+            "generate-sources",
+            "process-sources",
+            "generate-resources",
+            "process-resources",
+            "compile",
+            "process-classes",
+
+            "generate-test-sources",
+            "process-test-sources",
+            "generate-test-resources",
+            "process-test-resources",
+            "test-compile",
+            "process-test-classes",
+            "test",
+            // moved before "*test*" phases
+            "prepare-package",
+            "package",
+
+            "pre-integration-test",
+            "integration-test",
+            "post-integration-test",
+            "verify",
+            "install",
+            "deploy"
+        };
+
+        var mojos = Stream.of(phases)
+            .map(phase -> {
+                var execution = new MojoExecution(null);
+                execution.setLifecyclePhase(phase);
+                return execution;
+            })
+            .toList();
+
+        var request = new DefaultMavenExecutionRequest();
+        var session = new MavenSession(null, null, request, null);
+        var project = new MavenProject();
+        session.setCurrentProject(project);
+
+        var strategy = new TurboMojosExecutionStrategy();
+        var eventsList = new ArrayList<String>();
+        var mojoRunner = new MojoExecutionRunner() {
+            @Override
+            public void run(MojoExecution execution) {
+                eventsList.add("exec:" + execution.getLifecyclePhase());
+            }
+        };
+
+        SignalingExecutorCompletionService.currentSignaler.set(p -> {
+            eventsList.add("signal");
+        });
+        try {
+            strategy.execute(mojos, session, mojoRunner);
+        } finally {
+            SignalingExecutorCompletionService.currentSignaler.remove();
+        }
+
+        assertEquals(List.of(
+            "exec:validate",
+            "exec:initialize",
+            "exec:generate-sources",
+            "exec:process-sources",
+            "exec:generate-resources",
+            "exec:process-resources",
+            "exec:compile",
+            "exec:process-classes",
+            "exec:prepare-package",
+            "exec:package",
+            "signal",
+            "exec:generate-test-sources",
+            "exec:process-test-sources",
+            "exec:generate-test-resources",
+            "exec:process-test-resources",
+            "exec:test-compile",
+            "exec:process-test-classes",
+            "exec:test",
+            "exec:pre-integration-test",
+            "exec:integration-test",
+            "exec:post-integration-test",
+            "exec:verify",
+            "exec:install",
+            "exec:deploy"
+        ), eventsList);
+    }
+
+}
