@@ -45,8 +45,9 @@ public class TestTaskCacheHelper {
         var testClasspath = getTestClasspath(project);
         for (var artifact : testClasspath.artifacts()) {
             if (isIncludeToCacheEntry(artifact, cacheExcludes)) {
-                // can be a jar file (when "install" command is executed) or
-                // a classes directory (when "test" command is executed)
+                // Can be a jar file (when "install" command is executed) or
+                // a classes directory (when "test" command is executed).
+                // The trick is we calculate hash of files which is the same in both cases (jar manifest is ignored)
                 var file = artifact.getFile();
                 var hash = fileHashCache.getFileHash(file, FileSensitivity.CLASSPATH);
                 var groupArtifactId = GroupArtifactId.of(artifact);

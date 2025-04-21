@@ -43,7 +43,6 @@ final class HashUtils {
         return map;
     }
 
-    @Contract(pure = true)
     private static String hashStream(InputStream in) throws IOException {
         var digest = getMessageDigest();
         int len;

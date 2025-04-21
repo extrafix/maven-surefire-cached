@@ -21,6 +21,11 @@ public class FileHashCache {
     private static final Logger log = LoggerFactory.getLogger(FileHashCache.class);
 
     /**
+     * Hash of an empty directory or jar file.
+     */
+    private static final String EMPTY_HASH = "00000000000000000000000000000000";
+
+    /**
      * "$canonicalAbsoluteFileName:$sensitivity" -> file hash
      */
     private final Cache<String, FileHashValue> cacheFiles;
@@ -65,7 +70,7 @@ public class FileHashCache {
                 return fileHashValue.hash();
             } else {
                 // this can be a non-existing classes directory for modules with empty sourceSet
-                return "00000000000000000000000000000000";
+                return EMPTY_HASH;
             }
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
@@ -78,6 +83,10 @@ public class FileHashCache {
         var filteredMap = new TreeMap<>(mapHash);
         // remove MANIFEST.MF from the hash to unify hash calculation for jar files and classes directories
         filteredMap.remove("META-INF/MANIFEST.MF");
+
+        if (filteredMap.isEmpty()) {
+            return EMPTY_HASH;
+        }
 
         var sw = new StringBuilder();
         filteredMap.forEach((key, value) -> sw.append(key).append(":").append(value).append("\n"));
