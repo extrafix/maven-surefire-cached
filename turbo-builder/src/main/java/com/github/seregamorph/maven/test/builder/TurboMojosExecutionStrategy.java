@@ -89,12 +89,25 @@ public class TurboMojosExecutionStrategy implements MojosExecutionStrategy {
         }
 
         var executedPackageMojos = new ArrayList<MojoExecution>();
+        boolean signaled = false;
         for (MojoExecution mojoExecution : reorderedMojos) {
-            mojoRunner.run(mojoExecution);
-            if (packageMojos.contains(mojoExecution)) {
-                executedPackageMojos.add(mojoExecution);
-                if (packageMojos.equals(executedPackageMojos)) {
+            if (!signaled && packageMojos.isEmpty()) {
+                String lifecyclePhase = mojoExecution.getLifecyclePhase();
+                if (lifecyclePhase != null && isTest(lifecyclePhase)) {
+                    signaled = true;
+                    // signal before tests
                     SignalingExecutorCompletionService.signal(session.getCurrentProject());
+                }
+            }
+            mojoRunner.run(mojoExecution);
+            if (!signaled) {
+                if (packageMojos.contains(mojoExecution)) {
+                    executedPackageMojos.add(mojoExecution);
+                    if (packageMojos.equals(executedPackageMojos)) {
+                        signaled = true;
+                        // signal after package
+                        SignalingExecutorCompletionService.signal(session.getCurrentProject());
+                    }
                 }
             }
         }

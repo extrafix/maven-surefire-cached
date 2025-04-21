@@ -1,5 +1,9 @@
 package com.github.seregamorph.maven.test.builder;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
@@ -7,17 +11,12 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionRunner;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TurboMojosExecutionStrategyTest {
 
     @Test
     public void shouldReorderAndSignalFullPhases() throws LifecycleExecutionException {
-        String[] phases = {
+        List<String> phases = List.of(
             "validate",
             "initialize",
             "generate-sources",
@@ -44,9 +43,81 @@ class TurboMojosExecutionStrategyTest {
             "verify",
             "install",
             "deploy"
-        };
+        );
+        var expectedEvents = List.of(
+            "exec:validate",
+            "exec:initialize",
+            "exec:generate-sources",
+            "exec:process-sources",
+            "exec:generate-resources",
+            "exec:process-resources",
+            "exec:compile",
+            "exec:process-classes",
+            "exec:prepare-package",
+            "exec:package",
+            "signal",
+            "exec:generate-test-sources",
+            "exec:process-test-sources",
+            "exec:generate-test-resources",
+            "exec:process-test-resources",
+            "exec:test-compile",
+            "exec:process-test-classes",
+            "exec:test",
+            "exec:pre-integration-test",
+            "exec:integration-test",
+            "exec:post-integration-test",
+            "exec:verify",
+            "exec:install",
+            "exec:deploy"
+        );
 
-        var mojos = Stream.of(phases)
+        shouldReorderAndSignalImpl(phases, expectedEvents);
+    }
+
+    @Test
+    public void shouldReorderAndSignalSubsetPhases() throws LifecycleExecutionException {
+        List<String> phases = List.of(
+            "validate",
+            "initialize",
+            "generate-sources",
+            "process-sources",
+            "generate-resources",
+            "process-resources",
+            "compile",
+            "process-classes",
+
+            "generate-test-sources",
+            "process-test-sources",
+            "generate-test-resources",
+            "process-test-resources",
+            "test-compile",
+            "process-test-classes",
+            "test"
+        );
+        var expectedEvents = List.of(
+            "exec:validate",
+            "exec:initialize",
+            "exec:generate-sources",
+            "exec:process-sources",
+            "exec:generate-resources",
+            "exec:process-resources",
+            "exec:compile",
+            "exec:process-classes",
+            "signal",
+            "exec:generate-test-sources",
+            "exec:process-test-sources",
+            "exec:generate-test-resources",
+            "exec:process-test-resources",
+            "exec:test-compile",
+            "exec:process-test-classes",
+            "exec:test"
+        );
+
+        shouldReorderAndSignalImpl(phases, expectedEvents);
+    }
+
+    private static void shouldReorderAndSignalImpl(List<String> phases, List<String> expectedEvents) throws LifecycleExecutionException {
+        var mojos = phases.stream()
             .map(phase -> {
                 var execution = new MojoExecution(null);
                 execution.setLifecyclePhase(phase);
@@ -77,32 +148,7 @@ class TurboMojosExecutionStrategyTest {
             SignalingExecutorCompletionService.currentSignaler.remove();
         }
 
-        assertEquals(List.of(
-            "exec:validate",
-            "exec:initialize",
-            "exec:generate-sources",
-            "exec:process-sources",
-            "exec:generate-resources",
-            "exec:process-resources",
-            "exec:compile",
-            "exec:process-classes",
-            "exec:prepare-package",
-            "exec:package",
-            "signal",
-            "exec:generate-test-sources",
-            "exec:process-test-sources",
-            "exec:generate-test-resources",
-            "exec:process-test-resources",
-            "exec:test-compile",
-            "exec:process-test-classes",
-            "exec:test",
-            "exec:pre-integration-test",
-            "exec:integration-test",
-            "exec:post-integration-test",
-            "exec:verify",
-            "exec:install",
-            "exec:deploy"
-        ), eventsList);
+        assertEquals(expectedEvents, eventsList);
     }
 
 }

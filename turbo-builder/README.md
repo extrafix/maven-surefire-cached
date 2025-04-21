@@ -26,7 +26,7 @@ To set up the extension
         <!-- https://github.com/seregamorph/maven-surefire-cached -->
         <groupId>com.github.seregamorph</groupId>
         <artifactId>turbo-builder</artifactId>
-        <version>0.2</version>
+        <version>0.3</version>
     </extension>
 </extensions>
 ```

@@ -27,10 +27,15 @@ class SignalingExecutorCompletionService {
         this.signaledQueue = new LinkedBlockingQueue<>();
     }
 
-    static void signal(MavenProject value) {
+    /**
+     * Notify scheduler that current project is not available for downstream dependencies.
+     *
+     * @param project built project
+     */
+    static void signal(MavenProject project) {
         Consumer<MavenProject> signaler = currentSignaler.get();
         if (signaler != null) {
-            signaler.accept(value);
+            signaler.accept(project);
         }
     }
 
