@@ -22,6 +22,11 @@ import org.jetbrains.annotations.Contract;
  */
 final class HashUtils {
 
+    /**
+     * Hash of an empty directory or jar file.
+     */
+    static final String HASH_EMPTY_FILE_COLLECTION = "00000000000000000000000000000000";
+
     @Contract(pure = true)
     static String hashArray(byte[] array) {
         return formatDigest(getMessageDigest().digest(array));

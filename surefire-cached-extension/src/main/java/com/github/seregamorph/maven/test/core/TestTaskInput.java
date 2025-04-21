@@ -78,7 +78,11 @@ public final class TestTaskInput {
         var artifactHashes = new TreeSet<>();
         artifactHashes.addAll(moduleArtifactHashes.values());
         artifactHashes.addAll(libraryArtifactHashes.values());
-        artifactHashes.forEach(pw::println);
+        artifactHashes.forEach(hash -> {
+            if (!HashUtils.HASH_EMPTY_FILE_COLLECTION.equals(hash)) {
+                pw.println(hash);
+            }
+        });
         if (classesHashes != null) {
             pw.println("# Classes");
             classesHashes.forEach((key, value) -> pw.println(key + " -> " + value));
