@@ -65,7 +65,13 @@ public class LocalReactorRepositorySessionDecorator implements RepositorySession
                 if ("pom".equals(artifact.getExtension())) {
                     return project.getFile();
                 } else if ("jar".equals(artifact.getExtension())) {
-                    return new File(project.getBuild().getDirectory(), project.getBuild().getFinalName() + ".jar");
+                    String fileName = project.getBuild().getFinalName();
+                    String classifier = artifact.getClassifier();
+                    if (classifier != null && !classifier.isEmpty()) {
+                        fileName += "-" + classifier;
+                    }
+                    fileName += ".jar";
+                    return new File(project.getBuild().getDirectory(), fileName);
                 } else {
                     throw new UnsupportedOperationException("Unsupported artifact extension: " + artifact.getExtension());
                 }
