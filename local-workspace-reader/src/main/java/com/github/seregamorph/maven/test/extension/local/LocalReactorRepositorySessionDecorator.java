@@ -15,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Instead of default resolving built artifacts in repositories (either local or remote) Maven will first check
+ * module target directory.
+ *
  * @author Sergey Chernov
  */
 @Named
@@ -24,12 +27,17 @@ public class LocalReactorRepositorySessionDecorator implements RepositorySession
 
     @Override
     public RepositorySystemSession decorate(MavenProject project, RepositorySystemSession session) {
-        var originalWorkspaceReader = session.getWorkspaceReader();
-        logger.info("Decorating {} with local reactor repository", project);
-        var delegate = new DefaultRepositorySystemSession(session);
-        var modules = ProjectModuleExtUtils.getProjectModules(project);
-        delegate.setWorkspaceReader(new LocalReactorWorkspaceReader(originalWorkspaceReader, modules));
-        return delegate;
+        var useLocalWorkspaceReader = System.getProperty("useLocalWorkspaceReader");
+        if ("true".equals(useLocalWorkspaceReader)) {
+            var originalWorkspaceReader = session.getWorkspaceReader();
+            logger.info("Decorating {} with local reactor repository", project);
+            var delegate = new DefaultRepositorySystemSession(session);
+            var modules = ProjectModuleExtUtils.getProjectModules(project);
+            delegate.setWorkspaceReader(new LocalReactorWorkspaceReader(originalWorkspaceReader, modules));
+            return delegate;
+        } else {
+            return null;
+        }
     }
 
     static class LocalReactorWorkspaceReader implements WorkspaceReader {

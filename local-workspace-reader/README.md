@@ -19,5 +19,5 @@ How to use. Add to your `.mvn/extensions.xml`:
 Then you don't need to install artifacts anymore:
 ```shell
 mvn clean package -DskipTests=true
-mvn surefire:test
+mvn surefire:test -DuseLocalWorkspaceReader=true
 ```
