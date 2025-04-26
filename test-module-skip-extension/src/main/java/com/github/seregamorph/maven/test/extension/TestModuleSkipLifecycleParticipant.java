@@ -1,14 +1,14 @@
 package com.github.seregamorph.maven.test.extension;
 
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
+import javax.inject.Named;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.SessionScoped;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import javax.inject.Named;
-import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Listener that cleans up test modules from the session to speed up the build.
@@ -28,7 +28,7 @@ public class TestModuleSkipLifecycleParticipant extends AbstractMavenLifecyclePa
             logger.info("test-module-skip-extension: cleaning up projects (total projects {})", session.getProjects().size());
             var removedModules = new TreeSet<String>();
             session.getProjects().removeIf(mavenProject -> {
-                if (isTestModule(mavenProject)) {
+                if (isTestModule(mavenProject) && "jar".equals(mavenProject.getPackaging())) {
                     removedModules.add(mavenProject.getGroupId() + ':' + mavenProject.getArtifactId());
                     return true;
                 } else {
@@ -52,7 +52,7 @@ public class TestModuleSkipLifecycleParticipant extends AbstractMavenLifecyclePa
             if (removedModules.isEmpty()) {
                 logger.info("No test modules found");
             } else {
-                logger.info("Removed {} test modules: {}", removedModules.size(), removedModules);
+                logger.info("Removed {} test modules of jar type: {}", removedModules.size(), removedModules);
             }
             if (removedTestDependenciesCount.get() == 0) {
                 logger.info("No test dependencies found");
