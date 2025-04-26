@@ -59,28 +59,39 @@ public class LocalReactorRepositorySessionDecorator implements RepositorySession
         public File findArtifact(Artifact artifact) {
             var groupArtifactId = new GroupArtifactId(artifact.getGroupId(), artifact.getArtifactId());
             var project = modules.get(groupArtifactId);
-            if (project == null) {
-                return delegate.findArtifact(artifact);
-            } else {
-                if ("pom".equals(artifact.getExtension())) {
-                    return project.getFile();
-                } else if ("jar".equals(artifact.getExtension())) {
-                    String fileName = project.getBuild().getFinalName();
-                    String classifier = artifact.getClassifier();
-                    if (classifier != null && !classifier.isEmpty()) {
-                        fileName += "-" + classifier;
-                    }
-                    fileName += ".jar";
-                    return new File(project.getBuild().getDirectory(), fileName);
+            if (project != null) {
+                File localFile = findLocalFileCandidate(artifact, project);
+                if (localFile.exists()) {
+                    logger.debug("Found local artifact {} in {}", artifact, project);
+                    return localFile;
                 } else {
-                    throw new UnsupportedOperationException("Unsupported artifact extension: " + artifact.getExtension());
+                    logger.warn("Local artifact {} not found in {}, expected at {}, fallback to default resolution",
+                        artifact, project, localFile);
                 }
+            }
+            return delegate.findArtifact(artifact);
+        }
+
+        // never null, but may be non existing
+        private static File findLocalFileCandidate(Artifact artifact, MavenProject project) {
+            if ("pom".equals(artifact.getExtension())) {
+                return project.getFile();
+            } else if ("jar".equals(artifact.getExtension())) {
+                String fileName = project.getBuild().getFinalName();
+                String classifier = artifact.getClassifier();
+                if (classifier != null && !classifier.isEmpty()) {
+                    fileName += "-" + classifier;
+                }
+                fileName += ".jar";
+                return new File(project.getBuild().getDirectory(), fileName);
+            } else {
+                throw new UnsupportedOperationException("Unsupported artifact extension: " + artifact.getExtension());
             }
         }
 
         @Override
         public List<String> findVersions(Artifact artifact) {
-            throw new UnsupportedOperationException("Unsupported findVersions() " + artifact);
+            return delegate.findVersions(artifact);
         }
     }
 }
