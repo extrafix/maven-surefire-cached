@@ -39,7 +39,7 @@ public class TestModuleSkipLifecycleParticipant extends AbstractMavenLifecyclePa
             AtomicInteger removedTestDependenciesAffectedProjectsCount = new AtomicInteger();
             session.getProjects().forEach(project -> {
                 if (project.getDependencies().removeIf(dependency -> {
-                    if ("test".equals(dependency.getScope())) {
+                    if ("test".equals(dependency.getScope()) || isTestModule(project)) {
                         removedTestDependenciesCount.incrementAndGet();
                         return true;
                     } else {
@@ -57,19 +57,20 @@ public class TestModuleSkipLifecycleParticipant extends AbstractMavenLifecyclePa
             if (removedTestDependenciesCount.get() == 0) {
                 logger.info("No test dependencies found");
             } else {
-                logger.info("Removed {} test scope dependencies from {} projects",
+                logger.info("Removed {} test dependencies from {} projects",
                     removedTestDependenciesCount.get(), removedTestDependenciesAffectedProjectsCount.get());
             }
         }
     }
 
     private static boolean isTestModule(MavenProject project) {
-        return "jar".equals(project.getPackaging())
-            && ("testing".equals(project.getArtifactId())
+        return "testing".equals(project.getArtifactId())
+            || project.getArtifactId().startsWith("testing-")
+            || project.getArtifactId().contains("-testing-")
             || project.getArtifactId().endsWith("-testing")
-            || project.getArtifactId().endsWith("-test")
+            || project.getArtifactId().startsWith("test-")
             || project.getArtifactId().contains("-test-")
-            || project.getArtifactId().endsWith("-tests")
-        );
+            || project.getArtifactId().endsWith("-test")
+            || project.getArtifactId().endsWith("-tests");
     }
 }
