@@ -11,7 +11,7 @@ How to use. Add to your `.mvn/extensions.xml`:
     <extension>
         <groupId>com.github.seregamorph</groupId>
         <artifactId>local-workspace-reader</artifactId>
-        <version>0.6</version>
+        <version>0.7</version>
     </extension>
 </extensions>
 ```
