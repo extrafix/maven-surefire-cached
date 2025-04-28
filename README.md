@@ -15,17 +15,19 @@ Also it does not cache so called CLI executions like `mvn surefire:test`, only l
 like `mvn clean test`, which is also not always convenient.
 
 ## Adoption
-Add to the root `pom.xml` `<build>` or `.mvn/extensions.xml`:
+Add to the or `.mvn/extensions.xml` of your project:
 ```xml
 <extensions>
     <extension>
         <groupId>com.github.seregamorph</groupId>
         <artifactId>surefire-cached-extension</artifactId>
-        <version>${surefire-cached.version}</version>
+        <version>0.7</version>
     </extension>
 </extensions>
 ```
 This extension will print the cache statistics after the build.
+
+Sample adoption: https://github.com/seregamorph/spring-test-smart-context/pull/6
 
 First build without tests
 ```shell
