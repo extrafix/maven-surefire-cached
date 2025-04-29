@@ -36,6 +36,7 @@ public class FileCacheStorage implements CacheStorage {
     }
 
     private File getEntryFile(CacheEntryKey cacheEntryKey, String fileName) {
+        verifyFileName(fileName);
         return new File(baseDir, cacheEntryKey + "/" + fileName);
     }
 
@@ -92,5 +93,15 @@ public class FileCacheStorage implements CacheStorage {
 
         directory.mkdirs();
         return deleted;
+    }
+
+    private static void verifyFileName(String fileName) {
+        if (fileName.contains("..")) {
+            // prevent possible path traversal attacks
+            throw new IllegalArgumentException("Invalid fileName: " + fileName);
+        }
+        if (!fileName.matches("^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$")) {
+            throw new IllegalArgumentException("Invalid fileName: " + fileName);
+        }
     }
 }
