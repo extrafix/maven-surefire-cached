@@ -59,6 +59,8 @@ public class TurboBuilder implements Builder {
         int nThreads = Math.min(
             session.getRequest().getDegreeOfConcurrency(),
             session.getProjects().size());
+        logger.info("TurboBuilder will use " + nThreads + " threads to build "
+            + session.getProjects().size() + " modules");
         boolean parallel = nThreads > 1;
         // Propagate the parallel flag to the root session and all of the cloned sessions in each project segment
         session.setParallel(parallel);
