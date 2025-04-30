@@ -36,9 +36,10 @@ import org.codehaus.plexus.logging.Logger;
 /**
  * Based on simplified code from
  * {@link org.apache.maven.lifecycle.internal.builder.multithreaded.MultiThreadedBuilder}.
- *
- * Executes the build with maximum parallelism, modules are not waiting for all dependencies to be resolved
- * as it's assumed they are already built in the previous execution.
+ * <p>
+ * Executes the build with maximum parallelism, modules are not waiting for all dependencies to be resolved as it's
+ * assumed they are already built in the previous execution.
+ * It supports optional configuration with prioritized modules, see module readme.
  *
  * @author Sergey Chernov
  */
@@ -68,6 +69,8 @@ public class SimpleParallelBuilder implements Builder {
         int nThreads = Math.min(
             session.getRequest().getDegreeOfConcurrency(),
             session.getProjects().size());
+        logger.info("SimpleParallelBuilder will use " + nThreads + " threads to build "
+            + session.getProjects().size() + " modules");
         boolean parallel = nThreads > 1;
         // Propagate the parallel flag to the root session and all of the cloned sessions in each project segment
         session.setParallel(parallel);
