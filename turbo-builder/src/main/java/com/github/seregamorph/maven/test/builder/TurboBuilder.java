@@ -28,8 +28,12 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.logging.Logger;
 
 /**
- * Custom maven project builder. Use "-b turbo" maven parameters like "mvn clean verify -b turbo" to activate.
- * Schedules downstream dependencies right after package phase, but not all phases as default Builder does.
+ * Custom maven project builder. It's rewritten from original
+ * {@link org.apache.maven.lifecycle.internal.builder.multithreaded.MultiThreadedBuilder}
+ *
+ * Use "-b turbo" maven parameters like "mvn clean verify -b turbo" to activate.
+ * Schedules downstream dependencies right after the package phase, also it's coupled with
+ * {@link TurboMojosExecutionStrategy} reordering package and test phases.
  *
  * @author Sergey Chernov
  */
@@ -180,7 +184,7 @@ public class TurboBuilder implements Builder {
         };
     }
 
-    private Set<String> gatherDuplicateArtifactIds(Set<MavenProject> projects) {
+    private static Set<String> gatherDuplicateArtifactIds(Set<MavenProject> projects) {
         Set<String> artifactIds = new HashSet<>(projects.size());
         Set<String> duplicateArtifactIds = new HashSet<>();
         for (MavenProject project : projects) {

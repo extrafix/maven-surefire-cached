@@ -28,28 +28,31 @@ class SignalingExecutorCompletionService {
     }
 
     /**
-     * Notify scheduler that current project is not available for downstream dependencies.
+     * Notify scheduler that the current project is now available for downstream dependencies, so
+     * they can be scheduled.
      *
      * @param project built project
      */
     static void signal(MavenProject project) {
         Consumer<MavenProject> signaler = currentSignaler.get();
-        if (signaler != null) {
-            signaler.accept(project);
+        if (signaler == null) {
+            throw new IllegalStateException("Current thread does not have a signaler");
         }
+        signaler.accept(project);
     }
 
-    Future<?> submit(Callable<MavenProject> call) {
-        Objects.requireNonNull(call);
+    Future<?> submit(Callable<MavenProject> buildCallable) {
+        Objects.requireNonNull(buildCallable);
         return executor.submit(new FutureTask<>(() -> {
             AtomicBoolean signaled = new AtomicBoolean(false);
-            currentSignaler.set(value -> {
-                // no race condition here with "if (!signaled.get())" block, because it's the same thread
+            currentSignaler.set(mavenProject -> {
+                // No race condition here with "if (!signaled.get())" block, because it's the same thread.
+                // This callback is eventually called from buildCallable.call() few lines below.
                 signaled.set(true);
-                signaledQueue.add(Try.success(value));
+                signaledQueue.add(Try.success(mavenProject));
             });
             try {
-                MavenProject result = call.call();
+                MavenProject result = buildCallable.call();
                 if (!signaled.get()) {
                     signaledQueue.add(Try.success(result));
                 }
@@ -67,7 +70,7 @@ class SignalingExecutorCompletionService {
         }));
     }
 
-    public MavenProject takeSignaled() throws InterruptedException, ExecutionException {
+    MavenProject takeSignaled() throws InterruptedException, ExecutionException {
         Try<MavenProject> t = signaledQueue.take();
         return t.get();
     }
