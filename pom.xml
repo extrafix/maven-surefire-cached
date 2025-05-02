@@ -8,8 +8,7 @@
     <packaging>pom</packaging>
 
     <description>
-        Maven surefire/failsafe plugins supporting build caching,
-        alternative Maven reactor implementation (TurboBuilder).
+        Maven extension wrapping surefire/failsafe plugins to support build caching
     </description>
 
     <url>https://github.com/seregamorph/maven-surefire-cached</url>
