@@ -23,7 +23,8 @@ Add to the or `.mvn/extensions.xml` of your project:
 ```
 This extension will print the cache statistics after the build.
 
-Sample adoption: https://github.com/seregamorph/spring-test-smart-context/pull/6
+Sample adoption:
+* https://github.com/seregamorph/spring-test-smart-context/pull/6
 
 First build without tests
 ```shell
@@ -53,6 +54,13 @@ Using remote cache
 ```shell
 mvn clean install -DcacheStorageUrl=http://localhost:8080/cache
 ```
+
+## How it works
+The extension wraps and replaces default Mojo factory
+[DefaultMavenPluginManager](https://github.com/apache/maven/blob/maven-3.9.9/maven-core/src/main/java/org/apache/maven/plugin/internal/DefaultMavenPluginManager.java)
+with own implementation [CachedMavenPluginManager](surefire-cached-extension/src/main/java/com/github/seregamorph/maven/test/extension/CachedMavenPluginManager.java).
+All mojos are delegating to default behaviour except Surefire and Failsafe plugins. They are wrapped to caching logic,
+which calculates task inputs (classpath elements hash codes) and reuses existing cached test result when available.
 
 ## Related projects
 ### Turbo reactor
