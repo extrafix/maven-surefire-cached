@@ -1,5 +1,9 @@
-# maven-surefire-cached
-This extension wraps standard Maven surefire and failsafe plugins to support local and remote build caching.
+
+[![Maven Central Version](https://img.shields.io/maven-central/v/com.github.seregamorph/maven-surefire-cached?style=flat-square)](https://central.sonatype.com/artifact/com.github.seregamorph/maven-surefire-cached/overview)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+
+# Maven Surefire Cached
+This extension wraps standard Maven `surefire` and `failsafe` plugins to support local and remote build caching.
 
 ## Comparison with Maven Build Cache Extension
 The [Maven Build Cache Extension](https://maven.apache.org/extensions/maven-build-cache-extension/) is an open-source
