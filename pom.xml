@@ -172,11 +172,6 @@
                 <artifactId>surefire-cached-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.github.seregamorph</groupId>
-                <artifactId>surefire-cached-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
 
             <dependency>
                 <groupId>javax.inject</groupId>
