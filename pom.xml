@@ -57,12 +57,9 @@
     </properties>
 
     <modules>
-        <module>local-workspace-reader</module>
-        <module>simple-parallel-builder</module>
         <module>surefire-cached-common</module>
         <module>surefire-cached-extension</module>
         <module>test-cache-server</module>
-        <module>test-module-skip-extension</module>
     </modules>
 
     <build>
