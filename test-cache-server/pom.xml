@@ -45,7 +45,6 @@
         <dependency>
             <groupId>com.github.seregamorph</groupId>
             <artifactId>surefire-cached-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
