@@ -24,6 +24,14 @@ public final class JsonSerializers {
         }
     }
 
+    public static String serializeAsString(Object obj) {
+        try {
+            return mapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
+
     public static <T> T deserialize(byte[] content, Class<T> type, String fileName) {
         try {
             return mapper.readValue(content, type);

@@ -72,8 +72,8 @@ public final class TestTaskInput {
     private List<String> activeProfiles;
     private String argLine;
     private String test;
-    private List<String> excludes;
     private Map<String, SurefireCachedConfig.ArtifactsConfig> artifactConfigs;
+    private List<String> excludes;
 
     @JsonIgnore
     public String hash() {
@@ -109,7 +109,7 @@ public final class TestTaskInput {
         pw.println("# Test");
         pw.println(test);
         pw.println("# Artifact configs");
-        pw.println(artifactConfigs);
+        pw.println(JsonSerializers.serializeAsString(artifactConfigs));
         pw.println("# Excludes");
         pw.println(excludes);
         return HashUtils.hashArray(sw.toString().getBytes(UTF_8));
