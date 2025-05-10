@@ -16,7 +16,7 @@ class HashUtilsTest {
         var resourcesFile = failsafeReportsFile.getParentFile();
         var actual = HashUtils.hashDirectory(resourcesFile);
 
-        assertTrue(actual.containsKey("com/github/seregamorph/maven/test/common/TestSuiteReportTest.class"));
+        assertTrue(actual.containsKey("com/github/seregamorph/maven/test/core/TestSuiteReportTest.class"));
         assertTrue(actual.containsKey("com/github/seregamorph/maven/test/core/HashUtilsTest.class"));
         assertEquals("223cf05e7926df6abfbf0c77fa75d736", actual.get("failsafe-reports/TEST-com.github.seregamorph.testsmartcontext.demo.SampleIT.xml"));
         assertEquals("6e12494faa3b9fa98c9df3ea901e6a63", actual.get("surefire-reports/TEST-com.github.seregamorph.testsmartcontext.demo.Unit1Test.xml"));

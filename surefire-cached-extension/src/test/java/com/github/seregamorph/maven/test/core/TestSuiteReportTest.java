@@ -1,9 +1,8 @@
-package com.github.seregamorph.maven.test.common;
+package com.github.seregamorph.maven.test.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import java.io.File;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
