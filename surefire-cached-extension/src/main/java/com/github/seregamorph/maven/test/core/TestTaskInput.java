@@ -19,6 +19,7 @@ import javax.annotation.Nullable;
  * @author Sergey Chernov
  */
 @JsonPropertyOrder({
+        "version",
         "moduleName",
         "timestamp",
         "argLine",
@@ -33,6 +34,11 @@ import javax.annotation.Nullable;
         "excludes"
 })
 public final class TestTaskInput {
+
+    /**
+     * Updated on each breaking change
+     */
+    private static final String VERSION = "1";
 
     private final SortedMap<String, String> ignoredProperties = new TreeMap<>();
 
@@ -70,6 +76,8 @@ public final class TestTaskInput {
     public String hash() {
         var sw = new StringWriter();
         var pw = new PrintWriter(sw, true);
+        pw.println("# Version");
+        pw.println(getVersion());
         pw.println("# Properties");
         properties.forEach((key, value) -> pw.println(key + " -> " + value));
         pw.println("# Plugins");
@@ -169,6 +177,10 @@ public final class TestTaskInput {
 
     public void setExcludes(List<String> excludes) {
         this.excludes = excludes;
+    }
+
+    public String getVersion() {
+        return VERSION;
     }
 
     public String getModuleName() {
