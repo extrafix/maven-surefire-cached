@@ -1,3 +1,13 @@
 {
-  "cacheExcludes": ["com.acme:core"]
+  "surefire": {
+    "cacheExcludes": ["com.acme:core"],
+    "artifacts": {
+      "surefire-reports": {
+        "includes": ["surefire-reports/TEST-*.xml"]
+      },
+      "jacoco": {
+        "includes": ["jacoco-*.exec"]
+      }
+    }
+  }
 }

@@ -32,7 +32,28 @@ It's mandatory to define `surefire-cached.json` file for the module. If the file
 the extension will go thru the parent modules (till root) and try to find it there. Sample configuration file:
 ```json
 {
-  "cacheExcludes": ["com.acme:core"]
+  "surefire": {
+    "cacheExcludes": ["com.acme:core"],
+    "artifacts": {
+      "surefire-reports": {
+        "includes": ["surefire-reports/TEST-*.xml"]
+      },
+      "jacoco": {
+        "includes": ["jacoco-surefire-*.exec"]
+      }
+    }
+  },
+  "failsafe": {
+    "cacheExcludes": ["com.acme:core"],
+    "artifacts": {
+      "failsafe-reports": {
+        "includes": ["failsafe-reports/TEST-*.xml"]
+      },
+      "jacoco": {
+        "includes": ["jacoco-failsafe-*.exec"]
+      }
+    }
+  }
 }
 ```
 

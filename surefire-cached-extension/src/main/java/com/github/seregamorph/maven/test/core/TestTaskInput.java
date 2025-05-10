@@ -31,6 +31,7 @@ import javax.annotation.Nullable;
         "pluginArtifactHashes",
         "moduleArtifactHashes",
         "libraryArtifactHashes",
+        "artifactConfigs",
         "excludes"
 })
 public final class TestTaskInput {
@@ -38,7 +39,7 @@ public final class TestTaskInput {
     /**
      * Updated on each breaking change
      */
-    private static final String VERSION = "1";
+    private static final int VERSION = 2;
 
     private final SortedMap<String, String> ignoredProperties = new TreeMap<>();
 
@@ -71,6 +72,7 @@ public final class TestTaskInput {
     private String argLine;
     private String test;
     private List<String> excludes;
+    private Map<String, SurefireCachedConfig.ArtifactsConfig> artifactConfigs;
 
     @JsonIgnore
     public String hash() {
@@ -103,6 +105,8 @@ public final class TestTaskInput {
         pw.println(argLine);
         pw.println("# Test");
         pw.println(test);
+        pw.println("# Artifact configs");
+        pw.println(artifactConfigs);
         pw.println("# Excludes");
         pw.println(excludes);
         return HashUtils.hashArray(sw.toString().getBytes(UTF_8));
@@ -175,11 +179,15 @@ public final class TestTaskInput {
         this.test = test;
     }
 
+    public void setArtifactConfigs(Map<String, SurefireCachedConfig.ArtifactsConfig> artifactConfigs) {
+        this.artifactConfigs = artifactConfigs;
+    }
+
     public void setExcludes(List<String> excludes) {
         this.excludes = excludes;
     }
 
-    public String getVersion() {
+    public int getVersion() {
         return VERSION;
     }
 
@@ -221,6 +229,10 @@ public final class TestTaskInput {
 
     public String getTest() {
         return test;
+    }
+
+    public Map<String, SurefireCachedConfig.ArtifactsConfig> getArtifactConfigs() {
+        return artifactConfigs;
     }
 
     public List<String> getExcludes() {

@@ -57,6 +57,11 @@ public class FileCacheStorage implements CacheStorage {
         return deleted;
     }
 
+    /**
+     *
+     * @param directory
+     * @return number of deleted files
+     */
     private int createParentAndCleanupOld(File directory) {
         // "$baseId/$groupId/$artifactId/$hash"
         if (directory.exists()) {

@@ -35,7 +35,7 @@ public class CachedTestWrapperTest {
             "http://localhost:8080", TestTaskOutput.PLUGIN_SUREFIRE_CACHED);
 
         var config = cachedTestWrapper.loadSurefireCachedConfig();
-        assertEquals(List.of("com.acme:core"), config.getCacheExcludes());
+        assertEquals(List.of("com.acme:core"), config.getSurefire().getCacheExcludes());
     }
 
     private static URI getResourceURI(String name) {

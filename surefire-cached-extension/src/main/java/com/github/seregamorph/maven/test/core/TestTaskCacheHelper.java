@@ -8,6 +8,7 @@ import java.io.File;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.Mojo;
@@ -21,7 +22,11 @@ public class TestTaskCacheHelper {
 
     private final FileHashCache fileHashCache = new FileHashCache();
 
-    public TestTaskInput getTestTaskInput(MavenProject project, Mojo delegate, Set<GroupArtifactId> cacheExcludes) {
+    public TestTaskInput getTestTaskInput(
+        MavenProject project,
+        Mojo delegate,
+        SurefireCachedConfig.TestPluginConfig testPluginConfig
+    ) {
         var modules = ProjectModuleUtils.getProjectModules(project);
 
         var testTaskInput = new TestTaskInput();
@@ -43,6 +48,9 @@ public class TestTaskCacheHelper {
 
         testTaskInput.setModuleName(project.getGroupId() + ":" + project.getArtifactId());
         var testClasspath = getTestClasspath(project);
+        var cacheExcludes = testPluginConfig.getCacheExcludes().stream()
+            .map(GroupArtifactId::fromString)
+            .collect(Collectors.toSet());
         for (var artifact : testClasspath.artifacts()) {
             if (isIncludeToCacheEntry(artifact, cacheExcludes)) {
                 // Can be a jar file (when "install" command is executed) or
@@ -66,9 +74,9 @@ public class TestTaskCacheHelper {
         if (testClasspath.testClassesDir().exists()) {
             testTaskInput.setTestClassesHashes(HashUtils.hashDirectory(testClasspath.testClassesDir()));
         }
-        // todo support additional files like logback.xml not in the classpath
         testTaskInput.setArgLine(call(delegate, String.class, "getArgLine"));
         testTaskInput.setTest(call(delegate, String.class, "getTest"));
+        testTaskInput.setArtifactConfigs(testPluginConfig.getArtifacts());
         testTaskInput.setExcludes(call(delegate, List.class, "getExcludes"));
         return testTaskInput;
     }

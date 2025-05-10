@@ -24,7 +24,7 @@ public record TestTaskOutput(
     int totalTests,
     int totalErrors,
     int totalFailures,
-    // unpacked source name -> packed target name
+    // alias -> packed target name
     Map<String, String> files
 ) {
     public static TestTaskOutput empty() {

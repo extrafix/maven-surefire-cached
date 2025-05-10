@@ -22,9 +22,8 @@ import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -36,6 +35,8 @@ import org.apache.maven.project.MavenProject;
  * @author Sergey Chernov
  */
 public class CachedTestWrapper {
+
+    private static final String CONFIG_FILE_NAME = "surefire-cached.json";
 
     private final MavenSession session;
     private final MavenProject project;
@@ -66,6 +67,7 @@ public class CachedTestWrapper {
         this.log = delegate.getLog();
         // "target" subdir of basedir
         this.projectBuildDirectory = new File(project.getBuild().getDirectory());
+        // "target/surefire-reports" or "target/failsafe-reports"
         this.reportsDirectory = call(delegate, File.class, "getReportsDirectory");
     }
 
@@ -114,24 +116,20 @@ public class CachedTestWrapper {
         var skipCache = isEmptyOrTrue(session.getSystemProperties().getProperty("skipCache"));
         if (skipCache) {
             delegate.execute();
-            var testTaskOutput = getTaskOutput(startTime, Instant.now());
+            var testTaskOutput = getTaskOutput(null, startTime, Instant.now());
             setCachedExecution(TaskOutcome.SKIPPED_CACHE, testTaskOutput);
             return;
         }
 
         SurefireCachedConfig surefireCachedConfig = loadSurefireCachedConfig();
-
-        Set<GroupArtifactId> cacheExcludes = surefireCachedConfig.getCacheExcludes().stream()
-            .map(GroupArtifactId::fromString)
-            .collect(Collectors.toSet());
+        var testPluginConfig = getTestPluginConfig(surefireCachedConfig);
 
         var taskInputFile = new File(projectBuildDirectory, getTaskInputFileName());
         var taskOutputFile = new File(projectBuildDirectory, getTaskOutputFileName());
         MoreFileUtils.delete(taskInputFile);
         MoreFileUtils.delete(taskOutputFile);
 
-        // todo include surefire/failsafe plugin name
-        var testTaskInput = testTaskCacheHelper.getTestTaskInput(project, this.delegate, cacheExcludes);
+        var testTaskInput = testTaskCacheHelper.getTestTaskInput(project, this.delegate, testPluginConfig);
         var testTaskInputBytes = JsonSerializers.serialize(testTaskInput);
         log.debug(new String(testTaskInputBytes, UTF_8));
         MoreFileUtils.write(taskInputFile, testTaskInputBytes);
@@ -144,19 +142,19 @@ public class CachedTestWrapper {
         var testTaskOutputBytes = cacheStorage.read(cacheEntryKey, getTaskOutputFileName());
         if (testTaskOutputBytes == null) {
             log.info("Cache miss " + cacheEntryKey);
-            boolean thrown = true;
+            boolean success = false;
             try {
                 delegate.execute();
-                thrown = false;
+                success = true;
             } finally {
-                var testTaskOutput = getTaskOutput(startTime, Instant.now());
+                var testTaskOutput = getTaskOutput(testPluginConfig, startTime, Instant.now());
                 MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
                 if (testTaskOutput.totalErrors() > 0 || testTaskOutput.totalFailures() > 0) {
                     log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
                     setCachedExecution(TaskOutcome.FAILED, testTaskOutput);
-                } else if (!thrown) {
-                    log.info("Storing reports to cache from " + reportsDirectory);
-                    var deleted = storeCache(cacheEntryKey, testTaskInput, testTaskOutput);
+                } else if (success) {
+                    log.info("Storing artifacts to cache from " + projectBuildDirectory);
+                    var deleted = storeCache(testPluginConfig, cacheEntryKey, testTaskInput, testTaskOutput);
                     var result = testTaskOutput.totalTests() == 0 ? TaskOutcome.EMPTY : TaskOutcome.SUCCESS;
                     setCachedExecution(result, testTaskOutput);
                     setCachedDeletion(deleted);
@@ -166,8 +164,8 @@ public class CachedTestWrapper {
             MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
             log.info("Cache hit " + cacheEntryKey);
             var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class,
-                    getTaskOutputFileName());
-            log.info("Restoring reports from cache to " + reportsDirectory);
+                getTaskOutputFileName());
+            log.info("Restoring artifacts from cache to " + projectBuildDirectory);
             restoreCache(cacheEntryKey, testTaskOutput);
             setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
         }
@@ -176,7 +174,7 @@ public class CachedTestWrapper {
     SurefireCachedConfig loadSurefireCachedConfig() {
         MavenProject currentProject = this.project;
         do {
-            File surefireCachedConfigFile = new File(currentProject.getBasedir(), "surefire-cached.json");
+            File surefireCachedConfigFile = new File(currentProject.getBasedir(), CONFIG_FILE_NAME);
             if (surefireCachedConfigFile.exists()) {
                 return JsonSerializers.deserialize(
                     MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
@@ -186,20 +184,25 @@ public class CachedTestWrapper {
         } while (currentProject != null && currentProject.getBasedir() != null);
 
         throw new IllegalStateException("Unable to find surefire cached config file in "
-            + new File(this.project.getBasedir(), "surefire-cached.json") + " or parent Maven project");
+            + new File(this.project.getBasedir(), CONFIG_FILE_NAME) + " or parent Maven project");
     }
 
-    private int storeCache(CacheEntryKey cacheEntryKey, TestTaskInput testTaskInput, TestTaskOutput testTaskOutput) {
+    private int storeCache(
+        SurefireCachedConfig.TestPluginConfig testPluginConfig,
+        CacheEntryKey cacheEntryKey,
+        TestTaskInput testTaskInput,
+        TestTaskOutput testTaskOutput
+    ) {
         int deleted = cacheStorage.write(cacheEntryKey, getTaskInputFileName(),
             JsonSerializers.serialize(testTaskInput));
-        for (Map.Entry<String, String> entry : testTaskOutput.files().entrySet()) {
-            var unpackedName = entry.getKey();
-            var packedName = entry.getValue();
-            var file = new File(projectBuildDirectory, unpackedName);
-            var zipFile = new File(projectBuildDirectory, packedName);
-            MoreFileUtils.delete(zipFile);
-            ZipUtils.zipDirectory(file, zipFile);
-            deleted += cacheStorage.write(cacheEntryKey, packedName, MoreFileUtils.read(zipFile));
+        for (Map.Entry<String, SurefireCachedConfig.ArtifactsConfig> entry : testPluginConfig.getArtifacts().entrySet()) {
+            var alias = entry.getKey();
+            var artifactsConfig = entry.getValue();
+            var artifactPackName = getArtifactPackName(alias);
+            var packFile = new File(projectBuildDirectory, artifactPackName);
+            MoreFileUtils.delete(packFile);
+            ZipUtils.packDirectory(projectBuildDirectory, artifactsConfig.getIncludes(), packFile);
+            deleted += cacheStorage.write(cacheEntryKey, artifactPackName, MoreFileUtils.read(packFile));
         }
         var testTaskOutputBytes = JsonSerializers.serialize(testTaskOutput);
         deleted += cacheStorage.write(cacheEntryKey, getTaskOutputFileName(), testTaskOutputBytes);
@@ -217,7 +220,7 @@ public class CachedTestWrapper {
             MoreFileUtils.write(zipFile, packedContent);
             var unpackedFile = new File(projectBuildDirectory, unpackedName);
             MoreFileUtils.delete(unpackedFile);
-            ZipUtils.unzipDirectory(zipFile, unpackedFile);
+            ZipUtils.unpackDirectory(zipFile, unpackedFile);
         });
     }
 
@@ -228,7 +231,11 @@ public class CachedTestWrapper {
             testTaskInput.hash());
     }
 
-    private TestTaskOutput getTaskOutput(Instant startTime, Instant endTime) {
+    private TestTaskOutput getTaskOutput(
+        @Nullable SurefireCachedConfig.TestPluginConfig testPluginConfig,
+        Instant startTime,
+        Instant endTime
+    ) {
         var testReports = reportsDirectory.listFiles((dir, name) ->
             name.startsWith("TEST-") && name.endsWith(".xml"));
 
@@ -251,11 +258,28 @@ public class CachedTestWrapper {
         }
 
         var files = new TreeMap<String, String>();
-        files.put(reportsDirectory.getName(), getReportsZipName());
-        // todo add jacoco coverage file
+        if (testPluginConfig != null) {
+            testPluginConfig.getArtifacts().keySet().forEach(alias -> {
+                files.put(alias, getArtifactPackName(alias));
+            });
+        }
 
         return new TestTaskOutput(startTime, endTime, getTotalTimeSeconds(startTime, endTime),
             totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures, files);
+    }
+
+    private static String getArtifactPackName(String alias) {
+        return alias + ".tar.gz";
+    }
+
+    private SurefireCachedConfig.TestPluginConfig getTestPluginConfig(SurefireCachedConfig surefireCachedConfig) {
+        if (TestTaskOutput.PLUGIN_SUREFIRE_CACHED.equals(pluginName)) {
+            return surefireCachedConfig.getSurefire();
+        } else if (TestTaskOutput.PLUGIN_FAILSAFE_CACHED.equals(pluginName)) {
+            return surefireCachedConfig.getFailsafe();
+        } else {
+            throw new IllegalStateException("Unknown plugin " + pluginName);
+        }
     }
 
     private static BigDecimal getTotalTimeSeconds(Instant startTime, Instant endTime) {
@@ -270,10 +294,6 @@ public class CachedTestWrapper {
 
     private String getTaskOutputFileName() {
         return pluginName + "-output.json";
-    }
-
-    private String getReportsZipName() {
-        return reportsDirectory.getName() + ".zip";
     }
 
     private static boolean isEmptyOrTrue(String value) {
