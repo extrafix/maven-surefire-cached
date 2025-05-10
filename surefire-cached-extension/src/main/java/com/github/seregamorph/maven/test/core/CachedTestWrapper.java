@@ -160,7 +160,7 @@ public class CachedTestWrapper {
         } else {
             MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
             log.info("Cache hit " + cacheEntryKey);
-            var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class);
+            var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class, getTaskOutputFileName());
             log.info("Restoring reports from cache to " + reportsDirectory);
             restoreCache(cacheEntryKey, testTaskOutput);
             setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);

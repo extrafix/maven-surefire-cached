@@ -24,11 +24,11 @@ public final class JsonSerializers {
         }
     }
 
-    public static <T> T deserialize(byte[] content, Class<T> type) {
+    public static <T> T deserialize(byte[] content, Class<T> type, String fileName) {
         try {
             return mapper.readValue(content, type);
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new UncheckedIOException("Failed to deserialize " + fileName, e);
         }
     }
 

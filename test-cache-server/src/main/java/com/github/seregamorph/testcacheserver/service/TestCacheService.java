@@ -65,7 +65,7 @@ public class TestCacheService {
             .increment(body.length);
 
         if (TRACKED_TASK_OUTPUTS.contains(fileName)) {
-            var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class);
+            var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class, fileName);
             Counter.builder("cache_saved_time_seconds")
                 .tag("pluginName", cacheEntryKey.pluginName())
                 .register(meterRegistry)
