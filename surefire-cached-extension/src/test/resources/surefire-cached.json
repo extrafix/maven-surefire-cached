@@ -1,0 +1,3 @@
+{
+  "cacheExcludes": ["com.acme:core"]
+}

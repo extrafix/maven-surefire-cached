@@ -15,7 +15,7 @@ Also it does not cache so called CLI executions like `mvn surefire:test`, only l
 like `mvn clean test`, which is also not always convenient.
 
 ## Adoption
-Add to the or `.mvn/extensions.xml` of your project:
+Add to the `.mvn/extensions.xml` of your project:
 ```xml
 <extensions>
     <extension>
@@ -26,6 +26,15 @@ Add to the or `.mvn/extensions.xml` of your project:
 </extensions>
 ```
 This extension will print the cache statistics after the build.
+
+## Configuration
+It's mandatory to define `surefire-cached.json` file for the module. If the file is not found,
+the extension will go thru the parent modules (till root) and try to find it there. Sample configuration file:
+```json
+{
+  "cacheExcludes": ["com.acme:core"]
+}
+```
 
 Sample adoption:
 * https://github.com/seregamorph/spring-test-smart-context/pull/6

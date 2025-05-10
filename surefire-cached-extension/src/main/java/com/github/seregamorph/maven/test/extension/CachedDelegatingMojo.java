@@ -37,11 +37,9 @@ public class CachedDelegatingMojo extends AbstractMojo {
         if (cacheStorage == null) {
             cacheStorage = System.getProperty("user.home") + "/.m2/test-cache";
         }
-        // TODO
-        String[] cacheExcludes = {};
 
         var cachedTestWrapper = new CachedTestWrapper(session, project, delegate, testTaskCacheHelper,
-            cacheStorage, cacheExcludes, pluginName);
+            cacheStorage, pluginName);
         cachedTestWrapper.execute(delegate::execute);
     }
 }

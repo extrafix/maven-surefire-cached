@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import javax.annotation.Nullable;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -42,7 +40,6 @@ public class CachedTestWrapper {
     private final Mojo delegate;
     private final TestTaskCacheHelper testTaskCacheHelper;
     private final CacheStorage cacheStorage;
-    private final Set<GroupArtifactId> cacheExcludes;
     private final String pluginName;
 
     private final Log log;
@@ -55,8 +52,6 @@ public class CachedTestWrapper {
         Mojo delegate,
         TestTaskCacheHelper testTaskCacheHelper,
         String cacheStorage,
-        @Nullable
-        String[] cacheExcludes,
         String pluginName
     ) {
         this.session = session;
@@ -64,12 +59,10 @@ public class CachedTestWrapper {
         this.delegate = delegate;
         this.testTaskCacheHelper = testTaskCacheHelper;
         this.cacheStorage = createCacheStorage(cacheStorage);
-        this.cacheExcludes = cacheExcludes == null ? Set.of() : Stream.of(cacheExcludes)
-            .map(GroupArtifactId::fromString)
-            .collect(Collectors.toSet());
         this.pluginName = pluginName;
 
         this.log = delegate.getLog();
+        // "target" subdir of basedir
         this.projectBuildDirectory = new File(project.getBuild().getDirectory());
         this.reportsDirectory = call(delegate, File.class, "getReportsDirectory");
     }
@@ -124,6 +117,12 @@ public class CachedTestWrapper {
             return;
         }
 
+        SurefireCachedConfig surefireCachedConfig = loadSurefireCachedConfig();
+
+        Set<GroupArtifactId> cacheExcludes = surefireCachedConfig.getCacheExcludes().stream()
+            .map(GroupArtifactId::fromString)
+            .collect(Collectors.toSet());
+
         var taskInputFile = new File(projectBuildDirectory, getTaskInputFileName());
         var taskOutputFile = new File(projectBuildDirectory, getTaskOutputFileName());
         MoreFileUtils.delete(taskInputFile);
@@ -165,6 +164,22 @@ public class CachedTestWrapper {
             restoreCache(cacheEntryKey, testTaskOutput);
             setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
         }
+    }
+
+    SurefireCachedConfig loadSurefireCachedConfig() {
+        MavenProject currentProject = this.project;
+        do {
+            File surefireCachedConfigFile = new File(currentProject.getBasedir(), "surefire-cached.json");
+            if (surefireCachedConfigFile.exists()) {
+                return JsonSerializers.deserialize(
+                    MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
+                    surefireCachedConfigFile.toString());
+            }
+            currentProject = currentProject.getParent();
+        } while (currentProject != null && currentProject.getBasedir() != null);
+
+        throw new IllegalStateException("Unable to find surefire cached config file in "
+            + new File(this.project.getBasedir(), "surefire-cached.json") + " or parent Maven project");
     }
 
     private int storeCache(CacheEntryKey cacheEntryKey, TestTaskInput testTaskInput, TestTaskOutput testTaskOutput) {
