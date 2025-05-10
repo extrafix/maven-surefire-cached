@@ -9,10 +9,18 @@ import java.util.Map;
  * @author Sergey Chernov
  */
 public record TestTaskOutput(
-    Instant beginTime,
+    Instant startTime,
     Instant endTime,
+    /*
+    Time between begin and end of test task
+    */
+    BigDecimal totalTimeSeconds,
     int totalClasses,
-    BigDecimal totalTime,
+    /*
+     Time in seconds from TEST-*.xml reports.
+     TODO check why it does not match real test time.
+     */
+    BigDecimal totalTestTimeSeconds,
     int totalTests,
     int totalErrors,
     int totalFailures,
@@ -21,7 +29,7 @@ public record TestTaskOutput(
 ) {
     public static TestTaskOutput empty() {
         return new TestTaskOutput(
-            Instant.now(), Instant.now(),
+            Instant.now(), Instant.now(), BigDecimal.ZERO,
             0, BigDecimal.ZERO,
             0, 0, 0, Collections.emptyMap());
     }

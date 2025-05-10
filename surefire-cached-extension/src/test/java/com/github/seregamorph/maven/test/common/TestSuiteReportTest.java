@@ -16,7 +16,7 @@ class TestSuiteReportTest {
             "failsafe-reports/TEST-com.github.seregamorph.testsmartcontext.demo.SampleIT.xml"));
 
         assertEquals("com.github.seregamorph.testsmartcontext.demo.SampleIT", testSuiteReport.name());
-        assertEquals(new BigDecimal("0.155"), testSuiteReport.time());
+        assertEquals(new BigDecimal("0.155"), testSuiteReport.timeSeconds());
         assertEquals(1, testSuiteReport.tests());
         assertEquals(0, testSuiteReport.errors());
         assertEquals(0, testSuiteReport.failures());
@@ -28,7 +28,7 @@ class TestSuiteReportTest {
             "surefire-reports/TEST-com.github.seregamorph.testsmartcontext.demo.Unit1Test.xml"));
 
         assertEquals("com.github.seregamorph.testsmartcontext.demo.Unit1Test", testSuiteReport.name());
-        assertEquals(new BigDecimal("0.005"), testSuiteReport.time());
+        assertEquals(new BigDecimal("0.005"), testSuiteReport.timeSeconds());
         assertEquals(1, testSuiteReport.tests());
         assertEquals(0, testSuiteReport.errors());
         assertEquals(0, testSuiteReport.failures());

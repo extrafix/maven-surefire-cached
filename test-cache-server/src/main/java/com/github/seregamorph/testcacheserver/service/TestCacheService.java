@@ -69,7 +69,7 @@ public class TestCacheService {
             Counter.builder("cache_saved_time_seconds")
                 .tag("pluginName", cacheEntryKey.pluginName())
                 .register(meterRegistry)
-                .increment(testTaskOutput.totalTime().doubleValue());
+                .increment(testTaskOutput.totalTimeSeconds().doubleValue());
         }
 
         return body;

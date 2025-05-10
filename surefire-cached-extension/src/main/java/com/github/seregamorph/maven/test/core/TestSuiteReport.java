@@ -13,7 +13,7 @@ import org.xml.sax.SAXException;
  *
  * @author Sergey Chernov
  */
-public record TestSuiteReport(String name, BigDecimal time, int tests, int errors, int failures) {
+public record TestSuiteReport(String name, BigDecimal timeSeconds, int tests, int errors, int failures) {
 
     public static TestSuiteReport fromFile(File file) {
         try {
@@ -29,12 +29,12 @@ public record TestSuiteReport(String name, BigDecimal time, int tests, int error
 
             // test class name
             var name = rootElement.getAttribute("name");
-            var time = new BigDecimal(rootElement.getAttribute("time"));
+            var timeSeconds = new BigDecimal(rootElement.getAttribute("time"));
             var tests = Integer.parseInt(rootElement.getAttribute("tests"));
             var errors = Integer.parseInt(rootElement.getAttribute("errors"));
             var failures = Integer.parseInt(rootElement.getAttribute("failures"));
 
-            return new TestSuiteReport(name, time, tests, errors, failures);
+            return new TestSuiteReport(name, timeSeconds, tests, errors, failures);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             throw new RuntimeException("Failed to read " + file, e);
         }

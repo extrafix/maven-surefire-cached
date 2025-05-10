@@ -17,7 +17,9 @@ import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import com.github.seregamorph.maven.test.util.ZipUtils;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URI;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
@@ -79,7 +81,7 @@ public class CachedTestWrapper {
     private void setCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {
         project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_RESULT, result.name());
         project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_TIME,
-            testTaskOutput.totalTime().toString());
+            testTaskOutput.totalTimeSeconds().toString());
 
         var message = result.message(testTaskOutput);
         log.info("Cached execution "
@@ -135,6 +137,10 @@ public class CachedTestWrapper {
         MoreFileUtils.write(taskInputFile, testTaskInputBytes);
         var cacheEntryKey = getLayoutKey(testTaskInput);
 
+        // TODO calculate cache operation time (hash, load, store, etc.)
+        var entryCalculatedTime = Instant.now();
+        log.debug("Cache entry calculated in " + Duration.between(startTime, entryCalculatedTime));
+
         var testTaskOutputBytes = cacheStorage.read(cacheEntryKey, getTaskOutputFileName());
         if (testTaskOutputBytes == null) {
             log.info("Cache miss " + cacheEntryKey);
@@ -159,7 +165,8 @@ public class CachedTestWrapper {
         } else {
             MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
             log.info("Cache hit " + cacheEntryKey);
-            var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class, getTaskOutputFileName());
+            var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class,
+                    getTaskOutputFileName());
             log.info("Restoring reports from cache to " + reportsDirectory);
             restoreCache(cacheEntryKey, testTaskOutput);
             setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
@@ -230,14 +237,14 @@ public class CachedTestWrapper {
         }
 
         int totalClasses = 0;
-        BigDecimal totalTime = BigDecimal.ZERO;
+        BigDecimal totalTestTimeSeconds = BigDecimal.ZERO;
         int totalTests = 0;
         int totalErrors = 0;
         int totalFailures = 0;
         for (var testReport : testReports) {
             var testSuiteSummary = TestSuiteReport.fromFile(testReport);
             totalClasses++;
-            totalTime = totalTime.add(testSuiteSummary.time());
+            totalTestTimeSeconds = totalTestTimeSeconds.add(testSuiteSummary.timeSeconds());
             totalTests += testSuiteSummary.tests();
             totalErrors += testSuiteSummary.errors();
             totalFailures += testSuiteSummary.failures();
@@ -247,8 +254,14 @@ public class CachedTestWrapper {
         files.put(reportsDirectory.getName(), getReportsZipName());
         // todo add jacoco coverage file
 
-        return new TestTaskOutput(startTime, endTime,
-            totalClasses, totalTime, totalTests, totalErrors, totalFailures, files);
+        return new TestTaskOutput(startTime, endTime, getTotalTimeSeconds(startTime, endTime),
+            totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures, files);
+    }
+
+    private static BigDecimal getTotalTimeSeconds(Instant startTime, Instant endTime) {
+        var duration = Duration.between(startTime, endTime);
+        long durationMillis = duration.toMillis();
+        return BigDecimal.valueOf(durationMillis).divide(BigDecimal.valueOf(1000L), 3, RoundingMode.HALF_UP);
     }
 
     private String getTaskInputFileName() {

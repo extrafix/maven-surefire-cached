@@ -12,7 +12,7 @@ public enum TaskOutcome {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(" + testTaskOutput.totalTests() + " tests"
-                + ", " + testTaskOutput.totalTime() + "s)";
+                + ", " + testTaskOutput.totalTestTimeSeconds() + "s)";
         }
     },
     FAILED("serial time") {
@@ -26,7 +26,7 @@ public enum TaskOutcome {
     FROM_CACHE("serial time saved") {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
-            return "(saved " + testTaskOutput.totalTime() + "s)";
+            return "(saved " + testTaskOutput.totalTimeSeconds() + "s)";
         }
     };
 
