@@ -129,7 +129,8 @@ public class CachedTestWrapper {
         MoreFileUtils.delete(taskInputFile);
         MoreFileUtils.delete(taskOutputFile);
 
-        var testTaskInput = testTaskCacheHelper.getTestTaskInput(project, this.delegate, testPluginConfig);
+        var activeProfiles = session.getRequest().getActiveProfiles();
+        var testTaskInput = testTaskCacheHelper.getTestTaskInput(activeProfiles, project, this.delegate, testPluginConfig);
         var testTaskInputBytes = JsonSerializers.serialize(testTaskInput);
         log.debug(new String(testTaskInputBytes, UTF_8));
         MoreFileUtils.write(taskInputFile, testTaskInputBytes);

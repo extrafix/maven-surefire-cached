@@ -23,6 +23,7 @@ public class TestTaskCacheHelper {
     private final FileHashCache fileHashCache = new FileHashCache();
 
     public TestTaskInput getTestTaskInput(
+        List<String> activeProfiles,
         MavenProject project,
         Mojo delegate,
         SurefireCachedConfig.TestPluginConfig testPluginConfig
@@ -74,6 +75,7 @@ public class TestTaskCacheHelper {
         if (testClasspath.testClassesDir().exists()) {
             testTaskInput.setTestClassesHashes(HashUtils.hashDirectory(testClasspath.testClassesDir()));
         }
+        testTaskInput.setActiveProfiles(activeProfiles);
         testTaskInput.setArgLine(call(delegate, String.class, "getArgLine"));
         testTaskInput.setTest(call(delegate, String.class, "getTest"));
         testTaskInput.setArtifactConfigs(testPluginConfig.getArtifacts());

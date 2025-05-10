@@ -69,6 +69,7 @@ public final class TestTaskInput {
     private SortedMap<String, String> classesHashes;
     @Nullable
     private SortedMap<String, String> testClassesHashes;
+    private List<String> activeProfiles;
     private String argLine;
     private String test;
     private List<String> excludes;
@@ -101,6 +102,8 @@ public final class TestTaskInput {
             pw.println("# Test classes");
             testClassesHashes.forEach((key, value) -> pw.println(key + " -> " + value));
         }
+        pw.println("# Profiles");
+        pw.println(activeProfiles);
         pw.println("# Arg line");
         pw.println(argLine);
         pw.println("# Test");
@@ -171,6 +174,10 @@ public final class TestTaskInput {
         properties.put(key, value);
     }
 
+    public void setActiveProfiles(List<String> activeProfiles) {
+        this.activeProfiles = activeProfiles;
+    }
+
     public void setArgLine(String argLine) {
         this.argLine = argLine;
     }
@@ -221,6 +228,10 @@ public final class TestTaskInput {
 
     public SortedMap<String, String> getTestClassesHashes() {
         return testClassesHashes;
+    }
+
+    public List<String> getActiveProfiles() {
+        return activeProfiles;
     }
 
     public String getArgLine() {
