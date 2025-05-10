@@ -21,6 +21,7 @@ import java.math.RoundingMode;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import javax.annotation.Nullable;
@@ -175,11 +176,13 @@ public class CachedTestWrapper {
     SurefireCachedConfig loadSurefireCachedConfig() {
         MavenProject currentProject = this.project;
         do {
-            File surefireCachedConfigFile = new File(currentProject.getBasedir(), CONFIG_FILE_NAME);
-            if (surefireCachedConfigFile.exists()) {
-                return JsonSerializers.deserialize(
-                    MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
-                    surefireCachedConfigFile.toString());
+            for (String fileName : List.of(CONFIG_FILE_NAME, ".mvn/" + CONFIG_FILE_NAME)) {
+                File surefireCachedConfigFile = new File(currentProject.getBasedir(), fileName);
+                if (surefireCachedConfigFile.exists()) {
+                    return JsonSerializers.deserialize(
+                        MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
+                        surefireCachedConfigFile.toString());
+                }
             }
             currentProject = currentProject.getParent();
         } while (currentProject != null && currentProject.getBasedir() != null);
