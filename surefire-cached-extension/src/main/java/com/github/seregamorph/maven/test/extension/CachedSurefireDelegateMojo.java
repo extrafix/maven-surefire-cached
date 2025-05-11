@@ -16,10 +16,10 @@ import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
+import com.github.seregamorph.maven.test.util.TimeFormatUtils;
 import com.github.seregamorph.maven.test.util.ZipUtils;
 import java.io.File;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -280,7 +280,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     private static BigDecimal getTotalTimeSeconds(Instant startTime, Instant endTime) {
         var duration = Duration.between(startTime, endTime);
         long durationMillis = duration.toMillis();
-        return BigDecimal.valueOf(durationMillis).divide(BigDecimal.valueOf(1000L), 3, RoundingMode.HALF_UP);
+        return TimeFormatUtils.toSeconds(durationMillis);
     }
 
     private String getTaskInputFileName() {

@@ -5,9 +5,11 @@ import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_SUR
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_RESULT;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_TIME;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
+import static com.github.seregamorph.maven.test.util.TimeFormatUtils.formatTime;
+import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 
 import com.github.seregamorph.maven.test.common.TaskOutcome;
-import com.github.seregamorph.maven.test.util.TimeFormatUtils;
+import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.TreeMap;
@@ -29,6 +31,7 @@ Hint: monitor values Dashboard
 * Data Received
 * Data Sent
  */
+
 /**
  * @author Sergey Chernov
  */
@@ -66,7 +69,8 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
             for (var project : session.getProjects()) {
                 var cachedResult = project.getProperties().getProperty(pluginName + PROP_SUFFIX_TEST_CACHED_RESULT);
                 if (cachedResult != null) {
-                    var cachedTime = new BigDecimal(project.getProperties().getProperty(pluginName + PROP_SUFFIX_TEST_CACHED_TIME));
+                    var cachedTime =
+                            new BigDecimal(project.getProperties().getProperty(pluginName + PROP_SUFFIX_TEST_CACHED_TIME));
                     results.compute(TaskOutcome.valueOf(cachedResult),
                         (k, v) -> (v == null ? AggResult.EMPTY : v).add(cachedTime));
                     var deletedStr = project.getProperties().getProperty(pluginName + PROP_SUFFIX_TEST_DELETED_ENTRIES);
@@ -80,14 +84,28 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
                 results.forEach((k, v) -> {
                     var suffix = k.suffix();
                     logger.info("{} ({} modules): {}{}", k, v.total,
-                        TimeFormatUtils.formatTime(v.totalTime), suffix == null ? "" : " " + suffix);
+                        formatTime(v.totalTime), suffix == null ? "" : " " + suffix);
                 });
                 if (deleted > 0) {
                     logger.info("Total deleted cache entries: {}", deleted);
                 }
-                logger.info("");
             }
         }
+        logStorageMetrics(this.testTaskCacheHelper.getMetrics());
+        logger.info("");
         this.testTaskCacheHelper.destroy();
+    }
+
+    private static void logStorageMetrics(CacheServiceMetrics metrics) {
+        int readOps = metrics.getReadOperations();
+        long readMillis = metrics.getReadMillis();
+        int writeOps = metrics.getWriteOperations();
+        long writeMillis = metrics.getWriteMillis();
+        if (readOps > 0) {
+            logger.info("Cache read operations: {}, time: {}", readOps, formatTime(toSeconds(readMillis)));
+        }
+        if (writeOps > 0) {
+            logger.info("Cache write operations: {}, time: {}", writeOps, formatTime(toSeconds(writeMillis)));
+        }
     }
 }

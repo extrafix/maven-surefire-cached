@@ -1,11 +1,16 @@
 package com.github.seregamorph.maven.test.util;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @author Sergey Chernov
  */
 public final class TimeFormatUtils {
+
+    public static BigDecimal toSeconds(long durationMillis) {
+        return BigDecimal.valueOf(durationMillis).divide(BigDecimal.valueOf(1000L), 3, RoundingMode.HALF_UP);
+    }
 
     public static String formatTime(BigDecimal seconds) {
         var secondsInt = seconds.intValue();

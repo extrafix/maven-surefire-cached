@@ -7,6 +7,7 @@ import com.github.seregamorph.maven.test.core.FileHashCache;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
+import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
 import com.github.seregamorph.maven.test.util.HashUtils;
 import java.io.File;
 import java.time.Instant;
@@ -31,6 +32,7 @@ public class TestTaskCacheHelper {
 
     private FileHashCache fileHashCache;
     private Set<GroupArtifactId> modules;
+    private CacheServiceMetrics metrics;
     private CacheService cacheService;
 
     public void init(MavenSession session) {
@@ -39,7 +41,8 @@ public class TestTaskCacheHelper {
             .map(p -> new GroupArtifactId(p.getGroupId(), p.getArtifactId()))
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
 
-        this.cacheService = getCacheService(session);
+        this.metrics = new CacheServiceMetrics();
+        this.cacheService = getCacheService(session, metrics);
     }
 
     public void destroy() {
@@ -55,13 +58,20 @@ public class TestTaskCacheHelper {
         return cacheService;
     }
 
-    private static CacheService getCacheService(MavenSession session) {
+    public CacheServiceMetrics getMetrics() {
+        if (metrics == null) {
+            throw new IllegalStateException("metrics is not initialized");
+        }
+        return metrics;
+    }
+
+    private static CacheService getCacheService(MavenSession session, CacheServiceMetrics metrics) {
         String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
         if (cacheStorageUrl == null) {
             cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
         }
         var cacheStorage = CacheStorageFactory.createCacheStorage(cacheStorageUrl);
-        return new CacheService(cacheStorage);
+        return new CacheService(cacheStorage, metrics);
     }
 
     public TestTaskInput getTestTaskInput(
