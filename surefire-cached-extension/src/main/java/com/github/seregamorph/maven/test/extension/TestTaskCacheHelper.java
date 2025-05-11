@@ -4,7 +4,6 @@ import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.core.FileHashCache;
-import com.github.seregamorph.maven.test.core.FileSensitivity;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
@@ -78,7 +77,7 @@ public class TestTaskCacheHelper {
         for (var pluginArtifact : pluginArtifacts) {
             var file = pluginArtifact.getFile();
             // now the file is always null, enhance the caching key on demand
-            var hash = file == null ? null : fileHashCache.getFileHash(file, FileSensitivity.CLASSPATH);
+            var hash = file == null ? null : fileHashCache.getClasspathElementHash(file);
             var groupArtifactId = GroupArtifactId.of(pluginArtifact);
             testTaskInput.addPluginArtifactHash(groupArtifactId, pluginArtifact.getClassifier(),
                 pluginArtifact.getVersion(), hash);
@@ -98,7 +97,7 @@ public class TestTaskCacheHelper {
                 // a classes directory (when "test" command is executed).
                 // The trick is we calculate hash of files which is the same in both cases (jar manifest is ignored)
                 var file = artifact.getFile();
-                var hash = fileHashCache.getFileHash(file, FileSensitivity.CLASSPATH);
+                var hash = fileHashCache.getClasspathElementHash(file);
                 var groupArtifactId = GroupArtifactId.of(artifact);
                 var suffix = file.isDirectory() ? "@dir" : "@" + artifact.getType();
                 if (modules.contains(groupArtifactId)) {

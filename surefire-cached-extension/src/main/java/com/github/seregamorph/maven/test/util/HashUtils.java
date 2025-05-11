@@ -32,6 +32,12 @@ public final class HashUtils {
         return formatDigest(getMessageDigest().digest(array));
     }
 
+    /**
+     * Calculate hash sums of entries from the ZIP archive
+     *
+     * @param file zip file
+     * @return zip entry hash sums
+     */
     @Contract(pure = true)
     public static SortedMap<String, String> hashZipFile(File file) {
         var map = new TreeMap<String, String>();
@@ -71,6 +77,12 @@ public final class HashUtils {
         }
     }
 
+    /**
+     * Calculate hash sums of files from the directory
+     *
+     * @param dir
+     * @return directory entry (relative path) hash sums
+     */
     @Contract(pure = true)
     public static SortedMap<String, String> hashDirectory(File dir) {
         var map = new TreeMap<String, String>();

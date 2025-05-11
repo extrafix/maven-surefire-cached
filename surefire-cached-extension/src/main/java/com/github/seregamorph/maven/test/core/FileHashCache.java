@@ -35,9 +35,18 @@ public class FileHashCache {
         cacheDirectories = CacheBuilder.newBuilder().build();
     }
 
-    public String getFileHash(File file, FileSensitivity sensitivity) {
+    /**
+     * Get hash sum of classpath element which may be a JAR file or a directory with classes. The META-INF/MANIFEST.MF
+     * is ignored if present.
+     * <p>
+     * Note: this method will calculate the same hash sum for class directory and jar archive of the same directory.
+     *
+     * @param file class directory or JAR file
+     * @return aggregated hash sum
+     */
+    public String getClasspathElementHash(File file) {
         try {
-            var cacheKey = file.getCanonicalFile().getAbsolutePath() + ":" + sensitivity;
+            var cacheKey = file.getCanonicalFile().getAbsolutePath();
             if (file.isDirectory()) {
                 Callable<DirHashValue> loader = () -> {
                     var hash = plainHash(HashUtils.hashDirectory(file));
@@ -52,6 +61,7 @@ public class FileHashCache {
                 return fileHashValue.hash();
             } else if (file.exists()) {
                 Callable<FileHashValue> loader = () -> {
+                    // calculate has hums of zip entries ignoring timestamps
                     var hash = plainHash(HashUtils.hashZipFile(file));
                     return new FileHashValue(hash, file.length(), file.lastModified());
                 };
