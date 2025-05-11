@@ -1,5 +1,6 @@
 package com.github.seregamorph.maven.test.common;
 
+import com.github.seregamorph.maven.test.util.ValidatorUtils;
 import java.util.List;
 
 /**
@@ -14,6 +15,7 @@ public record CacheEntryKey(String pluginName, GroupArtifactId groupArtifactId, 
             throw new IllegalArgumentException("Unexpected pluginName [" + pluginName
                 + "], allowed only " + PLUGIN_NAMES);
         }
+        ValidatorUtils.validateFileName(hash);
     }
 
     @Override

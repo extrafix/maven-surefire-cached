@@ -38,7 +38,12 @@ public class FileCacheStorage implements CacheStorage {
 
     private File getEntryFile(CacheEntryKey cacheEntryKey, String fileName) {
         ValidatorUtils.validateFileName(fileName);
-        return new File(baseDir, cacheEntryKey + "/" + fileName);
+        String child = cacheEntryKey + "/" + fileName;
+        if (child.contains("..")) {
+            // this may be a file traversal attack
+            throw new IllegalArgumentException("Illegal file name '" + child + "'");
+        }
+        return new File(baseDir, child);
     }
 
     @Override
