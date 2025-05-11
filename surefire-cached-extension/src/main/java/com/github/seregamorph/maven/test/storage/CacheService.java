@@ -16,10 +16,20 @@ public class CacheService {
     @Nullable
     public byte[] read(CacheEntryKey cacheEntryKey, String fileName) {
         long start = System.nanoTime();
+        Integer bytes = null;
         try {
-            return cacheStorage.read(cacheEntryKey, fileName);
+            byte[] entity = cacheStorage.read(cacheEntryKey, fileName);
+            if (entity != null) {
+                bytes = entity.length;
+            }
+            return entity;
         } finally {
-            metrics.addReadOperation(System.nanoTime() - start);
+            long nanos = System.nanoTime() - start;
+            if (bytes == null) {
+                metrics.addReadMissOperation(nanos);
+            } else {
+                metrics.addReadHitOperation(nanos, bytes);
+            }
         }
     }
 
@@ -28,7 +38,7 @@ public class CacheService {
         try {
             return cacheStorage.write(cacheEntryKey, fileName, value);
         } finally {
-            metrics.addWriteOperation(System.nanoTime() - start);
+            metrics.addWriteOperation(System.nanoTime() - start, value.length);
         }
     }
 }

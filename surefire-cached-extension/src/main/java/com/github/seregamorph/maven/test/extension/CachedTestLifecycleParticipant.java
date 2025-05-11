@@ -97,15 +97,27 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
     }
 
     private static void logStorageMetrics(CacheServiceMetrics metrics) {
-        int readOps = metrics.getReadOperations();
-        long readMillis = metrics.getReadMillis();
+        int readHitOps = metrics.getReadHitOperations();
+        long readHitMillis = metrics.getReadHitMillis();
+        long readHitBytes = metrics.getReadHitBytes();
+        if (readHitOps > 0) {
+            logger.info("Cache hit read operations: {}, time: {}, bytes: {}",
+                readHitOps, formatTime(toSeconds(readHitMillis)), readHitBytes);
+        }
+
+        int readMissOps = metrics.getReadMissOperations();
+        long readMissMillis = metrics.getReadMissMillis();
+        if (readMissOps > 0) {
+            logger.info("Cache miss read operations: {}, time: {}",
+                readMissOps, formatTime(toSeconds(readMissMillis)));
+        }
+
         int writeOps = metrics.getWriteOperations();
         long writeMillis = metrics.getWriteMillis();
-        if (readOps > 0) {
-            logger.info("Cache read operations: {}, time: {}", readOps, formatTime(toSeconds(readMillis)));
-        }
+        long writeBytes = metrics.getWriteBytes();
         if (writeOps > 0) {
-            logger.info("Cache write operations: {}, time: {}", writeOps, formatTime(toSeconds(writeMillis)));
+            logger.info("Cache write operations: {}, time: {}, bytes: {}",
+                writeOps, formatTime(toSeconds(writeMillis)), writeBytes);
         }
     }
 }
