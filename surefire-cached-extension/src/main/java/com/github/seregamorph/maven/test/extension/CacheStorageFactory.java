@@ -1,4 +1,4 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.extension;
 
 import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.storage.FileCacheStorage;

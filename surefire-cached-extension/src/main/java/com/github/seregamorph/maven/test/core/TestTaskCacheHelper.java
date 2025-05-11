@@ -1,6 +1,6 @@
 package com.github.seregamorph.maven.test.core;
 
-import static com.github.seregamorph.maven.test.core.ReflectionUtils.call;
+import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.util.ProjectModuleUtils;

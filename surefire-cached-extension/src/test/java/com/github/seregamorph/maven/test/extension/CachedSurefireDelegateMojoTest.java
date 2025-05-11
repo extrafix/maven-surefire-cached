@@ -1,10 +1,11 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.extension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
+import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -17,7 +18,7 @@ import org.apache.maven.plugin.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
-public class CachedTestWrapperTest {
+public class CachedSurefireDelegateMojoTest {
 
     @Test
     public void shouldReadConfig() {
@@ -35,16 +36,16 @@ public class CachedTestWrapperTest {
         project.setBuild(build);
         var delegate = mock(TestSurefireMojo.class);
         var testTaskCacheHelper = new TestTaskCacheHelper();
-        var cachedTestWrapper = new CachedTestWrapper(testTaskCacheHelper, session, project, delegate,
+        var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper, session, project, delegate,
             TestTaskOutput.PLUGIN_SUREFIRE_CACHED);
 
-        var config = cachedTestWrapper.loadSurefireCachedConfig();
+        var config = cachedDelegateMojo.loadSurefireCachedConfig();
         assertEquals(List.of("com.acme:core"), config.getSurefire().getCacheExcludes());
     }
 
     private static URI getResourceURI(String name) {
         try {
-            URL resource = CachedTestWrapperTest.class.getClassLoader().getResource(name);
+            URL resource = CachedSurefireDelegateMojoTest.class.getClassLoader().getResource(name);
             if (resource == null) {
                 throw new RuntimeException("Resource not found: " + name);
             }

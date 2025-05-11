@@ -1,15 +1,20 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.extension;
 
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_RESULT;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_TIME;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
-import static com.github.seregamorph.maven.test.core.ReflectionUtils.call;
+import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.TaskOutcome;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
+import com.github.seregamorph.maven.test.core.JsonSerializers;
+import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
+import com.github.seregamorph.maven.test.core.TestSuiteReport;
+import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
+import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import com.github.seregamorph.maven.test.util.ZipUtils;
@@ -23,6 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.annotation.Nullable;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,7 +38,7 @@ import org.apache.maven.project.MavenProject;
 /**
  * @author Sergey Chernov
  */
-public class CachedTestWrapper {
+public class CachedSurefireDelegateMojo extends AbstractMojo {
 
     private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
 
@@ -49,12 +55,12 @@ public class CachedTestWrapper {
     private final File projectBuildDirectory;
     private final File reportsDirectory;
 
-    public CachedTestWrapper(
-        TestTaskCacheHelper testTaskCacheHelper,
-        MavenSession session,
-        MavenProject project,
-        Mojo delegate,
-        String pluginName
+    public CachedSurefireDelegateMojo(
+            TestTaskCacheHelper testTaskCacheHelper,
+            MavenSession session,
+            MavenProject project,
+            Mojo delegate,
+            String pluginName
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
         this.session = session;
@@ -86,27 +92,27 @@ public class CachedTestWrapper {
     private void setCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {
         project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_RESULT, result.name());
         project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_TIME,
-            testTaskOutput.totalTimeSeconds().toString());
+                testTaskOutput.totalTimeSeconds().toString());
 
         var message = result.message(testTaskOutput);
         log.info("Cached execution "
-            + project.getGroupId() + ":" + project.getArtifactId()
-            + " " + result + (message == null ? "" : " " + message));
+                + project.getGroupId() + ":" + project.getArtifactId()
+                + " " + result + (message == null ? "" : " " + message));
     }
 
     private void setCachedDeletion(int deleted) {
         if (deleted > 0) {
             project.getProperties()
-                .put(pluginName + PROP_SUFFIX_TEST_DELETED_ENTRIES, Integer.toString(deleted));
+                    .put(pluginName + PROP_SUFFIX_TEST_DELETED_ENTRIES, Integer.toString(deleted));
         }
     }
 
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (call(this.delegate, Boolean.class, "isSkip")
-            || call(this.delegate, Boolean.class, "isSkipTests")
-            || call(this.delegate, Boolean.class, "isSkipExec")
-            || "pom".equals(project.getPackaging())
-            || !projectBuildDirectory.exists()) {
+                || call(this.delegate, Boolean.class, "isSkipTests")
+                || call(this.delegate, Boolean.class, "isSkipExec")
+                || "pom".equals(project.getPackaging())
+                || !projectBuildDirectory.exists()) {
             delegate.execute();
             return;
         }
@@ -168,7 +174,7 @@ public class CachedTestWrapper {
             MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
             log.info("Cache hit " + cacheEntryKey);
             var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class,
-                getTaskOutputFileName());
+                    getTaskOutputFileName());
             log.info("Restoring artifacts from cache to " + projectBuildDirectory);
             restoreCache(cacheEntryKey, testTaskOutput);
             setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
@@ -182,25 +188,25 @@ public class CachedTestWrapper {
                 File surefireCachedConfigFile = new File(currentProject.getBasedir(), fileName);
                 if (surefireCachedConfigFile.exists()) {
                     return JsonSerializers.deserialize(
-                        MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
-                        surefireCachedConfigFile.toString());
+                            MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
+                            surefireCachedConfigFile.toString());
                 }
             }
             currentProject = currentProject.getParent();
         } while (currentProject != null && currentProject.getBasedir() != null);
 
         throw new IllegalStateException("Unable to find surefire cached config file in "
-            + new File(this.project.getBasedir(), CONFIG_FILE_NAME) + " or parent Maven project");
+                + new File(this.project.getBasedir(), CONFIG_FILE_NAME) + " or parent Maven project");
     }
 
     private int storeCache(
-        SurefireCachedConfig.TestPluginConfig testPluginConfig,
-        CacheEntryKey cacheEntryKey,
-        TestTaskInput testTaskInput,
-        TestTaskOutput testTaskOutput
+            SurefireCachedConfig.TestPluginConfig testPluginConfig,
+            CacheEntryKey cacheEntryKey,
+            TestTaskInput testTaskInput,
+            TestTaskOutput testTaskOutput
     ) {
         int deleted = cacheStorage.write(cacheEntryKey, getTaskInputFileName(),
-            JsonSerializers.serialize(testTaskInput));
+                JsonSerializers.serialize(testTaskInput));
         for (Map.Entry<String, SurefireCachedConfig.ArtifactsConfig> entry : testPluginConfig.getArtifacts().entrySet()) {
             var alias = entry.getKey();
             var artifactsConfig = entry.getValue();
@@ -231,18 +237,18 @@ public class CachedTestWrapper {
 
     private CacheEntryKey getLayoutKey(TestTaskInput testTaskInput) {
         return new CacheEntryKey(
-            pluginName,
-            new GroupArtifactId(project.getGroupId(), project.getArtifactId()),
-            testTaskInput.hash());
+                pluginName,
+                new GroupArtifactId(project.getGroupId(), project.getArtifactId()),
+                testTaskInput.hash());
     }
 
     private TestTaskOutput getTaskOutput(
-        @Nullable SurefireCachedConfig.TestPluginConfig testPluginConfig,
-        Instant startTime,
-        Instant endTime
+            @Nullable SurefireCachedConfig.TestPluginConfig testPluginConfig,
+            Instant startTime,
+            Instant endTime
     ) {
         var testReports = reportsDirectory.listFiles((dir, name) ->
-            name.startsWith("TEST-") && name.endsWith(".xml"));
+                name.startsWith("TEST-") && name.endsWith(".xml"));
 
         if (testReports == null) {
             return TestTaskOutput.empty();
@@ -270,7 +276,7 @@ public class CachedTestWrapper {
         }
 
         return new TestTaskOutput(startTime, endTime, getTotalTimeSeconds(startTime, endTime),
-            totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures, files);
+                totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures, files);
     }
 
     private static String getArtifactPackName(String alias) {

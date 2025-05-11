@@ -50,12 +50,19 @@ public class CachedMavenPluginManager implements MavenPluginManager {
     }
 
     @Override
-    public PluginDescriptor getPluginDescriptor(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session) throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
+    public PluginDescriptor getPluginDescriptor(
+        Plugin plugin, List<RemoteRepository> repositories,
+        RepositorySystemSession session
+    ) throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
         return delegate().getPluginDescriptor(plugin, repositories, session);
     }
 
     @Override
-    public MojoDescriptor getMojoDescriptor(Plugin plugin, String goal, List<RemoteRepository> repositories, RepositorySystemSession session) throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
+    public MojoDescriptor getMojoDescriptor(
+        Plugin plugin, String goal, List<RemoteRepository> repositories,
+        RepositorySystemSession session
+    ) throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+        InvalidPluginDescriptorException {
         return delegate().getMojoDescriptor(plugin, goal, repositories, session);
     }
 
@@ -65,26 +72,36 @@ public class CachedMavenPluginManager implements MavenPluginManager {
     }
 
     @Override
-    public void setupPluginRealm(PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent, List<String> imports, DependencyFilter filter) throws PluginResolutionException, PluginContainerException {
+    public void setupPluginRealm(
+        PluginDescriptor pluginDescriptor, MavenSession session, ClassLoader parent,
+        List<String> imports, DependencyFilter filter
+    ) throws PluginResolutionException, PluginContainerException {
         delegate().setupPluginRealm(pluginDescriptor, session, parent, imports, filter);
     }
 
     @Override
-    public ExtensionRealmCache.CacheRecord setupExtensionsRealm(MavenProject project, Plugin plugin, RepositorySystemSession session) throws PluginManagerException {
+    public ExtensionRealmCache.CacheRecord setupExtensionsRealm(
+        MavenProject project, Plugin plugin,
+        RepositorySystemSession session
+    ) throws PluginManagerException {
         return delegate().setupExtensionsRealm(project, plugin, session);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getConfiguredMojo(Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution) throws PluginConfigurationException, PluginContainerException {
+    public <T> T getConfiguredMojo(
+        Class<T> mojoInterface, MavenSession session, MojoExecution mojoExecution
+    ) throws PluginConfigurationException, PluginContainerException {
         T mojo = delegate().getConfiguredMojo(mojoInterface, session, mojoExecution);
         if ("org.apache.maven.plugin.surefire.SurefireMojo".equals(mojo.getClass().getName())
             || "org.apache.maven.plugin.surefire.SurefirePlugin".equals(mojo.getClass().getName())) {
             // we should normally generate a proxy here, but in the maven-core there is only one known call of
             // getConfiguredMojo method with mojoInterface=Mojo.class
-            return (T) new CachedDelegatingMojo(testTaskCacheHelper, session, session.getCurrentProject(), (Mojo) mojo, PLUGIN_SUREFIRE_CACHED);
+            return (T) new CachedSurefireDelegateMojo(testTaskCacheHelper, session, session.getCurrentProject(),
+                (Mojo) mojo, PLUGIN_SUREFIRE_CACHED);
         } else if ("org.apache.maven.plugin.failsafe.IntegrationTestMojo".equals(mojo.getClass().getName())) {
-            return (T) new CachedDelegatingMojo(testTaskCacheHelper, session, session.getCurrentProject(), (Mojo) mojo, PLUGIN_FAILSAFE_CACHED);
+            return (T) new CachedSurefireDelegateMojo(testTaskCacheHelper, session, session.getCurrentProject(),
+                (Mojo) mojo, PLUGIN_FAILSAFE_CACHED);
         }
         return mojo;
     }
