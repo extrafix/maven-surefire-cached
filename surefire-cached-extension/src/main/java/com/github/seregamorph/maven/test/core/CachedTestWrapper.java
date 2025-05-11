@@ -214,17 +214,16 @@ public class CachedTestWrapper {
     }
 
     private void restoreCache(CacheEntryKey cacheEntryKey, TestTaskOutput testTaskOutput) {
-        testTaskOutput.files().forEach((unpackedName, packedName) -> {
+        testTaskOutput.files().forEach((alias, packedName) -> {
             var packedContent = cacheStorage.read(cacheEntryKey, packedName);
             if (packedContent == null) {
                 throw new IllegalStateException("Cache file not found " + cacheEntryKey + " " + packedName);
             }
 
-            var zipFile = new File(projectBuildDirectory, packedName);
-            MoreFileUtils.write(zipFile, packedContent);
-            var unpackedFile = new File(projectBuildDirectory, unpackedName);
-            MoreFileUtils.delete(unpackedFile);
-            ZipUtils.unpackDirectory(zipFile, unpackedFile);
+            var packFile = new File(projectBuildDirectory, packedName);
+            MoreFileUtils.write(packFile, packedContent);
+            ZipUtils.unpackDirectory(packFile, projectBuildDirectory);
+            MoreFileUtils.delete(packFile);
         });
     }
 
