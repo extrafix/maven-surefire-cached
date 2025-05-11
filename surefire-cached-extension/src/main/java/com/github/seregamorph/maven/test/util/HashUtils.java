@@ -43,7 +43,7 @@ public final class HashUtils {
                 }
             }
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new UncheckedIOException("Failed to unzip " + file, e);
         }
         return map;
     }
