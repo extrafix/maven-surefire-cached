@@ -9,37 +9,34 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
+/**
+ * @author Sergey Chernov
+ */
 public class CachedDelegatingMojo extends AbstractMojo {
 
-    private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
-
+    private final TestTaskCacheHelper testTaskCacheHelper;
     private final MavenSession session;
     private final MavenProject project;
     private final Mojo delegate;
-    private final TestTaskCacheHelper testTaskCacheHelper;
     private final String pluginName;
 
-    public CachedDelegatingMojo(MavenSession session, MavenProject project, Mojo delegate,
-                                TestTaskCacheHelper testTaskCacheHelper, String pluginName) {
+    public CachedDelegatingMojo(
+        TestTaskCacheHelper testTaskCacheHelper,
+        MavenSession session,
+        MavenProject project,
+        Mojo delegate,
+        String pluginName
+    ) {
+        this.testTaskCacheHelper = testTaskCacheHelper;
         this.session = session;
         this.project = project;
         this.delegate = delegate;
-        this.testTaskCacheHelper = testTaskCacheHelper;
         this.pluginName = pluginName;
     }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        String cacheStorage = project.getProperties().getProperty(PROP_CACHE_STORAGE_URL);
-        if (cacheStorage == null) {
-            cacheStorage = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
-        }
-        if (cacheStorage == null) {
-            cacheStorage = System.getProperty("user.home") + "/.m2/test-cache";
-        }
-
-        var cachedTestWrapper = new CachedTestWrapper(session, project, delegate, testTaskCacheHelper,
-            cacheStorage, pluginName);
-        cachedTestWrapper.execute(delegate::execute);
+        var cachedTestWrapper = new CachedTestWrapper(testTaskCacheHelper, session, project, delegate, pluginName);
+        cachedTestWrapper.execute();
     }
 }

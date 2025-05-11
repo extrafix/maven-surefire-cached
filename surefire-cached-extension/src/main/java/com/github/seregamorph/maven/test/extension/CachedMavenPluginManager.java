@@ -82,9 +82,9 @@ public class CachedMavenPluginManager implements MavenPluginManager {
             || "org.apache.maven.plugin.surefire.SurefirePlugin".equals(mojo.getClass().getName())) {
             // we should normally generate a proxy here, but in the maven-core there is only one known call of
             // getConfiguredMojo method with mojoInterface=Mojo.class
-            return (T) new CachedDelegatingMojo(session, session.getCurrentProject(), (Mojo) mojo, testTaskCacheHelper, PLUGIN_SUREFIRE_CACHED);
+            return (T) new CachedDelegatingMojo(testTaskCacheHelper, session, session.getCurrentProject(), (Mojo) mojo, PLUGIN_SUREFIRE_CACHED);
         } else if ("org.apache.maven.plugin.failsafe.IntegrationTestMojo".equals(mojo.getClass().getName())) {
-            return (T) new CachedDelegatingMojo(session, session.getCurrentProject(), (Mojo) mojo, testTaskCacheHelper, PLUGIN_FAILSAFE_CACHED);
+            return (T) new CachedDelegatingMojo(testTaskCacheHelper, session, session.getCurrentProject(), (Mojo) mojo, PLUGIN_FAILSAFE_CACHED);
         }
         return mojo;
     }

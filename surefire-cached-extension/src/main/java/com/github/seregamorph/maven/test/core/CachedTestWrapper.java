@@ -11,14 +11,11 @@ import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.TaskOutcome;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
-import com.github.seregamorph.maven.test.storage.FileCacheStorage;
-import com.github.seregamorph.maven.test.storage.HttpCacheStorage;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import com.github.seregamorph.maven.test.util.ZipUtils;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
@@ -37,33 +34,36 @@ import org.apache.maven.project.MavenProject;
  */
 public class CachedTestWrapper {
 
+    private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
+
     private static final String CONFIG_FILE_NAME = "surefire-cached.json";
 
+    private final TestTaskCacheHelper testTaskCacheHelper;
     private final MavenSession session;
     private final MavenProject project;
     private final Mojo delegate;
-    private final TestTaskCacheHelper testTaskCacheHelper;
-    private final CacheStorage cacheStorage;
     private final String pluginName;
 
+    private final CacheStorage cacheStorage;
     private final Log log;
     private final File projectBuildDirectory;
     private final File reportsDirectory;
 
     public CachedTestWrapper(
+        TestTaskCacheHelper testTaskCacheHelper,
         MavenSession session,
         MavenProject project,
         Mojo delegate,
-        TestTaskCacheHelper testTaskCacheHelper,
-        String cacheStorage,
         String pluginName
     ) {
+        this.testTaskCacheHelper = testTaskCacheHelper;
         this.session = session;
         this.project = project;
         this.delegate = delegate;
-        this.testTaskCacheHelper = testTaskCacheHelper;
-        this.cacheStorage = createCacheStorage(cacheStorage);
         this.pluginName = pluginName;
+
+        String cacheStorage = getCacheStorage(session, project);
+        this.cacheStorage = CacheStorageFactory.createCacheStorage(cacheStorage);
 
         this.log = delegate.getLog();
         // "target" subdir of basedir
@@ -72,13 +72,15 @@ public class CachedTestWrapper {
         this.reportsDirectory = call(delegate, File.class, "getReportsDirectory");
     }
 
-    private static CacheStorage createCacheStorage(String cacheStorage) {
-        //noinspection HttpUrlsUsage
-        if (cacheStorage.startsWith("http://") || cacheStorage.startsWith("https://")) {
-            return new HttpCacheStorage(URI.create(cacheStorage));
+    private static String getCacheStorage(MavenSession session, MavenProject project) {
+        String cacheStorage = project.getProperties().getProperty(PROP_CACHE_STORAGE_URL);
+        if (cacheStorage == null) {
+            cacheStorage = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
         }
-
-        return new FileCacheStorage(new File(cacheStorage));
+        if (cacheStorage == null) {
+            cacheStorage = System.getProperty("user.home") + "/.m2/test-cache";
+        }
+        return cacheStorage;
     }
 
     private void setCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {
@@ -99,7 +101,7 @@ public class CachedTestWrapper {
         }
     }
 
-    public void execute(MojoDelegate delegate) throws MojoExecutionException, MojoFailureException {
+    public void execute() throws MojoExecutionException, MojoFailureException {
         if (call(this.delegate, Boolean.class, "isSkip")
             || call(this.delegate, Boolean.class, "isSkipTests")
             || call(this.delegate, Boolean.class, "isSkipExec")
@@ -301,9 +303,5 @@ public class CachedTestWrapper {
 
     private static boolean isEmptyOrTrue(String value) {
         return "".equals(value) || "true".equals(value);
-    }
-
-    public interface MojoDelegate {
-        void execute() throws MojoExecutionException, MojoFailureException;
     }
 }

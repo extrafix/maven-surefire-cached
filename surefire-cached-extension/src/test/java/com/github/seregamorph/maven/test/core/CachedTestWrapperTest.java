@@ -1,6 +1,8 @@
 package com.github.seregamorph.maven.test.core;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import java.io.File;
@@ -8,12 +10,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Properties;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Build;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 public class CachedTestWrapperTest {
 
@@ -23,16 +25,18 @@ public class CachedTestWrapperTest {
         var testPomFile = new File(testPomResource.getPath());
         var basedir = testPomFile.getParentFile();
 
-        var session = Mockito.mock(MavenSession.class);
+        var userProperties = new Properties();
+        var session = mock(MavenSession.class);
+        when(session.getUserProperties()).thenReturn(userProperties);
         var build = new Build();
         build.setDirectory(new File(basedir, "target").getAbsolutePath());
         var project = new MavenProject();
         project.setFile(testPomFile);
         project.setBuild(build);
-        var delegate = Mockito.mock(TestSurefireMojo.class);
+        var delegate = mock(TestSurefireMojo.class);
         var testTaskCacheHelper = new TestTaskCacheHelper();
-        var cachedTestWrapper = new CachedTestWrapper(session, project, delegate, testTaskCacheHelper,
-            "http://localhost:8080", TestTaskOutput.PLUGIN_SUREFIRE_CACHED);
+        var cachedTestWrapper = new CachedTestWrapper(testTaskCacheHelper, session, project, delegate,
+            TestTaskOutput.PLUGIN_SUREFIRE_CACHED);
 
         var config = cachedTestWrapper.loadSurefireCachedConfig();
         assertEquals(List.of("com.acme:core"), config.getSurefire().getCacheExcludes());
