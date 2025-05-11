@@ -14,7 +14,7 @@ import com.github.seregamorph.maven.test.core.JsonSerializers;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
 import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
-import com.github.seregamorph.maven.test.storage.CacheStorage;
+import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import com.github.seregamorph.maven.test.util.ZipUtils;
 import java.io.File;
@@ -42,7 +42,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     private static final String CONFIG_FILE_NAME = "surefire-cached.json";
 
     private final TestTaskCacheHelper testTaskCacheHelper;
-    private final CacheStorage cacheStorage;
+    private final CacheService cacheService;
     private final MavenSession session;
     private final MavenProject project;
     private final Mojo delegate;
@@ -60,7 +60,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             String pluginName
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
-        this.cacheStorage = testTaskCacheHelper.getCacheStorage();
+        this.cacheService = testTaskCacheHelper.getCacheService();
         this.session = session;
         this.project = project;
         this.delegate = delegate;
@@ -133,7 +133,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         var entryCalculatedTime = Instant.now();
         log.debug("Cache entry calculated in " + Duration.between(startTime, entryCalculatedTime));
 
-        var testTaskOutputBytes = cacheStorage.read(cacheEntryKey, getTaskOutputFileName());
+        var testTaskOutputBytes = cacheService.read(cacheEntryKey, getTaskOutputFileName());
         if (testTaskOutputBytes == null) {
             log.info("Cache miss " + cacheEntryKey);
             boolean success = false;
@@ -189,7 +189,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             TestTaskInput testTaskInput,
             TestTaskOutput testTaskOutput
     ) {
-        int deleted = cacheStorage.write(cacheEntryKey, getTaskInputFileName(),
+        int deleted = cacheService.write(cacheEntryKey, getTaskInputFileName(),
                 JsonSerializers.serialize(testTaskInput));
         for (Map.Entry<String, SurefireCachedConfig.ArtifactsConfig> entry : testPluginConfig.getArtifacts().entrySet()) {
             var alias = entry.getKey();
@@ -198,16 +198,16 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             var packFile = new File(projectBuildDirectory, artifactPackName);
             MoreFileUtils.delete(packFile);
             ZipUtils.packDirectory(projectBuildDirectory, artifactsConfig.getIncludes(), packFile);
-            deleted += cacheStorage.write(cacheEntryKey, artifactPackName, MoreFileUtils.read(packFile));
+            deleted += cacheService.write(cacheEntryKey, artifactPackName, MoreFileUtils.read(packFile));
         }
         var testTaskOutputBytes = JsonSerializers.serialize(testTaskOutput);
-        deleted += cacheStorage.write(cacheEntryKey, getTaskOutputFileName(), testTaskOutputBytes);
+        deleted += cacheService.write(cacheEntryKey, getTaskOutputFileName(), testTaskOutputBytes);
         return deleted;
     }
 
     private void restoreCache(CacheEntryKey cacheEntryKey, TestTaskOutput testTaskOutput) {
         testTaskOutput.files().forEach((alias, packedName) -> {
-            var packedContent = cacheStorage.read(cacheEntryKey, packedName);
+            var packedContent = cacheService.read(cacheEntryKey, packedName);
             if (packedContent == null) {
                 throw new IllegalStateException("Cache file not found " + cacheEntryKey + " " + packedName);
             }

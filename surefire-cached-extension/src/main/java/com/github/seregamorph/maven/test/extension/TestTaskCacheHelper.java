@@ -6,7 +6,7 @@ import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.core.FileHashCache;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
-import com.github.seregamorph.maven.test.storage.CacheStorage;
+import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.util.HashUtils;
 import java.io.File;
 import java.time.Instant;
@@ -31,7 +31,7 @@ public class TestTaskCacheHelper {
 
     private FileHashCache fileHashCache;
     private Set<GroupArtifactId> modules;
-    private CacheStorage cacheStorage;
+    private CacheService cacheService;
 
     public void init(MavenSession session) {
         fileHashCache = new FileHashCache();
@@ -39,28 +39,29 @@ public class TestTaskCacheHelper {
             .map(p -> new GroupArtifactId(p.getGroupId(), p.getArtifactId()))
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
 
-        this.cacheStorage = getCacheStorage(session);
+        this.cacheService = getCacheService(session);
     }
 
     public void destroy() {
         fileHashCache = null;
         modules = null;
-        cacheStorage = null;
+        cacheService = null;
     }
 
-    public CacheStorage getCacheStorage() {
-        if (cacheStorage == null) {
+    public CacheService getCacheService() {
+        if (cacheService == null) {
             throw new IllegalStateException("cacheStorage is not initialized");
         }
-        return cacheStorage;
+        return cacheService;
     }
 
-    private static CacheStorage getCacheStorage(MavenSession session) {
+    private static CacheService getCacheService(MavenSession session) {
         String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
         if (cacheStorageUrl == null) {
             cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
         }
-        return CacheStorageFactory.createCacheStorage(cacheStorageUrl);
+        var cacheStorage = CacheStorageFactory.createCacheStorage(cacheStorageUrl);
+        return new CacheService(cacheStorage);
     }
 
     public TestTaskInput getTestTaskInput(
