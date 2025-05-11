@@ -59,7 +59,6 @@
     <modules>
         <module>surefire-cached-common</module>
         <module>surefire-cached-extension</module>
-        <module>test-cache-server</module>
     </modules>
 
     <build>
@@ -250,6 +249,18 @@
     </dependencies>
 
     <profiles>
+        <profile>
+            <id>test-cache-server</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>test-cache-server</module>
+            </modules>
+        </profile>
         <profile>
             <id>release-sign-artifacts</id>
             <activation>
