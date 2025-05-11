@@ -10,28 +10,39 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.project.MavenProject;
 
 /**
  * @author Sergey Chernov
  */
+@Singleton
 public class TestTaskCacheHelper {
 
-    private final FileHashCache fileHashCache = new FileHashCache();
+    private FileHashCache fileHashCache;
+    private Set<GroupArtifactId> modules;
+
+    public void init(MavenSession session) {
+        fileHashCache = new FileHashCache();
+        modules = session.getAllProjects().stream()
+            .map(p -> new GroupArtifactId(p.getGroupId(), p.getArtifactId()))
+            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
+    }
+
+    public void destroy() {
+        fileHashCache = null;
+        modules = null;
+    }
 
     public TestTaskInput getTestTaskInput(
-        List<MavenProject> allProjects,
         List<String> activeProfiles,
         MavenProject project,
         Mojo delegate,
         SurefireCachedConfig.TestPluginConfig testPluginConfig
     ) {
-        var modules = allProjects.stream()
-            .map(p -> new GroupArtifactId(p.getGroupId(), p.getArtifactId()))
-            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
-
         var testTaskInput = new TestTaskInput();
         testTaskInput.addIgnoredProperty("timestamp", Instant.now().toString());
         // todo git commit hash

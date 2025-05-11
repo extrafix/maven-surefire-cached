@@ -7,10 +7,12 @@ import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFI
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
 
 import com.github.seregamorph.maven.test.common.TaskOutcome;
+import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
 import com.github.seregamorph.maven.test.util.TimeFormatUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.TreeMap;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.SessionScoped;
@@ -45,6 +47,18 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         }
     }
 
+    private final TestTaskCacheHelper testTaskCacheHelper;
+
+    @Inject
+    public CachedTestLifecycleParticipant(TestTaskCacheHelper testTaskCacheHelper) {
+        this.testTaskCacheHelper = testTaskCacheHelper;
+    }
+
+    @Override
+    public void afterProjectsRead(MavenSession session) {
+        this.testTaskCacheHelper.init(session);
+    }
+
     @Override
     public void afterSessionEnd(MavenSession session) {
         for (var pluginName : List.of(PLUGIN_SUREFIRE_CACHED, PLUGIN_FAILSAFE_CACHED)) {
@@ -75,5 +89,6 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
                 logger.info("");
             }
         }
+        this.testTaskCacheHelper.destroy();
     }
 }
