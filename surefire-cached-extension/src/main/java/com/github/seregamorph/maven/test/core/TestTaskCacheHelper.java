@@ -3,11 +3,12 @@ package com.github.seregamorph.maven.test.core;
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
-import com.github.seregamorph.maven.test.util.ProjectModuleUtils;
 import java.io.File;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.Mojo;
@@ -21,12 +22,15 @@ public class TestTaskCacheHelper {
     private final FileHashCache fileHashCache = new FileHashCache();
 
     public TestTaskInput getTestTaskInput(
+        List<MavenProject> allProjects,
         List<String> activeProfiles,
         MavenProject project,
         Mojo delegate,
         SurefireCachedConfig.TestPluginConfig testPluginConfig
     ) {
-        var modules = ProjectModuleUtils.getProjectModules(project);
+        var modules = allProjects.stream()
+            .map(p -> new GroupArtifactId(p.getGroupId(), p.getArtifactId()))
+            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
 
         var testTaskInput = new TestTaskInput();
         testTaskInput.addIgnoredProperty("timestamp", Instant.now().toString());
