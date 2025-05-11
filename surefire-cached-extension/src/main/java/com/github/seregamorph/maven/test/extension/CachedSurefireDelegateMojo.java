@@ -107,6 +107,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         }
     }
 
+    @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (call(this.delegate, Boolean.class, "isSkip")
                 || call(this.delegate, Boolean.class, "isSkipTests")
@@ -119,7 +120,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
         var startTime = Instant.now();
 
-        // todo support jacoco coverage file
         MoreFileUtils.delete(reportsDirectory);
 
         var skipCache = isEmptyOrTrue(session.getSystemProperties().getProperty("skipCache"));
