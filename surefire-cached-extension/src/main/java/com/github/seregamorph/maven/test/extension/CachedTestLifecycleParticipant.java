@@ -5,6 +5,7 @@ import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_SUR
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_RESULT;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_TIME;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
+import static com.github.seregamorph.maven.test.util.ByteSizeFormatUtils.formatByteSize;
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.formatTime;
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 
@@ -101,8 +102,8 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         long readHitMillis = metrics.getReadHitMillis();
         long readHitBytes = metrics.getReadHitBytes();
         if (readHitOps > 0) {
-            logger.info("Cache hit read operations: {}, time: {}, bytes: {}",
-                readHitOps, formatTime(toSeconds(readHitMillis)), readHitBytes);
+            logger.info("Cache hit read operations: {}, time: {}, size: {}",
+                readHitOps, formatTime(toSeconds(readHitMillis)), formatByteSize(readHitBytes));
         }
 
         int readMissOps = metrics.getReadMissOperations();
@@ -116,8 +117,8 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         long writeMillis = metrics.getWriteMillis();
         long writeBytes = metrics.getWriteBytes();
         if (writeOps > 0) {
-            logger.info("Cache write operations: {}, time: {}, bytes: {}",
-                writeOps, formatTime(toSeconds(writeMillis)), writeBytes);
+            logger.info("Cache write operations: {}, time: {}, size: {}",
+                writeOps, formatTime(toSeconds(writeMillis)), formatByteSize(writeBytes));
         }
     }
 }
