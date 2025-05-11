@@ -3,6 +3,7 @@ package com.github.seregamorph.maven.test.core;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.github.seregamorph.maven.test.util.HashUtils;
 import java.io.File;
 import java.util.TreeMap;
 import javax.inject.Inject;

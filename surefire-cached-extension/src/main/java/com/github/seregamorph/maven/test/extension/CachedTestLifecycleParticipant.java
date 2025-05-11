@@ -7,7 +7,6 @@ import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFI
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
 
 import com.github.seregamorph.maven.test.common.TaskOutcome;
-import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
 import com.github.seregamorph.maven.test.util.TimeFormatUtils;
 import java.math.BigDecimal;
 import java.util.List;

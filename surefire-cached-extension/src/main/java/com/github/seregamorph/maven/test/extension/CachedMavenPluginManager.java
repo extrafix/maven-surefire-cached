@@ -3,7 +3,6 @@ package com.github.seregamorph.maven.test.extension;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_FAILSAFE_CACHED;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_SUREFIRE_CACHED;
 
-import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;

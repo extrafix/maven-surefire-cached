@@ -1,4 +1,4 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.util;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,20 +20,20 @@ import org.jetbrains.annotations.Contract;
 /**
  * @author Sergey Chernov
  */
-final class HashUtils {
+public final class HashUtils {
 
     /**
      * Hash of an empty directory or jar file.
      */
-    static final String HASH_EMPTY_FILE_COLLECTION = "00000000000000000000000000000000";
+    public static final String HASH_EMPTY_FILE_COLLECTION = "00000000000000000000000000000000";
 
     @Contract(pure = true)
-    static String hashArray(byte[] array) {
+    public static String hashArray(byte[] array) {
         return formatDigest(getMessageDigest().digest(array));
     }
 
     @Contract(pure = true)
-    static SortedMap<String, String> hashZipFile(File file) {
+    public static SortedMap<String, String> hashZipFile(File file) {
         var map = new TreeMap<String, String>();
         try (var zipStream = new ZipInputStream(new FileInputStream(file))) {
             ZipEntry zipEntry;
@@ -72,7 +72,7 @@ final class HashUtils {
     }
 
     @Contract(pure = true)
-    static SortedMap<String, String> hashDirectory(File dir) {
+    public static SortedMap<String, String> hashDirectory(File dir) {
         var map = new TreeMap<String, String>();
         hashDirectory(map, dir.toPath(), dir.toPath());
         return map;

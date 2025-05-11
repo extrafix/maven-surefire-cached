@@ -1,5 +1,6 @@
 package com.github.seregamorph.maven.test.core;
 
+import com.github.seregamorph.maven.test.util.HashUtils;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import java.io.File;

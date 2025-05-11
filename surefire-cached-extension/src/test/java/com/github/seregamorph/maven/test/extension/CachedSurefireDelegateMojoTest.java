@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
-import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -26,16 +25,19 @@ public class CachedSurefireDelegateMojoTest {
         var testPomFile = new File(testPomResource.getPath());
         var basedir = testPomFile.getParentFile();
 
-        var userProperties = new Properties();
-        var session = mock(MavenSession.class);
-        when(session.getUserProperties()).thenReturn(userProperties);
         var build = new Build();
         build.setDirectory(new File(basedir, "target").getAbsolutePath());
         var project = new MavenProject();
         project.setFile(testPomFile);
         project.setBuild(build);
+
+        var userProperties = new Properties();
+        var session = mock(MavenSession.class);
+        when(session.getUserProperties()).thenReturn(userProperties);
+        when(session.getAllProjects()).thenReturn(List.of(project));
         var delegate = mock(TestSurefireMojo.class);
         var testTaskCacheHelper = new TestTaskCacheHelper();
+        testTaskCacheHelper.init(session);
         var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper, session, project, delegate,
             TestTaskOutput.PLUGIN_SUREFIRE_CACHED);
 

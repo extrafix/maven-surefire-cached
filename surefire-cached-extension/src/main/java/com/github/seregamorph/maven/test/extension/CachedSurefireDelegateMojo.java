@@ -13,7 +13,6 @@ import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import com.github.seregamorph.maven.test.core.JsonSerializers;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
 import com.github.seregamorph.maven.test.core.TestSuiteReport;
-import com.github.seregamorph.maven.test.core.TestTaskCacheHelper;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
@@ -40,17 +39,15 @@ import org.apache.maven.project.MavenProject;
  */
 public class CachedSurefireDelegateMojo extends AbstractMojo {
 
-    private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
-
     private static final String CONFIG_FILE_NAME = "surefire-cached.json";
 
     private final TestTaskCacheHelper testTaskCacheHelper;
+    private final CacheStorage cacheStorage;
     private final MavenSession session;
     private final MavenProject project;
     private final Mojo delegate;
     private final String pluginName;
 
-    private final CacheStorage cacheStorage;
     private final Log log;
     private final File projectBuildDirectory;
     private final File reportsDirectory;
@@ -63,30 +60,17 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             String pluginName
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
+        this.cacheStorage = testTaskCacheHelper.getCacheStorage();
         this.session = session;
         this.project = project;
         this.delegate = delegate;
         this.pluginName = pluginName;
-
-        String cacheStorage = getCacheStorage(session, project);
-        this.cacheStorage = CacheStorageFactory.createCacheStorage(cacheStorage);
 
         this.log = delegate.getLog();
         // "target" subdir of basedir
         this.projectBuildDirectory = new File(project.getBuild().getDirectory());
         // "target/surefire-reports" or "target/failsafe-reports"
         this.reportsDirectory = call(delegate, File.class, "getReportsDirectory");
-    }
-
-    private static String getCacheStorage(MavenSession session, MavenProject project) {
-        String cacheStorage = project.getProperties().getProperty(PROP_CACHE_STORAGE_URL);
-        if (cacheStorage == null) {
-            cacheStorage = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
-        }
-        if (cacheStorage == null) {
-            cacheStorage = System.getProperty("user.home") + "/.m2/test-cache";
-        }
-        return cacheStorage;
     }
 
     private void setCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {

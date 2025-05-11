@@ -1,8 +1,14 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.extension;
 
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
+import com.github.seregamorph.maven.test.core.FileHashCache;
+import com.github.seregamorph.maven.test.core.FileSensitivity;
+import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
+import com.github.seregamorph.maven.test.core.TestTaskInput;
+import com.github.seregamorph.maven.test.storage.CacheStorage;
+import com.github.seregamorph.maven.test.util.HashUtils;
 import java.io.File;
 import java.time.Instant;
 import java.util.Comparator;
@@ -22,19 +28,40 @@ import org.apache.maven.project.MavenProject;
 @Singleton
 public class TestTaskCacheHelper {
 
+    private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
+
     private FileHashCache fileHashCache;
     private Set<GroupArtifactId> modules;
+    private CacheStorage cacheStorage;
 
     public void init(MavenSession session) {
         fileHashCache = new FileHashCache();
         modules = session.getAllProjects().stream()
             .map(p -> new GroupArtifactId(p.getGroupId(), p.getArtifactId()))
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
+
+        this.cacheStorage = getCacheStorage(session);
     }
 
     public void destroy() {
         fileHashCache = null;
         modules = null;
+        cacheStorage = null;
+    }
+
+    public CacheStorage getCacheStorage() {
+        if (cacheStorage == null) {
+            throw new IllegalStateException("cacheStorage is not initialized");
+        }
+        return cacheStorage;
+    }
+
+    private static CacheStorage getCacheStorage(MavenSession session) {
+        String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
+        if (cacheStorageUrl == null) {
+            cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
+        }
+        return CacheStorageFactory.createCacheStorage(cacheStorageUrl);
     }
 
     public TestTaskInput getTestTaskInput(

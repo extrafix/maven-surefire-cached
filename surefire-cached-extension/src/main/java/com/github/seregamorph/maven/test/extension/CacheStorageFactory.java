@@ -8,13 +8,13 @@ import java.net.URI;
 
 public class CacheStorageFactory {
 
-    static CacheStorage createCacheStorage(String cacheStorage) {
+    public static CacheStorage createCacheStorage(String cacheStorageUrl) {
         //noinspection HttpUrlsUsage
-        if (cacheStorage.startsWith("http://") || cacheStorage.startsWith("https://")) {
-            return new HttpCacheStorage(URI.create(cacheStorage));
+        if (cacheStorageUrl.startsWith("http://") || cacheStorageUrl.startsWith("https://")) {
+            return new HttpCacheStorage(URI.create(cacheStorageUrl));
         }
 
-        return new FileCacheStorage(new File(cacheStorage));
+        return new FileCacheStorage(new File(cacheStorageUrl));
     }
 
     private CacheStorageFactory() {
