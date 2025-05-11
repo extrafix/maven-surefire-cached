@@ -42,11 +42,10 @@ public class CachedMavenPluginManager implements MavenPluginManager {
 
     @Inject
     public CachedMavenPluginManager(
-        Provider<DefaultMavenPluginManager> defaultMavenPluginManagerProvider,
-        TestTaskCacheHelper testTaskCacheHelper
+        Provider<DefaultMavenPluginManager> defaultMavenPluginManagerProvider
     ) {
         this.defaultMavenPluginManagerProvider = defaultMavenPluginManagerProvider;
-        this.testTaskCacheHelper = testTaskCacheHelper;
+        this.testTaskCacheHelper = new TestTaskCacheHelper();
     }
 
     @Override

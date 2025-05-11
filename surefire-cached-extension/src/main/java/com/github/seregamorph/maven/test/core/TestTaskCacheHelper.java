@@ -9,7 +9,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.project.MavenProject;
@@ -17,7 +16,6 @@ import org.apache.maven.project.MavenProject;
 /**
  * @author Sergey Chernov
  */
-@Singleton
 public class TestTaskCacheHelper {
 
     private final FileHashCache fileHashCache = new FileHashCache();
