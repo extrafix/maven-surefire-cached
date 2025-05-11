@@ -2,6 +2,7 @@ package com.github.seregamorph.maven.test.storage;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
+import com.github.seregamorph.maven.test.util.ValidatorUtils;
 import java.io.File;
 import java.util.Comparator;
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ public class FileCacheStorage implements CacheStorage {
     }
 
     private File getEntryFile(CacheEntryKey cacheEntryKey, String fileName) {
-        verifyFileName(fileName);
+        ValidatorUtils.validateFileName(fileName);
         return new File(baseDir, cacheEntryKey + "/" + fileName);
     }
 
@@ -98,15 +99,5 @@ public class FileCacheStorage implements CacheStorage {
 
         directory.mkdirs();
         return deleted;
-    }
-
-    private static void verifyFileName(String fileName) {
-        if (fileName.contains("..")) {
-            // prevent possible path traversal attacks
-            throw new IllegalArgumentException("Invalid fileName: " + fileName);
-        }
-        if (!fileName.matches("^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$")) {
-            throw new IllegalArgumentException("Invalid fileName: " + fileName);
-        }
     }
 }
