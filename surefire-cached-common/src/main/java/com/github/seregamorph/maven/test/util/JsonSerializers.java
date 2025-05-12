@@ -1,4 +1,4 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

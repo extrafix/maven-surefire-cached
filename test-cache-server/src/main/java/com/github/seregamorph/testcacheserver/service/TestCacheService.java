@@ -2,8 +2,8 @@ package com.github.seregamorph.testcacheserver.service;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
-import com.github.seregamorph.maven.test.core.JsonSerializers;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
+import com.github.seregamorph.maven.test.util.JsonSerializers;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;

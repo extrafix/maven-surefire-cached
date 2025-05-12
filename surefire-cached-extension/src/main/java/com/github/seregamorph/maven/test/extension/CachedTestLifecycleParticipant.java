@@ -9,7 +9,7 @@ import static com.github.seregamorph.maven.test.util.ByteSizeFormatUtils.formatB
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.formatTime;
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 
-import com.github.seregamorph.maven.test.common.TaskOutcome;
+import com.github.seregamorph.maven.test.core.TaskOutcome;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
 import java.math.BigDecimal;
 import java.util.List;

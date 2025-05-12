@@ -1,5 +1,6 @@
-package com.github.seregamorph.maven.test.common;
+package com.github.seregamorph.maven.test.core;
 
+import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import javax.annotation.Nullable;
 
 /**
