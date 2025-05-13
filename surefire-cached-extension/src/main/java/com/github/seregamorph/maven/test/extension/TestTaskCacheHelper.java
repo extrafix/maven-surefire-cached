@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -78,11 +79,17 @@ public class TestTaskCacheHelper {
         List<String> activeProfiles,
         MavenProject project,
         Mojo delegate,
+        SurefireCachedConfig surefireCachedConfig,
         SurefireCachedConfig.TestPluginConfig testPluginConfig
     ) {
         var testTaskInput = new TestTaskInput();
         testTaskInput.addIgnoredProperty("timestamp", Instant.now().toString());
-        // todo git commit hash
+        for (var property : surefireCachedConfig.getInputProperties()) {
+            var value = getProperty(project, property);
+            if (value != null) {
+                testTaskInput.addProperty(property, value);
+            }
+        }
 
         var pluginArtifacts = project.getPluginArtifacts();
         for (var pluginArtifact : pluginArtifacts) {
@@ -131,6 +138,20 @@ public class TestTaskCacheHelper {
         testTaskInput.setArtifactConfigs(testPluginConfig.getArtifacts());
         testTaskInput.setExcludes(call(delegate, List.class, "getExcludes"));
         return testTaskInput;
+    }
+
+    @Nullable
+    private static String getProperty(MavenProject project, String property) {
+        if (property.startsWith("env.")) {
+            var variable = property.substring("env.".length());
+            return System.getenv(variable);
+        }
+
+        String value = project.getProperties().getProperty(property);
+        if (value == null) {
+            value = System.getProperty(property);
+        }
+        return value;
     }
 
     private static boolean isIncludeToCacheEntry(Artifact artifact, Set<GroupArtifactId> cacheExcludes) {

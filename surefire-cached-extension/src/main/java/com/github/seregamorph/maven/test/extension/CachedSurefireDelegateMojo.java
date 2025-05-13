@@ -123,7 +123,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         MoreFileUtils.delete(taskOutputFile);
 
         var activeProfiles = session.getRequest().getActiveProfiles();
-        var testTaskInput = testTaskCacheHelper.getTestTaskInput(activeProfiles, project, this.delegate, testPluginConfig);
+        var testTaskInput = testTaskCacheHelper.getTestTaskInput(activeProfiles, project, this.delegate,
+            surefireCachedConfig, testPluginConfig);
         var testTaskInputBytes = JsonSerializers.serialize(testTaskInput);
         log.debug(new String(testTaskInputBytes, UTF_8));
         MoreFileUtils.write(taskInputFile, testTaskInputBytes);
