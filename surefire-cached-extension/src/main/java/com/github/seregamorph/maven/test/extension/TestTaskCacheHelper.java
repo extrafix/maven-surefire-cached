@@ -104,7 +104,7 @@ public class TestTaskCacheHelper {
             var file = pluginArtifact.getFile();
             // now the file is always null, enhance the caching key on demand
             var hash = file == null ? null : fileHashCache.getClasspathElementHash(file);
-            var groupArtifactId = GroupArtifactId.of(pluginArtifact);
+            var groupArtifactId = groupArtifactId(pluginArtifact);
             testTaskInput.addPluginArtifactHash(groupArtifactId, pluginArtifact.getClassifier(),
                 pluginArtifact.getVersion(), hash);
         }
@@ -124,7 +124,7 @@ public class TestTaskCacheHelper {
                 // The trick is we calculate hash of files which is the same in both cases (jar manifest is ignored)
                 var file = artifact.getFile();
                 var hash = fileHashCache.getClasspathElementHash(file);
-                var groupArtifactId = GroupArtifactId.of(artifact);
+                var groupArtifactId = groupArtifactId(artifact);
                 var suffix = file.isDirectory() ? "@dir" : "@" + artifact.getType();
                 if (modules.contains(groupArtifactId)) {
                     testTaskInput.addModuleArtifactHash(groupArtifactId + suffix, hash);
@@ -164,7 +164,7 @@ public class TestTaskCacheHelper {
 
     private static boolean isIncludeToCacheEntry(Artifact artifact, Set<GroupArtifactId> cacheExcludes) {
         return artifact.getArtifactHandler().isAddedToClasspath()
-            && !cacheExcludes.contains(GroupArtifactId.of(artifact));
+            && !cacheExcludes.contains(groupArtifactId(artifact));
     }
 
     private static TestClasspath getTestClasspath(MavenProject project) {
@@ -172,6 +172,10 @@ public class TestTaskCacheHelper {
         var classesDir = new File(project.getBuild().getOutputDirectory());
         var testClassesDir = new File(project.getBuild().getTestOutputDirectory());
         return new TestClasspath(artifacts, classesDir, testClassesDir);
+    }
+
+    private static GroupArtifactId groupArtifactId(Artifact artifact) {
+        return new GroupArtifactId(artifact.getGroupId(), artifact.getArtifactId());
     }
 
     private record TestClasspath(Set<Artifact> artifacts, File classesDir, File testClassesDir) {
