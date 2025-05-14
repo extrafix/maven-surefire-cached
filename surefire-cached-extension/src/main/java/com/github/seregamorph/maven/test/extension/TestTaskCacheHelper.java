@@ -83,7 +83,15 @@ public class TestTaskCacheHelper {
         SurefireCachedConfig.TestPluginConfig testPluginConfig
     ) {
         var testTaskInput = new TestTaskInput();
+
         testTaskInput.addIgnoredProperty("timestamp", Instant.now().toString());
+        for (var ignoredProperty : surefireCachedConfig.getInputIgnoredProperties()) {
+            var value = getProperty(project, ignoredProperty);
+            if (value != null) {
+                testTaskInput.addIgnoredProperty(ignoredProperty, value);
+            }
+        }
+
         for (var property : surefireCachedConfig.getInputProperties()) {
             var value = getProperty(project, property);
             if (value != null) {
