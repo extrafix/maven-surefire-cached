@@ -9,6 +9,7 @@ import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
 import com.github.seregamorph.maven.test.util.HashUtils;
+import com.github.seregamorph.maven.test.util.MavenPropertyUtils;
 import java.io.File;
 import java.time.Instant;
 import java.util.Comparator;
@@ -16,7 +17,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
@@ -76,24 +76,26 @@ public class TestTaskCacheHelper {
     }
 
     public TestTaskInput getTestTaskInput(
-        List<String> activeProfiles,
+        MavenSession session,
         MavenProject project,
         Mojo delegate,
         SurefireCachedConfig surefireCachedConfig,
         SurefireCachedConfig.TestPluginConfig testPluginConfig
     ) {
+        var activeProfiles = session.getRequest().getActiveProfiles();
+
         var testTaskInput = new TestTaskInput();
 
         testTaskInput.addIgnoredProperty("timestamp", Instant.now().toString());
         for (var ignoredProperty : surefireCachedConfig.getInputIgnoredProperties()) {
-            var value = getProperty(project, ignoredProperty);
+            var value = MavenPropertyUtils.getProperty(session, project, ignoredProperty);
             if (value != null) {
                 testTaskInput.addIgnoredProperty(ignoredProperty, value);
             }
         }
 
         for (var property : surefireCachedConfig.getInputProperties()) {
-            var value = getProperty(project, property);
+            var value = MavenPropertyUtils.getProperty(session, project, property);
             if (value != null) {
                 testTaskInput.addProperty(property, value);
             }
@@ -146,20 +148,6 @@ public class TestTaskCacheHelper {
         testTaskInput.setArtifactConfigs(testPluginConfig.getArtifacts());
         testTaskInput.setExcludes(call(delegate, List.class, "getExcludes"));
         return testTaskInput;
-    }
-
-    @Nullable
-    private static String getProperty(MavenProject project, String property) {
-        if (property.startsWith("env.")) {
-            var variable = property.substring("env.".length());
-            return System.getenv(variable);
-        }
-
-        String value = project.getProperties().getProperty(property);
-        if (value == null) {
-            value = System.getProperty(property);
-        }
-        return value;
     }
 
     private static boolean isIncludeToCacheEntry(Artifact artifact, Set<GroupArtifactId> cacheExcludes) {

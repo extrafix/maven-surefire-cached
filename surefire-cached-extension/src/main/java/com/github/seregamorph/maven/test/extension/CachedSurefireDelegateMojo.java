@@ -15,6 +15,7 @@ import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.util.JsonSerializers;
+import com.github.seregamorph.maven.test.util.MavenPropertyUtils;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import com.github.seregamorph.maven.test.util.TimeFormatUtils;
 import com.github.seregamorph.maven.test.util.ZipUtils;
@@ -106,7 +107,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
         MoreFileUtils.delete(reportsDirectory);
 
-        var skipCache = isEmptyOrTrue(session.getSystemProperties().getProperty("skipCache"));
+        var skipCache = isEmptyOrTrue(MavenPropertyUtils.getProperty(session, project, "skipCache"));
         if (skipCache) {
             delegate.execute();
             var testTaskOutput = getTaskOutput(null, startTime, Instant.now());
@@ -122,8 +123,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         MoreFileUtils.delete(taskInputFile);
         MoreFileUtils.delete(taskOutputFile);
 
-        var activeProfiles = session.getRequest().getActiveProfiles();
-        var testTaskInput = testTaskCacheHelper.getTestTaskInput(activeProfiles, project, this.delegate,
+        var testTaskInput = testTaskCacheHelper.getTestTaskInput(session, project, this.delegate,
             surefireCachedConfig, testPluginConfig);
         var testTaskInputBytes = JsonSerializers.serialize(testTaskInput);
         log.debug(new String(testTaskInputBytes, UTF_8));
