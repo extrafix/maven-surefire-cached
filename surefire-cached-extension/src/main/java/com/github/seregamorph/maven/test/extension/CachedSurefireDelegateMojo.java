@@ -54,11 +54,11 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     private final File reportsDirectory;
 
     public CachedSurefireDelegateMojo(
-            TestTaskCacheHelper testTaskCacheHelper,
-            MavenSession session,
-            MavenProject project,
-            Mojo delegate,
-            String pluginName
+        TestTaskCacheHelper testTaskCacheHelper,
+        MavenSession session,
+        MavenProject project,
+        Mojo delegate,
+        String pluginName
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
         this.cacheService = testTaskCacheHelper.getCacheService();
@@ -77,28 +77,28 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     private void setCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {
         project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_RESULT, result.name());
         project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_TIME,
-                testTaskOutput.totalTimeSeconds().toString());
+            testTaskOutput.totalTimeSeconds().toString());
 
         var message = result.message(testTaskOutput);
         log.info("Cached execution "
-                + project.getGroupId() + ":" + project.getArtifactId()
-                + " " + result + (message == null ? "" : " " + message));
+            + project.getGroupId() + ":" + project.getArtifactId()
+            + " " + result + (message == null ? "" : " " + message));
     }
 
     private void setCachedDeletion(int deleted) {
         if (deleted > 0) {
             project.getProperties()
-                    .put(pluginName + PROP_SUFFIX_TEST_DELETED_ENTRIES, Integer.toString(deleted));
+                .put(pluginName + PROP_SUFFIX_TEST_DELETED_ENTRIES, Integer.toString(deleted));
         }
     }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (call(this.delegate, Boolean.class, "isSkip")
-                || call(this.delegate, Boolean.class, "isSkipTests")
-                || call(this.delegate, Boolean.class, "isSkipExec")
-                || "pom".equals(project.getPackaging())
-                || !projectBuildDirectory.exists()) {
+            || call(this.delegate, Boolean.class, "isSkipTests")
+            || call(this.delegate, Boolean.class, "isSkipExec")
+            || "pom".equals(project.getPackaging())
+            || !projectBuildDirectory.exists()) {
             delegate.execute();
             return;
         }
@@ -136,34 +136,41 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         log.debug("Cache entry calculated in " + Duration.between(startTime, entryCalculatedTime));
 
         var testTaskOutputBytes = cacheService.read(cacheEntryKey, getTaskOutputFileName());
-        if (testTaskOutputBytes == null) {
-            log.info("Cache miss " + cacheEntryKey);
-            boolean success = false;
-            try {
-                delegate.execute();
-                success = true;
-            } finally {
-                var testTaskOutput = getTaskOutput(testPluginConfig, startTime, Instant.now());
-                MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
-                if (testTaskOutput.totalErrors() > 0 || testTaskOutput.totalFailures() > 0) {
-                    log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
-                    setCachedExecution(TaskOutcome.FAILED, testTaskOutput);
-                } else if (success) {
-                    log.info("Storing artifacts to cache from " + projectBuildDirectory);
-                    var deleted = storeCache(testPluginConfig, cacheEntryKey, testTaskInput, testTaskOutput);
-                    var result = testTaskOutput.totalTests() == 0 ? TaskOutcome.EMPTY : TaskOutcome.SUCCESS;
-                    setCachedExecution(result, testTaskOutput);
-                    setCachedDeletion(deleted);
-                }
-            }
-        } else {
+        if (testTaskOutputBytes != null) {
             MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
             log.info("Cache hit " + cacheEntryKey);
             var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class,
-                    getTaskOutputFileName());
+                getTaskOutputFileName());
             log.info("Restoring artifacts from cache to " + projectBuildDirectory);
-            restoreCache(cacheEntryKey, testTaskOutput);
-            setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
+
+            try {
+                restoreCache(cacheEntryKey, testTaskOutput);
+                setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
+                return;
+            } catch (InconsistentCacheException e) {
+                // failover to standard execution
+                log.warn(e.getMessage());
+            }
+        }
+
+        log.info("Cache miss " + cacheEntryKey);
+        boolean success = false;
+        try {
+            delegate.execute();
+            success = true;
+        } finally {
+            var testTaskOutput = getTaskOutput(testPluginConfig, startTime, Instant.now());
+            MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
+            if (testTaskOutput.totalErrors() > 0 || testTaskOutput.totalFailures() > 0) {
+                log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
+                setCachedExecution(TaskOutcome.FAILED, testTaskOutput);
+            } else if (success) {
+                log.info("Storing artifacts to cache from " + projectBuildDirectory);
+                var deleted = storeCache(testPluginConfig, cacheEntryKey, testTaskInput, testTaskOutput);
+                var result = testTaskOutput.totalTests() == 0 ? TaskOutcome.EMPTY : TaskOutcome.SUCCESS;
+                setCachedExecution(result, testTaskOutput);
+                setCachedDeletion(deleted);
+            }
         }
     }
 
@@ -174,26 +181,27 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
                 File surefireCachedConfigFile = new File(currentProject.getBasedir(), fileName);
                 if (surefireCachedConfigFile.exists()) {
                     return JsonSerializers.deserialize(
-                            MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
-                            surefireCachedConfigFile.toString());
+                        MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
+                        surefireCachedConfigFile.toString());
                 }
             }
             currentProject = currentProject.getParent();
         } while (currentProject != null && currentProject.getBasedir() != null);
 
         throw new IllegalStateException("Unable to find surefire cached config file in "
-                + new File(this.project.getBasedir(), CONFIG_FILE_NAME) + " or parent Maven project");
+            + new File(this.project.getBasedir(), CONFIG_FILE_NAME) + " or parent Maven project");
     }
 
     private int storeCache(
-            SurefireCachedConfig.TestPluginConfig testPluginConfig,
-            CacheEntryKey cacheEntryKey,
-            TestTaskInput testTaskInput,
-            TestTaskOutput testTaskOutput
+        SurefireCachedConfig.TestPluginConfig testPluginConfig,
+        CacheEntryKey cacheEntryKey,
+        TestTaskInput testTaskInput,
+        TestTaskOutput testTaskOutput
     ) {
         int deleted = cacheService.write(cacheEntryKey, getTaskInputFileName(),
-                JsonSerializers.serialize(testTaskInput));
-        for (Map.Entry<String, SurefireCachedConfig.ArtifactsConfig> entry : testPluginConfig.getArtifacts().entrySet()) {
+            JsonSerializers.serialize(testTaskInput));
+        for (Map.Entry<String, SurefireCachedConfig.ArtifactsConfig> entry :
+                testPluginConfig.getArtifacts().entrySet()) {
             var alias = entry.getKey();
             var artifactsConfig = entry.getValue();
             var artifactPackName = getArtifactPackName(alias);
@@ -207,34 +215,35 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         return deleted;
     }
 
-    private void restoreCache(CacheEntryKey cacheEntryKey, TestTaskOutput testTaskOutput) {
-        testTaskOutput.files().forEach((alias, packedName) -> {
+    private void restoreCache(CacheEntryKey cacheEntryKey, TestTaskOutput testTaskOutput) throws InconsistentCacheException {
+        for (Map.Entry<String, String> entry : testTaskOutput.files().entrySet()) {
+            String packedName = entry.getValue();
             var packedContent = cacheService.read(cacheEntryKey, packedName);
             if (packedContent == null) {
-                throw new IllegalStateException("Cache file not found " + cacheEntryKey + " " + packedName);
+                throw new InconsistentCacheException("Cache file not found " + cacheEntryKey + " " + packedName);
             }
 
             var packFile = new File(projectBuildDirectory, packedName);
             MoreFileUtils.write(packFile, packedContent);
             ZipUtils.unpackDirectory(packFile, projectBuildDirectory);
             MoreFileUtils.delete(packFile);
-        });
+        }
     }
 
     private CacheEntryKey getLayoutKey(TestTaskInput testTaskInput) {
         return new CacheEntryKey(
-                pluginName,
-                new GroupArtifactId(project.getGroupId(), project.getArtifactId()),
-                testTaskInput.hash());
+            pluginName,
+            new GroupArtifactId(project.getGroupId(), project.getArtifactId()),
+            testTaskInput.hash());
     }
 
     private TestTaskOutput getTaskOutput(
-            @Nullable SurefireCachedConfig.TestPluginConfig testPluginConfig,
-            Instant startTime,
-            Instant endTime
+        @Nullable SurefireCachedConfig.TestPluginConfig testPluginConfig,
+        Instant startTime,
+        Instant endTime
     ) {
         var testReports = reportsDirectory.listFiles((dir, name) ->
-                name.startsWith("TEST-") && name.endsWith(".xml"));
+            name.startsWith("TEST-") && name.endsWith(".xml"));
 
         if (testReports == null) {
             return TestTaskOutput.empty();
@@ -262,7 +271,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         }
 
         return new TestTaskOutput(startTime, endTime, getTotalTimeSeconds(startTime, endTime),
-                totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures, files);
+            totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures, files);
     }
 
     private static String getArtifactPackName(String alias) {
