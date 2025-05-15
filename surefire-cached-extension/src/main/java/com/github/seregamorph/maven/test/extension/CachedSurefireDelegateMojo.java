@@ -109,6 +109,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
         var skipCache = isEmptyOrTrue(MavenPropertyUtils.getProperty(session, project, "skipCache"));
         if (skipCache) {
+            log.info("Skipping cache for " + project.getGroupId() + ":" + project.getArtifactId());
             delegate.execute();
             var testTaskOutput = getTaskOutput(null, startTime, Instant.now());
             setCachedExecution(TaskOutcome.SKIPPED_CACHE, testTaskOutput);
