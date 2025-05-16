@@ -5,6 +5,8 @@ import java.lang.ref.SoftReference;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * In-memory cache LRU storage with SoftReference.
@@ -12,6 +14,8 @@ import javax.annotation.Nullable;
  * @author Sergey Chernov
  */
 public class SoftReferenceMemoryStorage implements CacheStorage {
+
+    private static final Logger logger = LoggerFactory.getLogger(SoftReferenceMemoryStorage.class);
 
     private final Map<CacheEntryKey, SoftReference<Map<String, byte[]>>> cache = new LinkedHashMap<>();
 
@@ -34,6 +38,7 @@ public class SoftReferenceMemoryStorage implements CacheStorage {
             }
             var cacheEntry = softReferenceCacheEntry.get();
             if (cacheEntry == null) {
+                logger.info("Null reference for cache key {}", cacheEntryKey);
                 return null;
             }
             // LRU
@@ -52,11 +57,11 @@ public class SoftReferenceMemoryStorage implements CacheStorage {
                 if (cache.size() >= size) {
                     // LRU
                     var iterator = cache.entrySet().iterator();
-                    var deletedReference = iterator.next().getValue();
-                    synchronized (deletedReference) {
-                        var deletedEntry = deletedReference.get();
-                        deleted = deletedEntry == null ? 0 : deletedEntry.size();
-                    }
+                    var deletedEntry = iterator.next();
+                    logger.info("Removing eldest cache entry {} from cache.", deletedEntry.getKey());
+                    var deletedReference = deletedEntry.getValue();
+                    var deletedValue = deletedReference.get();
+                    deleted = deletedValue == null ? 0 : deletedValue.size();
                     iterator.remove();
                 }
                 cacheEntry = new LinkedHashMap<>();

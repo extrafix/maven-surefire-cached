@@ -1,9 +1,12 @@
 package com.github.seregamorph.maven.test.storage;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.Nullable;
 
 /**
  * In-memory cache LRU storage.
@@ -11,6 +14,8 @@ import javax.annotation.Nullable;
  * @author Sergey Chernov
  */
 public class MemoryStorage implements CacheStorage {
+
+    private static final Logger logger = LoggerFactory.getLogger(MemoryStorage.class);
 
     private final Map<CacheEntryKey, Map<String, byte[]>> cache = new LinkedHashMap<>();
 
@@ -46,9 +51,11 @@ public class MemoryStorage implements CacheStorage {
                 if (cache.size() >= size) {
                     // LRU
                     var iterator = cache.entrySet().iterator();
-                    var deletedEntry = iterator.next().getValue();
-                    synchronized (deletedEntry) {
-                        deleted = deletedEntry.size();
+                    var deletedEntry = iterator.next();
+                    logger.info("Removing eldest cache entry {} from cache.", deletedEntry.getKey());
+                    var deletedValue = deletedEntry.getValue();
+                    synchronized (deletedValue) {
+                        deleted = deletedValue.size();
                     }
                     iterator.remove();
                 }
