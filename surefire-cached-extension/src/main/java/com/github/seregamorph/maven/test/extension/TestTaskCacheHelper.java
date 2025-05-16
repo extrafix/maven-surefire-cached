@@ -8,6 +8,7 @@ import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
+import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.util.HashUtils;
 import com.github.seregamorph.maven.test.util.MavenPropertyUtils;
 import java.io.File;
@@ -34,6 +35,7 @@ public class TestTaskCacheHelper {
     private FileHashCache fileHashCache;
     private Set<GroupArtifactId> modules;
     private CacheServiceMetrics metrics;
+    private CacheStorage cacheStorage;
     private CacheService cacheService;
 
     public void init(MavenSession session) {
@@ -43,20 +45,14 @@ public class TestTaskCacheHelper {
             .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
 
         this.metrics = new CacheServiceMetrics();
-        this.cacheService = getCacheService(session, metrics);
+        this.cacheStorage = getCacheStorage(session);
+        this.cacheService = new CacheService(cacheStorage, metrics);
     }
 
     public void destroy() {
         fileHashCache = null;
         modules = null;
         cacheService = null;
-    }
-
-    public CacheService getCacheService() {
-        if (cacheService == null) {
-            throw new IllegalStateException("cacheStorage is not initialized");
-        }
-        return cacheService;
     }
 
     public CacheServiceMetrics getMetrics() {
@@ -66,13 +62,26 @@ public class TestTaskCacheHelper {
         return metrics;
     }
 
-    private static CacheService getCacheService(MavenSession session, CacheServiceMetrics metrics) {
+    public CacheStorage getCacheStorage() {
+        if (cacheStorage == null) {
+            throw new IllegalStateException("cacheStorage is not initialized");
+        }
+        return cacheStorage;
+    }
+
+    public CacheService getCacheService() {
+        if (cacheService == null) {
+            throw new IllegalStateException("cacheStorage is not initialized");
+        }
+        return cacheService;
+    }
+
+    private static CacheStorage getCacheStorage(MavenSession session) {
         String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
         if (cacheStorageUrl == null) {
             cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
         }
-        var cacheStorage = CacheStorageFactory.createCacheStorage(cacheStorageUrl);
-        return new CacheService(cacheStorage, metrics);
+        return CacheStorageFactory.createCacheStorage(cacheStorageUrl);
     }
 
     public TestTaskInput getTestTaskInput(

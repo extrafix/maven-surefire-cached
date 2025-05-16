@@ -6,11 +6,15 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FailsafeCacheStorage implements CacheStorage {
+public class FailsafeCacheStorage implements CacheStorage, ReportingCacheStorage {
 
     private static final Logger logger = LoggerFactory.getLogger(FailsafeCacheStorage.class);
 
-    private final AtomicInteger failures = new AtomicInteger(0);
+    private final AtomicInteger readFailures = new AtomicInteger(0);
+    private final AtomicInteger skippedReads = new AtomicInteger(0);
+
+    private final AtomicInteger writeFailures = new AtomicInteger(0);
+    private final AtomicInteger skippedWrites = new AtomicInteger(0);
 
     private final CacheStorage delegate;
     private final int threshold;
@@ -26,7 +30,8 @@ public class FailsafeCacheStorage implements CacheStorage {
     @Nullable
     @Override
     public byte[] read(CacheEntryKey cacheEntryKey, String fileName) {
-        if (failures.get() > threshold) {
+        if (readFailures.get() > threshold) {
+            skippedReads.incrementAndGet();
             logger.info("Skipping reading {} {} because of too many failures", cacheEntryKey, fileName);
             return null;
         }
@@ -35,14 +40,15 @@ public class FailsafeCacheStorage implements CacheStorage {
             return delegate.read(cacheEntryKey, fileName);
         } catch (CacheStorageException e) {
             logger.warn("Failed to read {} {}", cacheEntryKey, fileName, e);
-            failures.incrementAndGet();
+            readFailures.incrementAndGet();
             return null;
         }
     }
 
     @Override
     public int write(CacheEntryKey cacheEntryKey, String fileName, byte[] value) {
-        if (failures.get() > threshold) {
+        if (writeFailures.get() > threshold) {
+            skippedWrites.incrementAndGet();
             logger.info("Skipping writing {} {} because of too many failures", cacheEntryKey, fileName);
             return 0;
         }
@@ -51,8 +57,26 @@ public class FailsafeCacheStorage implements CacheStorage {
             return delegate.write(cacheEntryKey, fileName, value);
         } catch (CacheStorageException e) {
             logger.warn("Failed to write {} {}", cacheEntryKey, fileName, e);
-            failures.incrementAndGet();
+            writeFailures.incrementAndGet();
             return 0;
         }
+    }
+
+    @Override
+    public String getReadFailureReport() {
+        int readFailureCount = readFailures.get();
+        if (readFailureCount == 0) {
+            return null;
+        }
+        return String.format("Read failures: %d, then skipped %d operations", readFailureCount, skippedReads.get());
+    }
+
+    @Override
+    public String getWriteFailureReport() {
+        int writeFailureCount = writeFailures.get();
+        if (writeFailureCount == 0) {
+            return null;
+        }
+        return String.format("Write failures: %d, then skipped %d operations", writeFailureCount, skippedWrites.get());
     }
 }

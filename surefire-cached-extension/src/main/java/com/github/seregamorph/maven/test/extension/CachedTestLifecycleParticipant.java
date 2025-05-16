@@ -11,6 +11,8 @@ import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 
 import com.github.seregamorph.maven.test.core.TaskOutcome;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
+import com.github.seregamorph.maven.test.storage.CacheStorage;
+import com.github.seregamorph.maven.test.storage.ReportingCacheStorage;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.TreeMap;
@@ -92,12 +94,12 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
                 }
             }
         }
-        logStorageMetrics(this.testTaskCacheHelper.getMetrics());
+        logStorageMetrics(testTaskCacheHelper.getMetrics(), testTaskCacheHelper.getCacheStorage());
         logger.info("");
         this.testTaskCacheHelper.destroy();
     }
 
-    private static void logStorageMetrics(CacheServiceMetrics metrics) {
+    private static void logStorageMetrics(CacheServiceMetrics metrics, CacheStorage cacheStorage) {
         int readHitOps = metrics.getReadHitOperations();
         long readHitMillis = metrics.getReadHitMillis();
         long readHitBytes = metrics.getReadHitBytes();
@@ -111,6 +113,17 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         if (readMissOps > 0) {
             logger.info("Cache miss read operations: {}, time: {}",
                 readMissOps, formatTime(toSeconds(readMissMillis)));
+        }
+
+        if (cacheStorage instanceof ReportingCacheStorage reportingCacheStorage) {
+            var readFailureReport = reportingCacheStorage.getReadFailureReport();
+            if (readFailureReport != null) {
+                logger.warn(readFailureReport);
+            }
+            var writeFailureReport = reportingCacheStorage.getWriteFailureReport();
+            if (writeFailureReport != null) {
+                logger.warn(writeFailureReport);
+            }
         }
 
         int writeOps = metrics.getWriteOperations();
