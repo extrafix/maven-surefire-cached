@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 public interface CacheStorage {
 
     @Nullable
-    byte[] read(CacheEntryKey cacheEntryKey, String fileName);
+    byte[] read(CacheEntryKey cacheEntryKey, String fileName) throws CacheStorageException;
 
     /**
      * Write cache entry
@@ -19,5 +19,5 @@ public interface CacheStorage {
      * @param value
      * @return number of deleted files
      */
-    int write(CacheEntryKey cacheEntryKey, String fileName, byte[] value);
+    int write(CacheEntryKey cacheEntryKey, String fileName, byte[] value) throws CacheStorageException;
 }

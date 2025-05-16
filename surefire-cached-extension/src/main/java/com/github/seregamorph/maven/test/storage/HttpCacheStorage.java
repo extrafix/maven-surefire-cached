@@ -3,7 +3,6 @@ package com.github.seregamorph.maven.test.storage;
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.util.ResponseBodyUtils;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
@@ -69,7 +68,7 @@ public class HttpCacheStorage implements CacheStorage {
                 return responseBody.bytes();
             }
         } catch (IOException e) {
-            throw new UncheckedIOException("Error while fetching from cache " + url, e);
+            throw new CacheStorageException("Error while fetching from cache " + url, e);
         }
     }
 
@@ -94,7 +93,7 @@ public class HttpCacheStorage implements CacheStorage {
                 }
             }
         } catch (IOException e) {
-            throw new UncheckedIOException("Error while pushing to cache " + url, e);
+            throw new CacheStorageException("Error while pushing to cache " + url, e);
         }
 
         return 0;

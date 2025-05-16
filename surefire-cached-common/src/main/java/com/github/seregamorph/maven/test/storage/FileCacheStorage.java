@@ -4,6 +4,8 @@ import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import com.github.seregamorph.maven.test.util.ValidatorUtils;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Comparator;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
@@ -52,14 +54,22 @@ public class FileCacheStorage implements CacheStorage {
         if (!file.exists()) {
             return null;
         }
-        return MoreFileUtils.read(file);
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            throw new CacheStorageException("Error reading " + fileName, e);
+        }
     }
 
     @Override
     public int write(CacheEntryKey cacheEntryKey, String fileName, byte[] value) {
         var file = getEntryFile(cacheEntryKey, fileName);
         var deleted = createParentAndCleanupOld(file.getParentFile());
-        MoreFileUtils.write(file, value);
+        try {
+            Files.write(file.toPath(), value);
+        } catch (IOException e) {
+            throw new CacheStorageException("Error writing " + fileName, e);
+        }
         return deleted;
     }
 
