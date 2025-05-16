@@ -38,7 +38,8 @@ public class CachedSurefireDelegateMojoTest {
         var delegate = mock(TestSurefireMojo.class);
         var testTaskCacheHelper = new TestTaskCacheHelper();
         testTaskCacheHelper.init(session);
-        var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper, session, project, delegate,
+        var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper,
+            testTaskCacheHelper.getCacheService(), session, project, delegate,
             TestTaskOutput.PLUGIN_SUREFIRE_CACHED);
 
         var config = cachedDelegateMojo.loadSurefireCachedConfig();

@@ -55,13 +55,14 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
     public CachedSurefireDelegateMojo(
         TestTaskCacheHelper testTaskCacheHelper,
+        CacheService cacheService,
         MavenSession session,
         MavenProject project,
         Mojo delegate,
         String pluginName
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
-        this.cacheService = testTaskCacheHelper.getCacheService();
+        this.cacheService = cacheService;
         this.session = session;
         this.project = project;
         this.delegate = delegate;
