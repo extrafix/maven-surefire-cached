@@ -38,7 +38,7 @@ public class SoftReferenceMemoryStorage implements CacheStorage {
             }
             var cacheEntry = softReferenceCacheEntry.get();
             if (cacheEntry == null) {
-                logger.info("Null reference for cache key {}", cacheEntryKey);
+                logger.info("Null reference for cache key {}, current size {}", cacheEntryKey, cache.size());
                 return null;
             }
             // LRU
