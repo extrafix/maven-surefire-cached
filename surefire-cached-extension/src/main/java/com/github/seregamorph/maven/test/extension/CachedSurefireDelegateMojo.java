@@ -162,15 +162,20 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         } finally {
             var testTaskOutput = getTaskOutput(testPluginConfig, startTime, Instant.now());
             MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
+            // note that failsafe plugin does not throw exceptions on test failures
             if (testTaskOutput.totalErrors() > 0 || testTaskOutput.totalFailures() > 0) {
                 log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
                 setCachedExecution(TaskOutcome.FAILED, testTaskOutput);
             } else if (success) {
-                log.info("Storing artifacts to cache from " + projectBuildDirectory);
-                var deleted = storeCache(testPluginConfig, cacheEntryKey, testTaskInput, testTaskOutput);
-                var result = testTaskOutput.totalTests() == 0 ? TaskOutcome.EMPTY : TaskOutcome.SUCCESS;
-                setCachedExecution(result, testTaskOutput);
-                setCachedDeletion(deleted);
+                if (testTaskOutput.totalTests() == 0) {
+                    log.info("No tests found, not storing to cache");
+                    setCachedExecution(TaskOutcome.EMPTY, testTaskOutput);
+                } else {
+                    log.info("Storing artifacts to cache from " + projectBuildDirectory);
+                    var deleted = storeCache(testPluginConfig, cacheEntryKey, testTaskInput, testTaskOutput);
+                    setCachedExecution(TaskOutcome.SUCCESS, testTaskOutput);
+                    setCachedDeletion(deleted);
+                }
             }
         }
     }
