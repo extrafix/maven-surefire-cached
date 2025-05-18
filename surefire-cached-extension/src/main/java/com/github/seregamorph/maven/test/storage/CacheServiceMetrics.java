@@ -1,9 +1,24 @@
 package com.github.seregamorph.maven.test.storage;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+@JsonPropertyOrder({
+    "readHitOperations",
+    "readMissOperations",
+    "readHitBytes",
+    "readHitMillis",
+    "readMissMillis",
+    "readFailures",
+    "readSkipped",
+    "writeOperations",
+    "writeBytes",
+    "writeMillis",
+    "writeFailures",
+    "writeSkipped",
+})
 public class CacheServiceMetrics {
 
     private final AtomicInteger readHitOperations = new AtomicInteger();
@@ -16,6 +31,18 @@ public class CacheServiceMetrics {
     private final AtomicInteger writeOperations = new AtomicInteger();
     private final AtomicLong writeNanos = new AtomicLong();
     private final AtomicLong writeBytes = new AtomicLong();
+
+    private final AtomicInteger readFailures = new AtomicInteger(0);
+    /**
+     * Skipped after a threshold of failures
+     */
+    private final AtomicInteger readsSkipped = new AtomicInteger(0);
+
+    private final AtomicInteger writeFailures = new AtomicInteger(0);
+    /**
+     * Skipped after a threshold of failures
+     */
+    private final AtomicInteger writesSkipped = new AtomicInteger(0);
 
     public void addReadHitOperation(long nanos, long bytes) {
         readHitOperations.incrementAndGet();
@@ -64,5 +91,37 @@ public class CacheServiceMetrics {
 
     public long getWriteBytes() {
         return writeBytes.get();
+    }
+
+    public void addReadFailure() {
+        readFailures.incrementAndGet();
+    }
+
+    public int getReadFailures() {
+        return readFailures.get();
+    }
+
+    public void addReadSkipped() {
+        readsSkipped.incrementAndGet();
+    }
+
+    public int getReadSkipped() {
+        return readsSkipped.get();
+    }
+
+    public void addWriteFailure() {
+        writeFailures.incrementAndGet();
+    }
+
+    public int getWriteFailures() {
+        return writeFailures.get();
+    }
+
+    public void addWriteSkipped() {
+        writesSkipped.incrementAndGet();
+    }
+
+    public int getWriteSkipped() {
+        return writesSkipped.get();
     }
 }

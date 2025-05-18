@@ -7,10 +7,12 @@ import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
-import com.github.seregamorph.maven.test.storage.CacheStorage;
-import com.github.seregamorph.maven.test.storage.ReportingCacheStorage;
+import com.github.seregamorph.maven.test.util.JsonSerializers;
+import com.github.seregamorph.maven.test.util.MoreFileUtils;
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,11 +42,11 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
     private static final Logger logger = LoggerFactory.getLogger(CachedTestLifecycleParticipant.class);
 
-    private record AggResult(int total, BigDecimal totalTime) {
+    private record AggResult(int totalModules, BigDecimal totalTimeSec) {
         private static final AggResult EMPTY = new AggResult(0, BigDecimal.ZERO);
 
         AggResult add(BigDecimal time) {
-            return new AggResult(total + 1, totalTime.add(time));
+            return new AggResult(totalModules + 1, totalTimeSec.add(time));
         }
     }
 
@@ -63,33 +65,47 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
     @Override
     public void afterSessionEnd(MavenSession session) {
         var cacheReport = testTaskCacheHelper.getCacheReport();
+        var pluginResults = new TreeMap<String, Map<TaskOutcome, AggResult>>();
         for (var pluginName : List.of(PluginName.SUREFIRE_CACHED, PluginName.FAILSAFE_CACHED)) {
-            var results = new TreeMap<TaskOutcome, AggResult>();
+            var pluginResult = new TreeMap<TaskOutcome, AggResult>();
             int deleted = 0;
             var executionResults = cacheReport.getExecutionResults(pluginName);
             for (var executionResult : executionResults) {
-                results.compute(executionResult.result(),
+                pluginResult.compute(executionResult.result(),
                     (k, v) -> (v == null ? AggResult.EMPTY : v).add(executionResult.totalTimeSeconds()));
                 deleted += executionResult.deletedCacheEntries();
             }
-            if (!results.isEmpty()) {
+            if (!pluginResult.isEmpty()) {
                 logger.info("Total test cached results ({}):", pluginName);
-                results.forEach((k, v) -> {
+                pluginResult.forEach((k, v) -> {
                     var suffix = k.suffix();
-                    logger.info("{} ({} modules): {}{}", k, v.total,
-                        formatTime(v.totalTime), suffix == null ? "" : " " + suffix);
+                    logger.info("{} ({} modules): {}{}", k, v.totalModules,
+                        formatTime(v.totalTimeSec), suffix == null ? "" : " " + suffix);
                 });
                 if (deleted > 0) {
                     logger.info("Total deleted cache entries: {}", deleted);
                 }
+                pluginResults.put(pluginName.name(), pluginResult);
             }
         }
-        logStorageMetrics(testTaskCacheHelper.getMetrics(), testTaskCacheHelper.getCacheStorage());
-        logger.info("");
+        logStorageMetrics(testTaskCacheHelper.getMetrics());
+        saveJsonReport(session, pluginResults);
         this.testTaskCacheHelper.destroy();
     }
 
-    private static void logStorageMetrics(CacheServiceMetrics metrics, CacheStorage cacheStorage) {
+    private void saveJsonReport(MavenSession session, TreeMap<String, Map<TaskOutcome, AggResult>> pluginResults) {
+        var jsonCacheReport = new JsonCacheReport(pluginResults, testTaskCacheHelper.getMetrics());
+        var dir = new File(session.getExecutionRootDirectory(), "target");
+        dir.mkdir();
+        MoreFileUtils.write(new File(dir, "surefire-cache-report.json"), JsonSerializers.serialize(jsonCacheReport));
+    }
+
+    private record JsonCacheReport(
+        Map<String, Map<TaskOutcome, AggResult>> pluginResults,
+        CacheServiceMetrics cacheServiceMetrics) {
+    }
+
+    private static void logStorageMetrics(CacheServiceMetrics metrics) {
         int readHitOps = metrics.getReadHitOperations();
         long readHitMillis = metrics.getReadHitMillis();
         long readHitBytes = metrics.getReadHitBytes();
@@ -105,23 +121,21 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
                 readMissOps, formatTime(toSeconds(readMissMillis)));
         }
 
-        if (cacheStorage instanceof ReportingCacheStorage reportingCacheStorage) {
-            var readFailureReport = reportingCacheStorage.getReadFailureReport();
-            if (readFailureReport != null) {
-                logger.warn(readFailureReport);
-            }
-            var writeFailureReport = reportingCacheStorage.getWriteFailureReport();
-            if (writeFailureReport != null) {
-                logger.warn(writeFailureReport);
-            }
-        }
-
         int writeOps = metrics.getWriteOperations();
         long writeMillis = metrics.getWriteMillis();
         long writeBytes = metrics.getWriteBytes();
         if (writeOps > 0) {
             logger.info("Cache write operations: {}, time: {}, size: {}",
                 writeOps, formatTime(toSeconds(writeMillis)), formatByteSize(writeBytes));
+        }
+
+        int readFailures = metrics.getReadFailures();
+        if (readFailures != 0) {
+            logger.warn("Read failures: {}, then skipped {} operations", readFailures, metrics.getReadSkipped());
+        }
+        int writeFailures = metrics.getWriteFailures();
+        if (writeFailures != 0) {
+            logger.warn("Write failures: {}, then skipped {} operations", writeFailures, metrics.getWriteSkipped());
         }
     }
 }

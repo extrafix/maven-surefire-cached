@@ -47,7 +47,7 @@ public class TestTaskCacheHelper {
 
         this.metrics = new CacheServiceMetrics();
         this.cacheStorage = createCacheStorage(session);
-        this.cacheService = new CacheService(cacheStorage, metrics);
+        this.cacheService = new CacheService(cacheStorage, metrics, 2);
         this.cacheReport = new CacheReport();
     }
 
