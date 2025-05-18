@@ -39,7 +39,7 @@ public class FailsafeCacheStorage implements CacheStorage, ReportingCacheStorage
         try {
             return delegate.read(cacheEntryKey, fileName);
         } catch (CacheStorageException e) {
-            logger.warn("Failed to read {} {}", cacheEntryKey, fileName, e);
+            logger.warn("Failed to read cache entry {} {}", cacheEntryKey, fileName, e);
             readFailures.incrementAndGet();
             return null;
         }
@@ -56,7 +56,7 @@ public class FailsafeCacheStorage implements CacheStorage, ReportingCacheStorage
         try {
             return delegate.write(cacheEntryKey, fileName, value);
         } catch (CacheStorageException e) {
-            logger.warn("Failed to write {} {}", cacheEntryKey, fileName, e);
+            logger.warn("Failed to write cache entry {} {}", cacheEntryKey, fileName, e);
             writeFailures.incrementAndGet();
             return 0;
         }
