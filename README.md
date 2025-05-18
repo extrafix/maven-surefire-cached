@@ -32,19 +32,21 @@ It's mandatory to define `surefire-cached.json` file for the module. If the file
 the extension will go thru the parent modules (till root) and try to find it there. Sample configuration file:
 ```json
 {
-  "inputIgnoredProperties": [
-    "java.version",
-    "os.arch",
-    "os.name",
-    "env.CI",
-    "env.GITHUB_BASE_REF",
-    "env.GITHUB_REF",
-    "env.GITHUB_RUN_ID",
-    "env.GITHUB_JOB",
-    "env.GITHUB_SHA"
-  ],
+  "common": {
+    "inputIgnoredProperties": [
+      "java.version",
+      "os.arch",
+      "os.name",
+      "env.CI",
+      "env.GITHUB_BASE_REF",
+      "env.GITHUB_REF",
+      "env.GITHUB_RUN_ID",
+      "env.GITHUB_JOB",
+      "env.GITHUB_SHA"
+    ],
+    "cacheExcludes": ["com.acme:core"]
+  },
   "surefire": {
-    "cacheExcludes": ["com.acme:core"],
     "artifacts": {
       "surefire-reports": {
         "includes": ["surefire-reports/TEST-*.xml"]
@@ -55,7 +57,6 @@ the extension will go thru the parent modules (till root) and try to find it the
     }
   },
   "failsafe": {
-    "cacheExcludes": ["com.acme:core"],
     "artifacts": {
       "failsafe-reports": {
         "includes": ["failsafe-reports/TEST-*.xml"]

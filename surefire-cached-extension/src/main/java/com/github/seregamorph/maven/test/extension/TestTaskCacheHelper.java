@@ -100,7 +100,6 @@ public class TestTaskCacheHelper {
         MavenSession session,
         MavenProject project,
         Mojo delegate,
-        SurefireCachedConfig surefireCachedConfig,
         SurefireCachedConfig.TestPluginConfig testPluginConfig
     ) {
         var activeProfiles = session.getRequest().getActiveProfiles();
@@ -108,14 +107,14 @@ public class TestTaskCacheHelper {
         var testTaskInput = new TestTaskInput();
 
         testTaskInput.addIgnoredProperty("timestamp", Instant.now().toString());
-        for (var ignoredProperty : surefireCachedConfig.getInputIgnoredProperties()) {
+        for (var ignoredProperty : testPluginConfig.getInputIgnoredProperties()) {
             var value = MavenPropertyUtils.getProperty(session, project, ignoredProperty);
             if (value != null) {
                 testTaskInput.addIgnoredProperty(ignoredProperty, value);
             }
         }
 
-        for (var property : surefireCachedConfig.getInputProperties()) {
+        for (var property : testPluginConfig.getInputProperties()) {
             var value = MavenPropertyUtils.getProperty(session, project, property);
             if (value != null) {
                 testTaskInput.addProperty(property, value);

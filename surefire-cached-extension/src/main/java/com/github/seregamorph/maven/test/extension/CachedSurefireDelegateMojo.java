@@ -8,6 +8,7 @@ import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
+import com.github.seregamorph.maven.test.core.SurefireCachedConfigLoader;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
 import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
@@ -21,7 +22,6 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -38,8 +38,6 @@ import org.apache.maven.project.MavenProject;
  * @author Sergey Chernov
  */
 public class CachedSurefireDelegateMojo extends AbstractMojo {
-
-    private static final String CONFIG_FILE_NAME = "surefire-cached.json";
 
     private final TestTaskCacheHelper testTaskCacheHelper;
     private final CacheService cacheService;
@@ -115,16 +113,14 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             return;
         }
 
-        SurefireCachedConfig surefireCachedConfig = loadSurefireCachedConfig();
-        var testPluginConfig = getTestPluginConfig(surefireCachedConfig);
+        var testPluginConfig = loadTestPluginConfig(pluginName);
 
         var taskInputFile = new File(projectBuildDirectory, getTaskInputFileName());
         var taskOutputFile = new File(projectBuildDirectory, getTaskOutputFileName());
         MoreFileUtils.delete(taskInputFile);
         MoreFileUtils.delete(taskOutputFile);
 
-        var testTaskInput = testTaskCacheHelper.getTestTaskInput(session, project, this.delegate,
-            surefireCachedConfig, testPluginConfig);
+        var testTaskInput = testTaskCacheHelper.getTestTaskInput(session, project, this.delegate, testPluginConfig);
         var testTaskInputBytes = JsonSerializers.serialize(testTaskInput);
         log.debug(new String(testTaskInputBytes, UTF_8));
         MoreFileUtils.write(taskInputFile, testTaskInputBytes);
@@ -194,22 +190,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         return false;
     }
 
-    SurefireCachedConfig loadSurefireCachedConfig() {
-        MavenProject currentProject = this.project;
-        do {
-            for (String fileName : List.of(CONFIG_FILE_NAME, ".mvn/" + CONFIG_FILE_NAME)) {
-                File surefireCachedConfigFile = new File(currentProject.getBasedir(), fileName);
-                if (surefireCachedConfigFile.exists()) {
-                    return JsonSerializers.deserialize(
-                        MoreFileUtils.read(surefireCachedConfigFile), SurefireCachedConfig.class,
-                        surefireCachedConfigFile.toString());
-                }
-            }
-            currentProject = currentProject.getParent();
-        } while (currentProject != null && currentProject.getBasedir() != null);
-
-        throw new IllegalStateException("Unable to find surefire cached config file in "
-            + new File(this.project.getBasedir(), CONFIG_FILE_NAME) + " or parent Maven project");
+    SurefireCachedConfig.TestPluginConfig loadTestPluginConfig(PluginName pluginName) {
+        return SurefireCachedConfigLoader.loadSurefireCachedConfig(project, pluginName);
     }
 
     private int storeCache(
@@ -296,16 +278,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
     private static String getArtifactPackName(String alias) {
         return alias + ".tar.gz";
-    }
-
-    private SurefireCachedConfig.TestPluginConfig getTestPluginConfig(SurefireCachedConfig surefireCachedConfig) {
-        if (pluginName == PluginName.SUREFIRE_CACHED) {
-            return surefireCachedConfig.getSurefire();
-        } else if (pluginName == PluginName.FAILSAFE_CACHED) {
-            return surefireCachedConfig.getFailsafe();
-        } else {
-            throw new IllegalStateException("Unknown plugin " + pluginName);
-        }
     }
 
     private static BigDecimal getTotalTimeSeconds(Instant startTime, Instant endTime) {

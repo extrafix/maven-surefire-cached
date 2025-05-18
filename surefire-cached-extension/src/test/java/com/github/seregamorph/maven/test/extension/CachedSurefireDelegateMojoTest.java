@@ -38,12 +38,15 @@ public class CachedSurefireDelegateMojoTest {
         var delegate = mock(TestSurefireMojo.class);
         var testTaskCacheHelper = new TestTaskCacheHelper();
         testTaskCacheHelper.init(session);
+        var pluginName = PluginName.SUREFIRE_CACHED;
         var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper,
             testTaskCacheHelper.getCacheService(), testTaskCacheHelper.getCacheReport(),
-            session, project, delegate, PluginName.SUREFIRE_CACHED);
+            session, project, delegate, pluginName);
 
-        var config = cachedDelegateMojo.loadSurefireCachedConfig();
-        assertEquals(List.of("com.acme:core"), config.getSurefire().getCacheExcludes());
+        var config = cachedDelegateMojo.loadTestPluginConfig(pluginName);
+        assertEquals(List.of("com.acme:core"), config.getCacheExcludes());
+        assertEquals(List.of("surefire-reports/TEST-*.xml"), config.getArtifacts().get("surefire-reports").getIncludes());
+        assertEquals(List.of("jacoco-*.exec"), config.getArtifacts().get("jacoco").getIncludes());
     }
 
     private static URI getResourceURI(String name) {
