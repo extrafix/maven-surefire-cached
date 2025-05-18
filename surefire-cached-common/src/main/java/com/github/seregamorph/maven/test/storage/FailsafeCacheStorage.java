@@ -30,7 +30,7 @@ public class FailsafeCacheStorage implements CacheStorage, ReportingCacheStorage
     @Nullable
     @Override
     public byte[] read(CacheEntryKey cacheEntryKey, String fileName) {
-        if (readFailures.get() > threshold) {
+        if (readFailures.get() >= threshold) {
             skippedReads.incrementAndGet();
             logger.info("Skipping reading {} {} because of too many failures", cacheEntryKey, fileName);
             return null;
@@ -39,7 +39,7 @@ public class FailsafeCacheStorage implements CacheStorage, ReportingCacheStorage
         try {
             return delegate.read(cacheEntryKey, fileName);
         } catch (CacheStorageException e) {
-            logger.warn("Failed to read cache entry {} {}", cacheEntryKey, fileName, e);
+            logger.warn("Failed to read cache entry {}", e.toString());
             readFailures.incrementAndGet();
             return null;
         }
@@ -47,7 +47,7 @@ public class FailsafeCacheStorage implements CacheStorage, ReportingCacheStorage
 
     @Override
     public int write(CacheEntryKey cacheEntryKey, String fileName, byte[] value) {
-        if (writeFailures.get() > threshold) {
+        if (writeFailures.get() >= threshold) {
             skippedWrites.incrementAndGet();
             logger.info("Skipping writing {} {} because of too many failures", cacheEntryKey, fileName);
             return 0;
@@ -56,7 +56,7 @@ public class FailsafeCacheStorage implements CacheStorage, ReportingCacheStorage
         try {
             return delegate.write(cacheEntryKey, fileName, value);
         } catch (CacheStorageException e) {
-            logger.warn("Failed to write cache entry {} {}", cacheEntryKey, fileName, e);
+            logger.warn("Failed to write cache entry {}", e.toString());
             writeFailures.incrementAndGet();
             return 0;
         }

@@ -68,7 +68,7 @@ public class HttpCacheStorage implements CacheStorage {
                 return responseBody.bytes();
             }
         } catch (IOException e) {
-            throw new CacheStorageException("Error while fetching from cache " + url, e);
+            throw new CacheStorageException("Error while fetching from cache " + url + " " + e, e);
         }
     }
 
@@ -93,7 +93,7 @@ public class HttpCacheStorage implements CacheStorage {
                 }
             }
         } catch (IOException e) {
-            throw new CacheStorageException("Error while pushing to cache " + url, e);
+            throw new CacheStorageException("Error while pushing to cache " + url + " " + e, e);
         }
 
         return 0;
