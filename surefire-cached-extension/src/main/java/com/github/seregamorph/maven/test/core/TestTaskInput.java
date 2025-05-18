@@ -41,7 +41,7 @@ public final class TestTaskInput {
     /**
      * Updated on each breaking change
      */
-    private static final int VERSION = 2;
+    private static final int VERSION = 1;
 
     private final SortedMap<String, String> ignoredProperties = new TreeMap<>();
 
