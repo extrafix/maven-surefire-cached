@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 import javax.annotation.Nullable;
 import org.apache.maven.execution.MavenSession;
@@ -136,25 +137,19 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         var entryCalculatedTime = Instant.now();
         log.debug("Cache entry calculated in " + Duration.between(startTime, entryCalculatedTime));
 
-        var testTaskOutputBytes = cacheService.read(cacheEntryKey, getTaskOutputFileName());
-        if (testTaskOutputBytes != null) {
-            MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
-            log.info("Cache hit " + cacheEntryKey);
-            var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class,
-                getTaskOutputFileName());
-            log.info("Restoring artifacts from cache to " + projectBuildDirectory);
-
-            try {
-                restoreCache(cacheEntryKey, testTaskOutput);
-                setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
-                return;
-            } catch (InconsistentCacheException e) {
-                // failover to standard execution
-                log.warn(e.getMessage());
-            }
+        boolean testClassesEmpty = Optional.ofNullable(testTaskInput.getTestClassesHashes())
+            .map(Map::isEmpty).orElse(true);
+        // try to restore from cache only if there are test classes
+        var restoredFromCache = !testClassesEmpty && restoreFromCache(cacheEntryKey, taskOutputFile);
+        if (restoredFromCache) {
+            return;
         }
 
-        log.info("Cache miss " + cacheEntryKey);
+        if (testClassesEmpty) {
+            log.info("Not test classes found");
+        } else {
+            log.info("Cache miss " + cacheEntryKey);
+        }
         boolean success = false;
         try {
             delegate.execute();
@@ -178,6 +173,29 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
                 }
             }
         }
+    }
+
+    private boolean restoreFromCache(CacheEntryKey cacheEntryKey, File taskOutputFile) {
+        var testTaskOutputBytes = cacheService.read(cacheEntryKey, getTaskOutputFileName());
+        if (testTaskOutputBytes == null) {
+            return false;
+        }
+
+        MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
+        log.info("Cache hit " + cacheEntryKey);
+        var testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class,
+            getTaskOutputFileName());
+        log.info("Restoring artifacts from cache to " + projectBuildDirectory);
+
+        try {
+            restoreCache(cacheEntryKey, testTaskOutput);
+            setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
+            return true;
+        } catch (InconsistentCacheException e) {
+            // failover to standard execution
+            log.warn(e.getMessage());
+        }
+        return false;
     }
 
     SurefireCachedConfig loadSurefireCachedConfig() {
