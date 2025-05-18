@@ -78,7 +78,7 @@ public class TestTaskCacheHelper {
         return cacheService;
     }
 
-    private static CacheStorage getCacheStorage(MavenSession session) {
+    private static CacheStorage createCacheStorage(MavenSession session) {
         String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
         if (cacheStorageUrl == null) {
             cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";

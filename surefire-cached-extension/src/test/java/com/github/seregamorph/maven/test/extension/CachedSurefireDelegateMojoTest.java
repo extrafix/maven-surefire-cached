@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.github.seregamorph.maven.test.common.TestTaskOutput;
+import com.github.seregamorph.maven.test.common.PluginName;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,7 +40,7 @@ public class CachedSurefireDelegateMojoTest {
         testTaskCacheHelper.init(session);
         var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper,
             testTaskCacheHelper.getCacheService(), session, project, delegate,
-            TestTaskOutput.PLUGIN_SUREFIRE_CACHED);
+            PluginName.SUREFIRE_CACHED);
 
         var config = cachedDelegateMojo.loadSurefireCachedConfig();
         assertEquals(List.of("com.acme:core"), config.getSurefire().getCacheExcludes());

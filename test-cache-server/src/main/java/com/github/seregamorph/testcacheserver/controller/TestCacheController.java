@@ -2,6 +2,7 @@ package com.github.seregamorph.testcacheserver.controller;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
+import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.testcacheserver.service.TestCacheService;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
@@ -30,7 +31,7 @@ public class TestCacheController {
     @Counted(value = "putCache")
     @PutMapping("/{pluginName}/{groupId}/{artifactId}/{hash}/{file}")
     public ResponseEntity<?> putCache(
-        @PathVariable("pluginName") String pluginName,
+        @PathVariable("pluginName") PluginName pluginName,
         @PathVariable("groupId") String groupId,
         @PathVariable("artifactId") String artifactId,
         @PathVariable("hash") String hash,
@@ -46,7 +47,7 @@ public class TestCacheController {
     @Counted(value = "getCache")
     @GetMapping("/{pluginName}/{groupId}/{artifactId}/{hash}/{file}")
     public ResponseEntity<byte[]> getCache(
-        @PathVariable("pluginName") String pluginName,
+        @PathVariable("pluginName") PluginName pluginName,
         @PathVariable("groupId") String groupId,
         @PathVariable("artifactId") String artifactId,
         @PathVariable("hash") String hash,

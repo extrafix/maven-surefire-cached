@@ -37,7 +37,4 @@ public record TestTaskOutput(
     public static final String PROP_SUFFIX_TEST_CACHED_RESULT = "_test-cached-result";
     public static final String PROP_SUFFIX_TEST_CACHED_TIME = "_test-cached-time";
     public static final String PROP_SUFFIX_TEST_DELETED_ENTRIES = "_test-deleted-entries";
-
-    public static final String PLUGIN_SUREFIRE_CACHED = "surefire-cached";
-    public static final String PLUGIN_FAILSAFE_CACHED = "failsafe-cached";
 }

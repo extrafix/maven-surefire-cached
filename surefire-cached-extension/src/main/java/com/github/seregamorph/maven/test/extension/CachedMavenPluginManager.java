@@ -1,8 +1,6 @@
 package com.github.seregamorph.maven.test.extension;
 
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_FAILSAFE_CACHED;
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_SUREFIRE_CACHED;
-
+import com.github.seregamorph.maven.test.common.PluginName;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -98,11 +96,11 @@ public class CachedMavenPluginManager implements MavenPluginManager {
             // getConfiguredMojo method with mojoInterface=Mojo.class
             return (T) new CachedSurefireDelegateMojo(testTaskCacheHelper, testTaskCacheHelper.getCacheService(),
                 session, session.getCurrentProject(),
-                (Mojo) mojo, PLUGIN_SUREFIRE_CACHED);
+                (Mojo) mojo, PluginName.SUREFIRE_CACHED);
         } else if ("org.apache.maven.plugin.failsafe.IntegrationTestMojo".equals(mojo.getClass().getName())) {
             return (T) new CachedSurefireDelegateMojo(testTaskCacheHelper, testTaskCacheHelper.getCacheService(),
                 session, session.getCurrentProject(),
-                (Mojo) mojo, PLUGIN_FAILSAFE_CACHED);
+                (Mojo) mojo, PluginName.FAILSAFE_CACHED);
         }
         return mojo;
     }

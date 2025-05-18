@@ -8,6 +8,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
+import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
@@ -48,7 +49,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     private final MavenSession session;
     private final MavenProject project;
     private final Mojo delegate;
-    private final String pluginName;
+    private final PluginName pluginName;
 
     private final Log log;
     private final File projectBuildDirectory;
@@ -60,7 +61,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         MavenSession session,
         MavenProject project,
         Mojo delegate,
-        String pluginName
+        PluginName pluginName
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
         this.cacheService = cacheService;
@@ -303,9 +304,9 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     }
 
     private SurefireCachedConfig.TestPluginConfig getTestPluginConfig(SurefireCachedConfig surefireCachedConfig) {
-        if (TestTaskOutput.PLUGIN_SUREFIRE_CACHED.equals(pluginName)) {
+        if (pluginName == PluginName.SUREFIRE_CACHED) {
             return surefireCachedConfig.getSurefire();
-        } else if (TestTaskOutput.PLUGIN_FAILSAFE_CACHED.equals(pluginName)) {
+        } else if (pluginName == PluginName.FAILSAFE_CACHED) {
             return surefireCachedConfig.getFailsafe();
         } else {
             throw new IllegalStateException("Unknown plugin " + pluginName);

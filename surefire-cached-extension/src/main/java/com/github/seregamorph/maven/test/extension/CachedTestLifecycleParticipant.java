@@ -1,7 +1,5 @@
 package com.github.seregamorph.maven.test.extension;
 
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_FAILSAFE_CACHED;
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PLUGIN_SUREFIRE_CACHED;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_RESULT;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_TIME;
 import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
@@ -9,6 +7,7 @@ import static com.github.seregamorph.maven.test.util.ByteSizeFormatUtils.formatB
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.formatTime;
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 
+import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
@@ -66,7 +65,7 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
     @Override
     public void afterSessionEnd(MavenSession session) {
-        for (var pluginName : List.of(PLUGIN_SUREFIRE_CACHED, PLUGIN_FAILSAFE_CACHED)) {
+        for (var pluginName : List.of(PluginName.SUREFIRE_CACHED, PluginName.FAILSAFE_CACHED)) {
             var results = new TreeMap<TaskOutcome, AggResult>();
             int deleted = 0;
             for (var project : session.getProjects()) {

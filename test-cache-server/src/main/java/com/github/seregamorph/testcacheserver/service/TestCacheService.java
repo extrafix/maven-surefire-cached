@@ -33,12 +33,12 @@ public class TestCacheService {
         cacheStorage.write(cacheEntryKey, fileName, body);
 
         Counter.builder("put_cache")
-            .tag("pluginName", cacheEntryKey.pluginName())
+            .tag("pluginName", cacheEntryKey.pluginName().name())
             .register(meterRegistry)
             .increment();
 
         Counter.builder("put_cache_size")
-            .tag("pluginName", cacheEntryKey.pluginName())
+            .tag("pluginName", cacheEntryKey.pluginName().name())
             .register(meterRegistry)
             .increment(body.length);
     }
@@ -48,26 +48,26 @@ public class TestCacheService {
         var body = cacheStorage.read(cacheEntryKey, fileName);
         if (body == null) {
             Counter.builder("get_cache_miss")
-                .tag("pluginName", cacheEntryKey.pluginName())
+                .tag("pluginName", cacheEntryKey.pluginName().name())
                 .register(meterRegistry)
                 .increment();
             return null;
         }
 
         Counter.builder("get_cache_hit")
-            .tag("pluginName", cacheEntryKey.pluginName())
+            .tag("pluginName", cacheEntryKey.pluginName().name())
             .register(meterRegistry)
             .increment();
 
         Counter.builder("get_cache_size")
-            .tag("pluginName", cacheEntryKey.pluginName())
+            .tag("pluginName", cacheEntryKey.pluginName().name())
             .register(meterRegistry)
             .increment(body.length);
 
         if (TRACKED_TASK_OUTPUTS.contains(fileName)) {
             var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class, fileName);
             Counter.builder("cache_saved_time_seconds")
-                .tag("pluginName", cacheEntryKey.pluginName())
+                .tag("pluginName", cacheEntryKey.pluginName().name())
                 .register(meterRegistry)
                 .increment(testTaskOutput.totalTimeSeconds().doubleValue());
         }

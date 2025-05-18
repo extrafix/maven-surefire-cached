@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
+import com.github.seregamorph.maven.test.common.PluginName;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ class GzipDelegateCacheStorageTest {
     @Test
     public void testGzipDelegateCacheStorage() {
         var storage = new GzipDelegateCacheStorage(new SoftReferenceMemoryStorage(4));
-        var cacheEntryKey = new CacheEntryKey("surefire-cached",
+        var cacheEntryKey = new CacheEntryKey(PluginName.SUREFIRE_CACHED,
             new GroupArtifactId("com.acme", "utils"), "01234567890abcdef");
         var fileName = "content.json";
 
