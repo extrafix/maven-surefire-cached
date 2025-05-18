@@ -71,13 +71,15 @@ the extension will go thru the parent modules (till root) and try to find it the
 Sample adoption:
 * https://github.com/seregamorph/spring-test-smart-context/pull/6
 
-First build without tests
+## Running with the local cache
+Build your project with the extension, the caching will use default file storage `$HOME/.m2/test-cache`
 ```shell
-mvn clean install -DskipTests=true
+mvn clean install
 ```
 
-Then run unit tests
+Or compile separately and run unit tests
 ```shell
+mvn clean install -DskipTests=true
 mvn surefire:test
 ```
 
@@ -88,6 +90,7 @@ mvn test
 
 Then run integration tests
 ```shell
+mvn clean install -DskipTests=true
 mvn failsafe:integration-test -Dit.test=SampleIT
 ```
 or via phase
@@ -95,7 +98,14 @@ or via phase
 mvn verify
 ```
 
-Using remote cache
+## Running with the remote cache
+Run server from this repo
+```shell
+./mvnw clean install
+docker compose up
+```
+
+Build your project with the extension using the remote cache
 ```shell
 mvn clean install -DcacheStorageUrl=http://localhost:8080/cache
 ```
