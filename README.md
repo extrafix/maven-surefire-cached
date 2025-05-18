@@ -110,6 +110,11 @@ Build your project with the extension using the remote cache
 mvn clean install -DcacheStorageUrl=http://localhost:8080/cache
 ```
 
+Actuator endpoints are available at http://localhost:8080/actuator, see http://localhost:8080/actuator/prometheus
+for metrics.
+
+TODO grafana dashboard WiP
+
 ## How it works
 The extension wraps and replaces default Mojo factory
 [DefaultMavenPluginManager](https://github.com/apache/maven/blob/maven-3.9.9/maven-core/src/main/java/org/apache/maven/plugin/internal/DefaultMavenPluginManager.java)
