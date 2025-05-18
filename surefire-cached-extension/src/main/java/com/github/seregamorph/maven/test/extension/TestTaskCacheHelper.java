@@ -4,7 +4,7 @@ import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.core.FileHashCache;
-import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
+import com.github.seregamorph.maven.test.core.TestPluginConfig;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
@@ -100,7 +100,7 @@ public class TestTaskCacheHelper {
         MavenSession session,
         MavenProject project,
         Mojo delegate,
-        SurefireCachedConfig.TestPluginConfig testPluginConfig
+        TestPluginConfig testPluginConfig
     ) {
         var activeProfiles = session.getRequest().getActiveProfiles();
 

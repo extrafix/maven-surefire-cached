@@ -1,7 +1,6 @@
 package com.github.seregamorph.maven.test.core;
 
 import com.github.seregamorph.maven.test.common.PluginName;
-import com.github.seregamorph.maven.test.core.SurefireCachedConfig.TestPluginConfig;
 import com.github.seregamorph.maven.test.util.JsonSerializers;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import java.io.File;
@@ -18,11 +17,11 @@ import org.apache.maven.project.MavenProject;
  * <p>
  * And then merge them in this order.
  */
-public class SurefireCachedConfigLoader {
+public class TestPluginConfigLoader {
 
     private static final String CONFIG_FILE_NAME = "surefire-cached.json";
 
-    public static TestPluginConfig loadSurefireCachedConfig(MavenProject project, PluginName pluginName) {
+    public static TestPluginConfig loadTestPluginConfig(MavenProject project, PluginName pluginName) {
         var configs = new ArrayList<SurefireCachedConfig>();
         MavenProject currentProject = project;
         do {
@@ -51,7 +50,7 @@ public class SurefireCachedConfigLoader {
             throw new IllegalStateException("Unable to find surefire cached config file in "
                 + new File(project.getBasedir(), CONFIG_FILE_NAME) + " or parent Maven project");
         }
-        return merge(mergedConfig, SurefireCachedConfig.DEFAULT_CONFIG);
+        return merge(mergedConfig, TestPluginConfig.DEFAULT_CONFIG);
     }
 
     private static TestPluginConfig mergeCommon(SurefireCachedConfig surefireCachedConfig, PluginName pluginName) {
@@ -63,20 +62,15 @@ public class SurefireCachedConfigLoader {
     }
 
     private static TestPluginConfig merge(TestPluginConfig primaryConfig, TestPluginConfig defaultConfig) {
-        var inputProperties = resolveProperty(primaryConfig, defaultConfig,
-            TestPluginConfig::getInputProperties);
-        var inputIgnoredProperties = resolveProperty(primaryConfig, defaultConfig,
-            TestPluginConfig::getInputIgnoredProperties);
-        var cacheExcludes = resolveProperty(primaryConfig, defaultConfig,
-            TestPluginConfig::getCacheExcludes);
-        var artifacts = resolveProperty(primaryConfig, defaultConfig,
-            TestPluginConfig::getArtifacts);
-
         return new TestPluginConfig()
-            .setInputProperties(inputProperties)
-            .setInputIgnoredProperties(inputIgnoredProperties)
-            .setCacheExcludes(cacheExcludes)
-            .setArtifacts(artifacts);
+            .setInputProperties(resolveProperty(primaryConfig, defaultConfig,
+                TestPluginConfig::getInputProperties))
+            .setInputIgnoredProperties(resolveProperty(primaryConfig, defaultConfig,
+                TestPluginConfig::getInputIgnoredProperties))
+            .setCacheExcludes(resolveProperty(primaryConfig, defaultConfig,
+                TestPluginConfig::getCacheExcludes))
+            .setArtifacts(resolveProperty(primaryConfig, defaultConfig,
+                TestPluginConfig::getArtifacts));
     }
 
     @Nullable

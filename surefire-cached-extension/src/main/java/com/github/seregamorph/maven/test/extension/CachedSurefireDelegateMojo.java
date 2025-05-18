@@ -8,8 +8,9 @@ import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
-import com.github.seregamorph.maven.test.core.SurefireCachedConfigLoader;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
+import com.github.seregamorph.maven.test.core.TestPluginConfig;
+import com.github.seregamorph.maven.test.core.TestPluginConfigLoader;
 import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
@@ -190,12 +191,12 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         return false;
     }
 
-    SurefireCachedConfig.TestPluginConfig loadTestPluginConfig(PluginName pluginName) {
-        return SurefireCachedConfigLoader.loadSurefireCachedConfig(project, pluginName);
+    TestPluginConfig loadTestPluginConfig(PluginName pluginName) {
+        return TestPluginConfigLoader.loadTestPluginConfig(project, pluginName);
     }
 
     private int storeCache(
-        SurefireCachedConfig.TestPluginConfig testPluginConfig,
+        TestPluginConfig testPluginConfig,
         CacheEntryKey cacheEntryKey,
         TestTaskInput testTaskInput,
         TestTaskOutput testTaskOutput
@@ -240,7 +241,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     }
 
     private TestTaskOutput getTaskOutput(
-        @Nullable SurefireCachedConfig.TestPluginConfig testPluginConfig,
+        @Nullable TestPluginConfig testPluginConfig,
         Instant startTime,
         Instant endTime
     ) {
