@@ -32,13 +32,14 @@ public class TestCacheService {
     public void putCache(CacheEntryKey cacheEntryKey, String fileName, byte[] body) {
         cacheStorage.write(cacheEntryKey, fileName, body);
 
+        var pluginName = cacheEntryKey.pluginName().name();
         Counter.builder("put_cache")
-            .tag("pluginName", cacheEntryKey.pluginName().name())
+            .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment();
 
         Counter.builder("put_cache_size")
-            .tag("pluginName", cacheEntryKey.pluginName().name())
+            .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment(body.length);
     }
@@ -46,28 +47,29 @@ public class TestCacheService {
     @Nullable
     public byte[] getCache(CacheEntryKey cacheEntryKey, String fileName) {
         var body = cacheStorage.read(cacheEntryKey, fileName);
+        var pluginName = cacheEntryKey.pluginName().name();
         if (body == null) {
             Counter.builder("get_cache_miss")
-                .tag("pluginName", cacheEntryKey.pluginName().name())
+                .tag("pluginName", pluginName)
                 .register(meterRegistry)
                 .increment();
             return null;
         }
 
         Counter.builder("get_cache_hit")
-            .tag("pluginName", cacheEntryKey.pluginName().name())
+            .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment();
 
         Counter.builder("get_cache_size")
-            .tag("pluginName", cacheEntryKey.pluginName().name())
+            .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment(body.length);
 
         if (TRACKED_TASK_OUTPUTS.contains(fileName)) {
             var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class, fileName);
             Counter.builder("cache_saved_time_seconds")
-                .tag("pluginName", cacheEntryKey.pluginName().name())
+                .tag("pluginName", pluginName)
                 .register(meterRegistry)
                 .increment(testTaskOutput.totalTimeSeconds().doubleValue());
         }
