@@ -15,6 +15,6 @@ public class CacheStorageConfiguration {
     @Bean
     public CacheStorage cacheStorage() {
         var baseDir = new File(System.getProperty("user.home"), ".m2/test-cache-server");
-        return new FileCacheStorage(baseDir, 64);
+        return new FileCacheStorage(baseDir, 16);
     }
 }
