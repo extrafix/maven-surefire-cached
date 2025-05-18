@@ -70,6 +70,7 @@ the extension will go thru the parent modules (till root) and try to find it the
 
 Sample adoption:
 * https://github.com/seregamorph/spring-test-smart-context/pull/6
+* https://github.com/seregamorph/rest-api-framework/pull/2
 
 ## Running with the local cache
 Build your project with the extension, the caching will use default file storage `$HOME/.m2/test-cache`
