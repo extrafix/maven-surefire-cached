@@ -21,7 +21,7 @@ Add to the `.mvn/extensions.xml` of your project:
     <extension>
         <groupId>com.github.seregamorph</groupId>
         <artifactId>surefire-cached-extension</artifactId>
-        <version>0.8</version>
+        <version>0.10</version>
     </extension>
 </extensions>
 ```
@@ -32,6 +32,17 @@ It's mandatory to define `surefire-cached.json` file for the module. If the file
 the extension will go thru the parent modules (till root) and try to find it there. Sample configuration file:
 ```json
 {
+  "inputIgnoredProperties": [
+    "java.version",
+    "os.arch",
+    "os.name",
+    "env.CI",
+    "env.GITHUB_BASE_REF",
+    "env.GITHUB_REF",
+    "env.GITHUB_RUN_ID",
+    "env.GITHUB_JOB",
+    "env.GITHUB_SHA"
+  ],
   "surefire": {
     "cacheExcludes": ["com.acme:core"],
     "artifacts": {
