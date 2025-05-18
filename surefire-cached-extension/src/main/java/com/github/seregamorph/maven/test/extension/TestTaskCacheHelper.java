@@ -50,9 +50,11 @@ public class TestTaskCacheHelper {
     }
 
     public void destroy() {
-        fileHashCache = null;
-        modules = null;
         cacheService = null;
+        cacheStorage = null;
+        metrics = null;
+        modules = null;
+        fileHashCache = null;
     }
 
     public CacheServiceMetrics getMetrics() {
