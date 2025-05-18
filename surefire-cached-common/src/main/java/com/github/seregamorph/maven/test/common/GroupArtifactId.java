@@ -5,7 +5,7 @@ import com.github.seregamorph.maven.test.util.ValidatorUtils;
 /**
  * @author Sergey Chernov
  */
-public record GroupArtifactId(String groupId, String artifactId) {
+public record GroupArtifactId(String groupId, String artifactId) implements Comparable<GroupArtifactId>{
 
     public GroupArtifactId {
         ValidatorUtils.validateFileName(groupId);
@@ -18,6 +18,11 @@ public record GroupArtifactId(String groupId, String artifactId) {
             throw new IllegalArgumentException("Invalid format: [" + str + "]");
         }
         return new GroupArtifactId(parts[0], parts[1]);
+    }
+
+    @Override
+    public int compareTo(GroupArtifactId that) {
+        return toString().compareTo(that.toString());
     }
 
     @Override

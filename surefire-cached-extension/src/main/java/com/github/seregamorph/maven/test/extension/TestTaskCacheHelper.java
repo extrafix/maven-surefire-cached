@@ -13,9 +13,9 @@ import com.github.seregamorph.maven.test.util.HashUtils;
 import com.github.seregamorph.maven.test.util.MavenPropertyUtils;
 import java.io.File;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import javax.inject.Singleton;
@@ -33,7 +33,7 @@ public class TestTaskCacheHelper {
     private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
 
     private FileHashCache fileHashCache;
-    private Set<GroupArtifactId> modules;
+    private SortedSet<GroupArtifactId> modules;
     private CacheServiceMetrics metrics;
     private CacheStorage cacheStorage;
     private CacheService cacheService;
@@ -42,10 +42,10 @@ public class TestTaskCacheHelper {
         fileHashCache = new FileHashCache();
         modules = session.getAllProjects().stream()
             .map(p -> new GroupArtifactId(p.getGroupId(), p.getArtifactId()))
-            .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(Object::toString))));
+            .collect(Collectors.toCollection(TreeSet::new));
 
         this.metrics = new CacheServiceMetrics();
-        this.cacheStorage = getCacheStorage(session);
+        this.cacheStorage = createCacheStorage(session);
         this.cacheService = new CacheService(cacheStorage, metrics);
     }
 
@@ -121,9 +121,6 @@ public class TestTaskCacheHelper {
             testTaskInput.addPluginArtifactHash(groupArtifactId, pluginArtifact.getClassifier(),
                 pluginArtifact.getVersion(), hash);
         }
-
-        // todo add java version
-        // todo system properties
 
         testTaskInput.setModuleName(project.getGroupId() + ":" + project.getArtifactId());
         var testClasspath = getTestClasspath(project);
