@@ -1,8 +1,5 @@
 package com.github.seregamorph.maven.test.extension;
 
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_RESULT;
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_TIME;
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
 import static com.github.seregamorph.maven.test.util.ByteSizeFormatUtils.formatByteSize;
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.formatTime;
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
@@ -65,21 +62,15 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
     @Override
     public void afterSessionEnd(MavenSession session) {
+        var cacheReport = testTaskCacheHelper.getCacheReport();
         for (var pluginName : List.of(PluginName.SUREFIRE_CACHED, PluginName.FAILSAFE_CACHED)) {
             var results = new TreeMap<TaskOutcome, AggResult>();
             int deleted = 0;
-            for (var project : session.getProjects()) {
-                var cachedResult = project.getProperties().getProperty(pluginName + PROP_SUFFIX_TEST_CACHED_RESULT);
-                if (cachedResult != null) {
-                    var cachedTime =
-                            new BigDecimal(project.getProperties().getProperty(pluginName + PROP_SUFFIX_TEST_CACHED_TIME));
-                    results.compute(TaskOutcome.valueOf(cachedResult),
-                        (k, v) -> (v == null ? AggResult.EMPTY : v).add(cachedTime));
-                    var deletedStr = project.getProperties().getProperty(pluginName + PROP_SUFFIX_TEST_DELETED_ENTRIES);
-                    if (deletedStr != null) {
-                        deleted += Integer.parseInt(deletedStr);
-                    }
-                }
+            var executionResults = cacheReport.getExecutionResults(pluginName);
+            for (var executionResult : executionResults) {
+                results.compute(executionResult.result(),
+                    (k, v) -> (v == null ? AggResult.EMPTY : v).add(executionResult.totalTimeSeconds()));
+                deleted += executionResult.deletedCacheEntries();
             }
             if (!results.isEmpty()) {
                 logger.info("Total test cached results ({}):", pluginName);

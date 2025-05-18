@@ -1,6 +1,6 @@
 package com.github.seregamorph.maven.test.common;
 
-public final class PluginName {
+public final class PluginName implements Comparable<PluginName>{
 
     // implementation notice: the enum is not used because it does not allow auto-convertion in spring webmvc
 
@@ -32,6 +32,12 @@ public final class PluginName {
         } else {
             throw new IllegalArgumentException("Unknown plugin name: " + pluginName);
         }
+    }
+
+    @Override
+    public int compareTo(PluginName that) {
+        // surefire-cached < failsafe-cached
+        return that.name.compareTo(name);
     }
 
     @Override

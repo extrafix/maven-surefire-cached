@@ -37,6 +37,7 @@ public class TestTaskCacheHelper {
     private CacheServiceMetrics metrics;
     private CacheStorage cacheStorage;
     private CacheService cacheService;
+    private CacheReport cacheReport;
 
     public void init(MavenSession session) {
         fileHashCache = new FileHashCache();
@@ -47,9 +48,11 @@ public class TestTaskCacheHelper {
         this.metrics = new CacheServiceMetrics();
         this.cacheStorage = createCacheStorage(session);
         this.cacheService = new CacheService(cacheStorage, metrics);
+        this.cacheReport = new CacheReport();
     }
 
     public void destroy() {
+        cacheReport = null;
         cacheService = null;
         cacheStorage = null;
         metrics = null;
@@ -76,6 +79,13 @@ public class TestTaskCacheHelper {
             throw new IllegalStateException("cacheStorage is not initialized");
         }
         return cacheService;
+    }
+
+    public CacheReport getCacheReport() {
+        if (cacheReport == null) {
+            throw new IllegalStateException("cacheReport is not initialized");
+        }
+        return cacheReport;
     }
 
     private static CacheStorage createCacheStorage(MavenSession session) {

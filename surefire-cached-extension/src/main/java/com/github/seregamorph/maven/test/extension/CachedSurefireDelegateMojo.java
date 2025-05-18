@@ -1,8 +1,5 @@
 package com.github.seregamorph.maven.test.extension;
 
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_RESULT;
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_CACHED_TIME;
-import static com.github.seregamorph.maven.test.common.TestTaskOutput.PROP_SUFFIX_TEST_DELETED_ENTRIES;
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -46,6 +43,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
     private final TestTaskCacheHelper testTaskCacheHelper;
     private final CacheService cacheService;
+    private final CacheReport cacheReport;
     private final MavenSession session;
     private final MavenProject project;
     private final Mojo delegate;
@@ -58,6 +56,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     public CachedSurefireDelegateMojo(
         TestTaskCacheHelper testTaskCacheHelper,
         CacheService cacheService,
+        CacheReport cacheReport,
         MavenSession session,
         MavenProject project,
         Mojo delegate,
@@ -65,6 +64,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
         this.cacheService = cacheService;
+        this.cacheReport = cacheReport;
         this.session = session;
         this.project = project;
         this.delegate = delegate;
@@ -77,22 +77,18 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         this.reportsDirectory = call(delegate, File.class, "getReportsDirectory");
     }
 
-    private void setCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {
-        project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_RESULT, result.name());
-        project.getProperties().put(pluginName + PROP_SUFFIX_TEST_CACHED_TIME,
-            testTaskOutput.totalTimeSeconds().toString());
+    private void reportCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {
+        reportCachedExecution(result, testTaskOutput, 0);
+    }
+
+    private void reportCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput, int deletedCacheEntries) {
+        cacheReport.addExecutionResult(getGroupArtifactId(project), pluginName,
+            result, testTaskOutput.totalTimeSeconds(), deletedCacheEntries);
 
         var message = result.message(testTaskOutput);
         log.info("Cached execution "
             + project.getGroupId() + ":" + project.getArtifactId()
             + " " + result + (message == null ? "" : " " + message));
-    }
-
-    private void setCachedDeletion(int deleted) {
-        if (deleted > 0) {
-            project.getProperties()
-                .put(pluginName + PROP_SUFFIX_TEST_DELETED_ENTRIES, Integer.toString(deleted));
-        }
     }
 
     @Override
@@ -115,7 +111,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             log.info("Skipping cache for " + project.getGroupId() + ":" + project.getArtifactId());
             delegate.execute();
             var testTaskOutput = getTaskOutput(null, startTime, Instant.now());
-            setCachedExecution(TaskOutcome.SKIPPED_CACHE, testTaskOutput);
+            reportCachedExecution(TaskOutcome.SKIPPED_CACHE, testTaskOutput);
             return;
         }
 
@@ -161,16 +157,15 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             // note that failsafe plugin does not throw exceptions on test failures
             if (testTaskOutput.totalErrors() > 0 || testTaskOutput.totalFailures() > 0) {
                 log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
-                setCachedExecution(TaskOutcome.FAILED, testTaskOutput);
+                reportCachedExecution(TaskOutcome.FAILED, testTaskOutput);
             } else if (success) {
                 if (testTaskOutput.totalTests() == 0) {
                     log.info("No tests found, not storing to cache");
-                    setCachedExecution(TaskOutcome.EMPTY, testTaskOutput);
+                    reportCachedExecution(TaskOutcome.EMPTY, testTaskOutput);
                 } else {
                     log.info("Storing artifacts to cache from " + projectBuildDirectory);
                     var deleted = storeCache(testPluginConfig, cacheEntryKey, testTaskInput, testTaskOutput);
-                    setCachedExecution(TaskOutcome.SUCCESS, testTaskOutput);
-                    setCachedDeletion(deleted);
+                    reportCachedExecution(TaskOutcome.SUCCESS, testTaskOutput, deleted);
                 }
             }
         }
@@ -190,7 +185,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
         try {
             restoreCache(cacheEntryKey, testTaskOutput);
-            setCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
+            reportCachedExecution(TaskOutcome.FROM_CACHE, testTaskOutput);
             return true;
         } catch (InconsistentCacheException e) {
             // failover to standard execution
@@ -329,5 +324,9 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
     private static boolean isEmptyOrTrue(String value) {
         return "".equals(value) || "true".equals(value);
+    }
+
+    private static GroupArtifactId getGroupArtifactId(MavenProject project) {
+        return new GroupArtifactId(project.getGroupId(), project.getArtifactId());
     }
 }

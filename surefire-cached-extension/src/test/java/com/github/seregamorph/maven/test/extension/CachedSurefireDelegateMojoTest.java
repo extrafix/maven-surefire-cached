@@ -39,8 +39,8 @@ public class CachedSurefireDelegateMojoTest {
         var testTaskCacheHelper = new TestTaskCacheHelper();
         testTaskCacheHelper.init(session);
         var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper,
-            testTaskCacheHelper.getCacheService(), session, project, delegate,
-            PluginName.SUREFIRE_CACHED);
+            testTaskCacheHelper.getCacheService(), testTaskCacheHelper.getCacheReport(),
+            session, project, delegate, PluginName.SUREFIRE_CACHED);
 
         var config = cachedDelegateMojo.loadSurefireCachedConfig();
         assertEquals(List.of("com.acme:core"), config.getSurefire().getCacheExcludes());

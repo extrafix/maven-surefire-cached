@@ -12,7 +12,7 @@ public record TestTaskOutput(
     Instant startTime,
     Instant endTime,
     /*
-    Time between begin and end of test task
+    Time between startTime and endTime of test task
     */
     BigDecimal totalTimeSeconds,
     int totalClasses,
@@ -33,8 +33,4 @@ public record TestTaskOutput(
             0, BigDecimal.ZERO,
             0, 0, 0, Collections.emptyMap());
     }
-
-    public static final String PROP_SUFFIX_TEST_CACHED_RESULT = "_test-cached-result";
-    public static final String PROP_SUFFIX_TEST_CACHED_TIME = "_test-cached-time";
-    public static final String PROP_SUFFIX_TEST_DELETED_ENTRIES = "_test-deleted-entries";
 }
