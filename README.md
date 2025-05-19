@@ -117,6 +117,49 @@ for metrics.
 
 TODO grafana dashboard WiP
 
+## Reporting
+The extension generates text and json reports at the end of the build.
+Sample text report:
+```
+[INFO] Total test cached results (surefire-cached):
+[INFO] SUCCESS (5 modules): 2m18s serial time
+[INFO] FROM_CACHE (3 modules): 36s serial time saved
+[INFO] Cache hit read operations: 9, time: 0.297s, size: 320.00 KB
+[INFO] Cache miss read operations: 5, time: 0.022s
+[INFO] Cache write operations: 20, time: 0.141s, size: 13.81 MB
+```
+Json report can be found in `target/surefire-cache-report.json` of the build root module. Sample:
+```json
+{
+  "pluginResults" : {
+    "surefire-cached" : {
+      "SUCCESS" : {
+        "totalModules" : 5,
+        "totalTimeSec" : 138.363
+      },
+      "FROM_CACHE" : {
+        "totalModules" : 3,
+        "totalTimeSec" : 36.281
+      }
+    }
+  },
+  "cacheServiceMetrics" : {
+    "readHitOperations" : 9,
+    "readMissOperations" : 5,
+    "readHitBytes" : 327683,
+    "readHitMillis" : 297,
+    "readMissMillis" : 22,
+    "readFailures" : 0,
+    "readSkipped" : 0,
+    "writeOperations" : 20,
+    "writeBytes" : 14484173,
+    "writeMillis" : 141,
+    "writeFailures" : 0,
+    "writeSkipped" : 0
+  }
+}
+```
+
 ## How it works
 The extension wraps and replaces default Mojo factory
 [DefaultMavenPluginManager](https://github.com/apache/maven/blob/maven-3.9.9/maven-core/src/main/java/org/apache/maven/plugin/internal/DefaultMavenPluginManager.java)
@@ -127,4 +170,5 @@ which calculates task inputs (classpath elements hash codes) and reuses existing
 ## Related projects
 ### Turbo reactor
 The default Maven multi-module build does not do an efficient multi-core CPU utilization.
-See [turbo-builder](https://github.com/seregamorph/maven-turbo-reactor) for more details.
+See [turbo-builder](https://github.com/seregamorph/maven-turbo-reactor) for more details. This extension is
+compatible with maven-surefire-cached extension.
