@@ -21,7 +21,9 @@ import java.util.stream.Collectors;
 import javax.inject.Singleton;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.Mojo;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 
 /**
@@ -121,14 +123,17 @@ public class TestTaskCacheHelper {
             }
         }
 
-        var pluginArtifacts = project.getPluginArtifacts();
-        for (var pluginArtifact : pluginArtifacts) {
-            var file = pluginArtifact.getFile();
-            // now the file is always null, enhance the caching key on demand
-            var hash = file == null ? null : fileHashCache.getClasspathElementHash(file);
-            var groupArtifactId = groupArtifactId(pluginArtifact);
-            testTaskInput.addPluginArtifactHash(groupArtifactId, pluginArtifact.getClassifier(),
-                pluginArtifact.getVersion(), hash);
+        var pluginContext = ((ContextEnabled) delegate).getPluginContext();
+        var pluginDescriptor = (PluginDescriptor) pluginContext.get("pluginDescriptor");
+        if (pluginDescriptor != null) {
+            var pluginArtifacts = pluginDescriptor.getArtifacts();
+            for (var pluginArtifact : pluginArtifacts) {
+                var file = pluginArtifact.getFile();
+                var hash = file == null ? null : fileHashCache.getClasspathElementHash(file);
+                var groupArtifactId = groupArtifactId(pluginArtifact);
+                testTaskInput.addPluginArtifactHash(groupArtifactId, pluginArtifact.getClassifier(),
+                    pluginArtifact.getVersion(), hash);
+            }
         }
 
         testTaskInput.setModuleName(project.getGroupId() + ":" + project.getArtifactId());
@@ -173,6 +178,7 @@ public class TestTaskCacheHelper {
     }
 
     private static TestClasspath getTestClasspath(MavenProject project) {
+        // todo respect getClasspathDependencyExcludes, getClasspathDependencyScopeExclude
         var artifacts = project.getArtifacts();
         var classesDir = new File(project.getBuild().getOutputDirectory());
         var testClassesDir = new File(project.getBuild().getTestOutputDirectory());
