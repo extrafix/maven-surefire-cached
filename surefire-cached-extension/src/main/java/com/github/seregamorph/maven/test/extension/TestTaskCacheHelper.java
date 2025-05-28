@@ -168,7 +168,10 @@ public class TestTaskCacheHelper {
         testTaskInput.setArgLine(call(delegate, String.class, "getArgLine"));
         testTaskInput.setTest(call(delegate, String.class, "getTest"));
         testTaskInput.setArtifactConfigs(testPluginConfig.getArtifacts());
+        testTaskInput.setGroups(call(delegate, String.class, "getGroups"));
+        testTaskInput.setExcludedGroups(call(delegate, String.class, "getExcludedGroups"));
         testTaskInput.setExcludes(call(delegate, List.class, "getExcludes"));
+        // todo filtered getProperties
         return testTaskInput;
     }
 

@@ -75,6 +75,8 @@ public final class TestTaskInput {
     private String argLine;
     private String test;
     private Map<String, SurefireCachedConfig.ArtifactsConfig> artifactConfigs;
+    private String groups;
+    private String excludedGroups;
     private List<String> excludes;
 
     @JsonIgnore
@@ -112,6 +114,10 @@ public final class TestTaskInput {
         pw.println(test);
         pw.println("# Artifact configs");
         pw.println(JsonSerializers.serializeAsString(artifactConfigs));
+        pw.println("# Groups");
+        pw.println(groups);
+        pw.println("# Excluded groups");
+        pw.println(excludedGroups);
         pw.println("# Excludes");
         pw.println(excludes);
         return HashUtils.hashArray(sw.toString().getBytes(UTF_8));
@@ -192,6 +198,14 @@ public final class TestTaskInput {
         this.artifactConfigs = artifactConfigs;
     }
 
+    public void setGroups(String groups) {
+        this.groups = groups;
+    }
+
+    public void setExcludedGroups(String excludedGroups) {
+        this.excludedGroups = excludedGroups;
+    }
+
     public void setExcludes(List<String> excludes) {
         this.excludes = excludes;
     }
@@ -246,6 +260,14 @@ public final class TestTaskInput {
 
     public Map<String, SurefireCachedConfig.ArtifactsConfig> getArtifactConfigs() {
         return artifactConfigs;
+    }
+
+    public String getGroups() {
+        return groups;
+    }
+
+    public String getExcludedGroups() {
+        return excludedGroups;
     }
 
     public List<String> getExcludes() {
