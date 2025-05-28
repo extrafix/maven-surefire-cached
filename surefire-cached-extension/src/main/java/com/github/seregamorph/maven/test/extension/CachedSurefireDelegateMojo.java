@@ -1,5 +1,6 @@
 package com.github.seregamorph.maven.test.extension;
 
+import static com.github.seregamorph.maven.test.util.MavenPropertyUtils.isEmptyOrTrue;
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -293,10 +294,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
     private String getTaskOutputFileName() {
         return pluginName + "-output.json";
-    }
-
-    private static boolean isEmptyOrTrue(String value) {
-        return "".equals(value) || "true".equals(value);
     }
 
     private static GroupArtifactId getGroupArtifactId(MavenProject project) {

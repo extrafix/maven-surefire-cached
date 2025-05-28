@@ -18,6 +18,10 @@ public final class MavenPropertyUtils {
         return propertyValue;
     }
 
+    public static boolean isEmptyOrTrue(String value) {
+        return "".equals(value) || "true".equals(value);
+    }
+
     private MavenPropertyUtils() {
     }
 }
