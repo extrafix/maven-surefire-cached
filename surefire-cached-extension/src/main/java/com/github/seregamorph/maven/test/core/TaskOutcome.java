@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
  */
 public enum TaskOutcome {
 
-    SKIPPED_CACHE(null),
+    SKIPPED_CACHE("serial time"),
     SUCCESS("serial time") {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
@@ -23,7 +23,7 @@ public enum TaskOutcome {
                 + ", failures " + testTaskOutput.totalFailures() + ")";
         }
     },
-    EMPTY(null),
+    EMPTY("serial time"),
     FROM_CACHE("serial time saved") {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
