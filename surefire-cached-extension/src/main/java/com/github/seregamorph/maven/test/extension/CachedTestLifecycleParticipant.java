@@ -7,6 +7,8 @@ import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
+import com.github.seregamorph.maven.test.storage.CacheStorage;
+import com.github.seregamorph.maven.test.storage.HttpCacheStorage;
 import com.github.seregamorph.maven.test.util.JsonSerializers;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import java.io.File;
@@ -90,9 +92,15 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
                 pluginResults.put(pluginName.name(), pluginResult);
             }
         }
-        logStorageMetrics(testTaskCacheHelper.getMetrics());
+        if (isLogStorageMetrics(testTaskCacheHelper.getCacheStorage())) {
+            logStorageMetrics(testTaskCacheHelper.getMetrics());
+        }
         saveJsonReport(session, pluginResults);
         this.testTaskCacheHelper.destroy();
+    }
+
+    private boolean isLogStorageMetrics(CacheStorage cacheStorage) {
+        return cacheStorage instanceof HttpCacheStorage;
     }
 
     private void saveJsonReport(MavenSession session, TreeMap<String, Map<TaskOutcome, AggResult>> pluginResults) {
