@@ -78,9 +78,11 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
             if (!pluginResult.isEmpty()) {
                 logger.info("Total test cached results ({}):", pluginName);
                 pluginResult.forEach((k, v) -> {
-                    var suffix = k.suffix();
-                    logger.info("{} ({} modules): {}{}", k, v.totalModules,
-                        formatTime(v.totalTimeSec), suffix == null ? "" : " " + suffix);
+                    if (k.isPrint()) {
+                        var suffix = k.suffix();
+                        logger.info("{} ({} modules): {}{}", k, v.totalModules,
+                            formatTime(v.totalTimeSec), suffix == null ? "" : " " + suffix);
+                    }
                 });
                 if (deleted > 0) {
                     logger.info("Total deleted cache entries: {}", deleted);

@@ -8,23 +8,23 @@ import javax.annotation.Nullable;
  */
 public enum TaskOutcome {
 
-    SKIPPED_CACHE("serial time"),
-    SUCCESS("serial time") {
+    SKIPPED_CACHE("serial time", true),
+    SUCCESS("serial time", true) {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(" + testTaskOutput.totalTests() + " tests"
                 + ", " + testTaskOutput.totalTestTimeSeconds() + "s)";
         }
     },
-    FAILED("serial time") {
+    FAILED("serial time", true) {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(errors " + testTaskOutput.totalErrors()
                 + ", failures " + testTaskOutput.totalFailures() + ")";
         }
     },
-    EMPTY("serial time"),
-    FROM_CACHE("serial time saved") {
+    EMPTY("serial time", false),
+    FROM_CACHE("serial time saved", true) {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(saved " + testTaskOutput.totalTimeSeconds() + "s)";
@@ -32,14 +32,23 @@ public enum TaskOutcome {
     };
 
     private final String suffix;
+    private final boolean print;
 
-    TaskOutcome(String suffix) {
+    TaskOutcome(String suffix, boolean print) {
         this.suffix = suffix;
+        this.print = print;
     }
 
     @Nullable
     public String suffix() {
         return suffix;
+    }
+
+    /**
+     * Should be printed in the text report
+     */
+    public boolean isPrint() {
+        return print;
     }
 
     @Nullable
