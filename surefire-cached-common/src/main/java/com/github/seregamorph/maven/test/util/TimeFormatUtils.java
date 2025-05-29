@@ -24,7 +24,11 @@ public final class TimeFormatUtils {
             result = (secondsInt % 60) + "m" + result;
             secondsInt /= 60;
             if (secondsInt > 0) {
-                result = secondsInt + "h" + result;
+                result = (secondsInt % 24) + "h" + result;
+                secondsInt /= 24;
+                if (secondsInt > 0) {
+                    result = secondsInt + "d" + result;
+                }
             }
         }
         return result;
