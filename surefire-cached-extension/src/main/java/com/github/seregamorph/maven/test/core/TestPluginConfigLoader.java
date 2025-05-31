@@ -16,12 +16,21 @@ import org.apache.maven.project.MavenProject;
  * <pre>surefire-cached.json</pre> and <pre>.mvn/surefire-cached.json.</pre> files.
  * <p>
  * And then merge them in this order.
+ *
+ * @author Sergey Chernov
  */
 public class TestPluginConfigLoader {
 
     private static final String CONFIG_FILE_NAME = "surefire-cached.json";
 
-    public static TestPluginConfig loadTestPluginConfig(MavenProject project, PluginName pluginName) {
+    /**
+     * Loads effective test plugin config which is merged from all parent projects.
+     *
+     * @param project
+     * @param pluginName
+     * @return
+     */
+    public static TestPluginConfig loadEffectiveTestPluginConfig(MavenProject project, PluginName pluginName) {
         var configs = new ArrayList<SurefireCachedConfig>();
         MavenProject currentProject = project;
         do {

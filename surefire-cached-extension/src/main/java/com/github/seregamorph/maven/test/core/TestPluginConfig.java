@@ -3,6 +3,11 @@ package com.github.seregamorph.maven.test.core;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Configuration entity per plugin (surefire, failsafe or common) for "surefire-cached.json".
+ *
+ * @author Sergey Chernov
+ */
 public class TestPluginConfig {
 
     static final TestPluginConfig DEFAULT_CONFIG = new TestPluginConfig()
@@ -10,6 +15,7 @@ public class TestPluginConfig {
         .setInputIgnoredProperties(List.of())
         .setCacheExcludes(List.of())
         .setArtifacts(Map.of());
+
     /**
      * Properties that should be included into cache key calculation.
      * <p>
@@ -73,5 +79,15 @@ public class TestPluginConfig {
 
     public Map<String, SurefireCachedConfig.ArtifactsConfig> getArtifacts() {
         return artifacts;
+    }
+
+    @Override
+    public String toString() {
+        return "TestPluginConfig{" +
+            "inputProperties=" + inputProperties +
+            ", inputIgnoredProperties=" + inputIgnoredProperties +
+            ", cacheExcludes=" + cacheExcludes +
+            ", artifacts=" + artifacts +
+            '}';
     }
 }

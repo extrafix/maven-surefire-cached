@@ -115,7 +115,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             return;
         }
 
-        var testPluginConfig = loadTestPluginConfig(pluginName);
+        var testPluginConfig = loadEffectiveTestPluginConfig(pluginName);
+        log.debug("Effective test plugin config " + testPluginConfig);
 
         var taskInputFile = new File(projectBuildDirectory, getTaskInputFileName());
         var taskOutputFile = new File(projectBuildDirectory, getTaskOutputFileName());
@@ -192,8 +193,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         return false;
     }
 
-    TestPluginConfig loadTestPluginConfig(PluginName pluginName) {
-        return TestPluginConfigLoader.loadTestPluginConfig(project, pluginName);
+    TestPluginConfig loadEffectiveTestPluginConfig(PluginName pluginName) {
+        return TestPluginConfigLoader.loadEffectiveTestPluginConfig(project, pluginName);
     }
 
     private int storeCache(

@@ -56,5 +56,12 @@ public class SurefireCachedConfig {
         public List<String> getIncludes() {
             return includes;
         }
+
+        @Override
+        public String toString() {
+            return "ArtifactsConfig{" +
+                "includes=" + includes +
+                '}';
+        }
     }
 }
