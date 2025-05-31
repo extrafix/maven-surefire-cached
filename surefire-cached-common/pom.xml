@@ -10,6 +10,7 @@
 
     <artifactId>surefire-cached-common</artifactId>
     <packaging>jar</packaging>
+    <name>surefire-cached-common</name>
 
     <dependencies>
         <dependency>

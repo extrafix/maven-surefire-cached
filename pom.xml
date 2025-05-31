@@ -6,7 +6,7 @@
     <artifactId>maven-surefire-cached</artifactId>
     <version>0.14-SNAPSHOT</version>
     <packaging>pom</packaging>
-
+    <name>maven-surefire-cached</name>
     <description>
         Maven extension wrapping surefire/failsafe plugins to support build caching
     </description>
