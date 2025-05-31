@@ -3,6 +3,9 @@ package com.github.seregamorph.maven.test.util;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class ResponseBodyUtils {
 
     @Nonnull

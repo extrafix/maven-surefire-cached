@@ -6,6 +6,9 @@ import com.github.seregamorph.maven.test.storage.HttpCacheStorage;
 import java.io.File;
 import java.net.URI;
 
+/**
+ * @author Sergey Chernov
+ */
 public class CacheStorageFactory {
 
     public static CacheStorage createCacheStorage(String cacheStorageUrl) {

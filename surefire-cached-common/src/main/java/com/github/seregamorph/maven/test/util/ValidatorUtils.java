@@ -1,5 +1,8 @@
 package com.github.seregamorph.maven.test.util;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class ValidatorUtils {
 
     public static void validateFileName(String fileName) {

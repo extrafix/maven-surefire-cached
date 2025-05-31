@@ -5,6 +5,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * @author Sergey Chernov
+ */
 @JsonPropertyOrder({
     "readHitOperations",
     "readMissOperations",

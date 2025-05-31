@@ -1,5 +1,8 @@
 package com.github.seregamorph.maven.test.common;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class PluginName implements Comparable<PluginName>{
 
     // implementation notice: the enum is not used because it does not allow auto-convertion in spring webmvc

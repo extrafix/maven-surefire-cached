@@ -5,6 +5,9 @@ import javax.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @author Sergey Chernov
+ */
 public class CacheService {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheService.class);

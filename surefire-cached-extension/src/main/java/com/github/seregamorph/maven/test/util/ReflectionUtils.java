@@ -1,5 +1,8 @@
 package com.github.seregamorph.maven.test.util;
 
+/**
+ * @author Sergey Chernov
+ */
 public final class ReflectionUtils {
 
     public static <T> T call(Object obj, Class<T> returnType, String name) {

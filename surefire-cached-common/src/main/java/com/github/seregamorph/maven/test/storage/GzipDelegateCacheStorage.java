@@ -8,6 +8,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.annotation.Nullable;
 
+/**
+ * @author Sergey Chernov
+ */
 public class GzipDelegateCacheStorage implements CacheStorage {
 
     private final CacheStorage delegate;

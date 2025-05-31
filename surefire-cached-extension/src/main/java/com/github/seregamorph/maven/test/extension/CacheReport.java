@@ -3,13 +3,15 @@ package com.github.seregamorph.maven.test.extension;
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+/**
+ * @author Sergey Chernov
+ */
 public class CacheReport {
 
     /**

@@ -29,6 +29,9 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.sisu.Priority;
 
+/**
+ * @author Sergey Chernov
+ */
 @Named
 @Singleton
 @Priority(10)
