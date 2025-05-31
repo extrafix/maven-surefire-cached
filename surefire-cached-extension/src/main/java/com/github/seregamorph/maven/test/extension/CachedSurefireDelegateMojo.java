@@ -206,7 +206,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         int deleted = cacheService.write(cacheEntryKey, getTaskInputFileName(),
             JsonSerializers.serialize(testTaskInput));
         for (Map.Entry<String, SurefireCachedConfig.ArtifactsConfig> entry :
-                testPluginConfig.getArtifacts().entrySet()) {
+            testPluginConfig.getArtifacts().entrySet()) {
             var alias = entry.getKey();
             var artifactsConfig = entry.getValue();
             var artifactPackName = getArtifactPackName(alias);
