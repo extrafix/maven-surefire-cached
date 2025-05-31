@@ -12,6 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Cache storage in a local directory layout. Has basic protection for file traverse vulnerabilities.
+ *
  * @author Sergey Chernov
  */
 public class FileCacheStorage implements CacheStorage {

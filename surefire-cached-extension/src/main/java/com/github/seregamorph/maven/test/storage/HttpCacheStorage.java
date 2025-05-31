@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Cache storage on a remote HTTP service. Uses HTTP PUT and GET methods.
+ *
  * @author Sergey Chernov
  */
 public class HttpCacheStorage implements CacheStorage {

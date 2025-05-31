@@ -9,6 +9,9 @@ import java.util.zip.GZIPOutputStream;
 import javax.annotation.Nullable;
 
 /**
+ * Wrapping cache storage that packs/unpacks entities to save storage space.
+ * May be efficient in combination with in-memory storages.
+ *
  * @author Sergey Chernov
  */
 public class GzipDelegateCacheStorage implements CacheStorage {
