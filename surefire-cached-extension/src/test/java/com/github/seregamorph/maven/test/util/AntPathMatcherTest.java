@@ -1,9 +1,9 @@
 package com.github.seregamorph.maven.test.util;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for {@link AntPathMatcher}.
@@ -11,6 +11,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class AntPathMatcherTest {
 
     private final AntPathMatcher matcher = new AntPathMatcher();
+
+    @Test
+    public void testDashMatch() {
+        assertTrue(matcher.match("META-INF/maven/**/pom.properties",
+            "META-INF/maven/com.acme/lib-gen-v1/pom.properties"));
+        assertFalse(matcher.match("META-INF/maven/**/pom.properties",
+            "META-INF/maven/com.acme/lib-gen-v1/pom.xml"));
+    }
+
+    @Test
+    public void testWildcardColon() {
+        var colonMatcher = new AntPathMatcher(":");
+        assertTrue(colonMatcher.match("com.acme:*", "com.acme:lib"));
+        assertTrue(colonMatcher.match("com.acme.*:*", "com.acme.module:lib"));
+        assertFalse(colonMatcher.match("com.acme:*", "com.meac:lib"));
+    }
 
     @Test
     public void testExactMatch() {

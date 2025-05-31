@@ -24,14 +24,26 @@ public class AntPathMatcher {
 
     private static final char WILDCARD_SINGLE = '?';
     private static final char WILDCARD_MULTIPLE = '*';
-    private static final String PATH_SEPARATOR = "/";
     private static final String DOUBLE_WILDCARD = "**";
+
+    private final String pathSeparator;
+
+    /**
+     * Create ant path matcher with default file separator "/"
+     */
+    public AntPathMatcher() {
+        this("/");
+    }
+
+    public AntPathMatcher(String pathSeparator) {
+        this.pathSeparator = pathSeparator;
+    }
 
     /**
      * Matches a path against a pattern using Ant-style wildcards.
      *
      * @param pattern the pattern to match against
-     * @param path the path to match
+     * @param path    the path to match
      * @return true if the path matches the pattern, false otherwise
      */
     public boolean match(String pattern, String path) {
@@ -54,8 +66,8 @@ public class AntPathMatcher {
      */
     private boolean doMatch(String pattern, String path) {
         // Split the pattern and path into segments
-        String[] patternSegments = pattern.split(PATH_SEPARATOR);
-        String[] pathSegments = path.split(PATH_SEPARATOR);
+        String[] patternSegments = pattern.split(pathSeparator);
+        String[] pathSegments = path.split(pathSeparator);
 
         int patternIdx = 0;
         int pathIdx = 0;
@@ -74,22 +86,23 @@ public class AntPathMatcher {
                 int nextPatternIdx = patternIdx + 1;
                 // Try matching with 0 segments skipped (current position)
                 if (matchSegment(patternSegments[nextPatternIdx], pathSegments[pathIdx]) &&
-                        doMatch(
-                                String.join(PATH_SEPARATOR,
-                                        java.util.Arrays.copyOfRange(patternSegments, nextPatternIdx + 1, patternSegments.length)),
-                                String.join(PATH_SEPARATOR,
-                                        java.util.Arrays.copyOfRange(pathSegments, pathIdx + 1, pathSegments.length)))) {
+                    doMatch(
+                        String.join(pathSeparator,
+                            java.util.Arrays.copyOfRange(patternSegments, nextPatternIdx + 1, patternSegments.length)),
+                        String.join(pathSeparator,
+                            java.util.Arrays.copyOfRange(pathSegments, pathIdx + 1, pathSegments.length)))) {
                     return true;
                 }
 
                 // Try matching with 1 or more segments skipped
                 for (int i = pathIdx + 1; i < pathSegments.length; i++) {
                     if (matchSegment(patternSegments[nextPatternIdx], pathSegments[i]) &&
-                            doMatch(
-                                    String.join(PATH_SEPARATOR,
-                                            java.util.Arrays.copyOfRange(patternSegments, nextPatternIdx + 1, patternSegments.length)),
-                                    String.join(PATH_SEPARATOR,
-                                            java.util.Arrays.copyOfRange(pathSegments, i + 1, pathSegments.length)))) {
+                        doMatch(
+                            String.join(pathSeparator,
+                                java.util.Arrays.copyOfRange(patternSegments, nextPatternIdx + 1,
+                                    patternSegments.length)),
+                            String.join(pathSeparator,
+                                java.util.Arrays.copyOfRange(pathSegments, i + 1, pathSegments.length)))) {
                         return true;
                     }
                 }
@@ -163,7 +176,7 @@ public class AntPathMatcher {
                     // If the next character in the pattern matches the current character in the segment,
                     // or if we've reached the end of the segment, try to match the rest
                     if (i == segment.length() || segment.charAt(i) == nextPatternChar ||
-                            nextPatternChar == WILDCARD_SINGLE || nextPatternChar == WILDCARD_MULTIPLE) {
+                        nextPatternChar == WILDCARD_SINGLE || nextPatternChar == WILDCARD_MULTIPLE) {
                         if (matchSegment(pattern.substring(patternIdx + 1), segment.substring(i))) {
                             return true;
                         }

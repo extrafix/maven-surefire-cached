@@ -9,6 +9,7 @@ import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
+import com.github.seregamorph.maven.test.util.AntPathMatcher;
 import com.github.seregamorph.maven.test.util.HashUtils;
 import com.github.seregamorph.maven.test.util.MavenPropertyUtils;
 import java.io.File;
@@ -139,11 +140,8 @@ public class TestTaskCacheHelper {
 
         testTaskInput.setModuleName(project.getGroupId() + ":" + project.getArtifactId());
         var testClasspath = getTestClasspath(project);
-        var excludeModules = testPluginConfig.getExcludeModules().stream()
-            .map(GroupArtifactId::fromString)
-            .collect(Collectors.toSet());
         for (var artifact : testClasspath.artifacts()) {
-            if (isIncludeToCacheEntry(artifact, excludeModules)) {
+            if (isIncludeToCacheEntry(testPluginConfig.getExcludeModules(), artifact)) {
                 // Can be a jar file (when "install" command is executed) or
                 // a classes directory (when "test" command is executed).
                 // The trick is we calculate hash of files which is the same in both cases (jar manifest is ignored)
@@ -179,9 +177,18 @@ public class TestTaskCacheHelper {
         return testTaskInput;
     }
 
-    private static boolean isIncludeToCacheEntry(Artifact artifact, Set<GroupArtifactId> excludeModules) {
-        return artifact.getArtifactHandler().isAddedToClasspath()
-            && !excludeModules.contains(groupArtifactId(artifact));
+    static boolean isIncludeToCacheEntry(List<String> excludeModules, Artifact artifact) {
+        if (artifact.getArtifactHandler().isAddedToClasspath()) {
+            var antPathMatcher = new AntPathMatcher(":");
+            for (var excludeModule : excludeModules) {
+                var gai = artifact.getGroupId() + ":" + artifact.getArtifactId();
+                if (antPathMatcher.match(excludeModule, gai)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     private static TestClasspath getTestClasspath(MavenProject project) {

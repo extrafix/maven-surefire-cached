@@ -46,7 +46,8 @@ public class TestPluginConfig {
     private List<String> inputIgnoredProperties;
 
     /**
-     * List of "$groupId:$artifactId" for modules that should be excluded from cache key calculation
+     * List of "$groupId:$artifactId" for modules that should be excluded from cache key calculation. Wildcard
+     * expressions like "$groupId:*" are supported as well.
      */
     private List<String> excludeModules;
 
