@@ -129,7 +129,8 @@ public class TestTaskCacheHelper {
             var pluginArtifacts = pluginDescriptor.getArtifacts();
             for (var pluginArtifact : pluginArtifacts) {
                 var file = pluginArtifact.getFile();
-                var hash = file == null ? null : fileHashCache.getClasspathElementHash(file, List.of());
+                var hash = file == null ? null : fileHashCache.getClasspathElementHash(file,
+                    testPluginConfig.getExcludeClasspathResources());
                 var groupArtifactId = groupArtifactId(pluginArtifact);
                 testTaskInput.addPluginArtifactHash(groupArtifactId, pluginArtifact.getClassifier(),
                     pluginArtifact.getVersion(), hash);
