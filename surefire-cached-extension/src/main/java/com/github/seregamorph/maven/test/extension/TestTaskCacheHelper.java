@@ -138,11 +138,11 @@ public class TestTaskCacheHelper {
 
         testTaskInput.setModuleName(project.getGroupId() + ":" + project.getArtifactId());
         var testClasspath = getTestClasspath(project);
-        var cacheExcludes = testPluginConfig.getCacheExcludes().stream()
+        var excludeModules = testPluginConfig.getExcludeModules().stream()
             .map(GroupArtifactId::fromString)
             .collect(Collectors.toSet());
         for (var artifact : testClasspath.artifacts()) {
-            if (isIncludeToCacheEntry(artifact, cacheExcludes)) {
+            if (isIncludeToCacheEntry(artifact, excludeModules)) {
                 // Can be a jar file (when "install" command is executed) or
                 // a classes directory (when "test" command is executed).
                 // The trick is we calculate hash of files which is the same in both cases (jar manifest is ignored)
@@ -175,9 +175,9 @@ public class TestTaskCacheHelper {
         return testTaskInput;
     }
 
-    private static boolean isIncludeToCacheEntry(Artifact artifact, Set<GroupArtifactId> cacheExcludes) {
+    private static boolean isIncludeToCacheEntry(Artifact artifact, Set<GroupArtifactId> excludeModules) {
         return artifact.getArtifactHandler().isAddedToClasspath()
-            && !cacheExcludes.contains(groupArtifactId(artifact));
+            && !excludeModules.contains(groupArtifactId(artifact));
     }
 
     private static TestClasspath getTestClasspath(MavenProject project) {

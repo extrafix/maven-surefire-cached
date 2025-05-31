@@ -76,8 +76,8 @@ public class TestPluginConfigLoader {
                 TestPluginConfig::getInputProperties))
             .setInputIgnoredProperties(resolveProperty(primaryConfig, defaultConfig,
                 TestPluginConfig::getInputIgnoredProperties))
-            .setCacheExcludes(resolveProperty(primaryConfig, defaultConfig,
-                TestPluginConfig::getCacheExcludes))
+            .setExcludeModules(resolveProperty(primaryConfig, defaultConfig,
+                TestPluginConfig::getExcludeModules))
             .setArtifacts(resolveProperty(primaryConfig, defaultConfig,
                 TestPluginConfig::getArtifacts));
     }
@@ -93,5 +93,8 @@ public class TestPluginConfigLoader {
             value = secondarySource == null ? null : extractor.apply(secondarySource);
         }
         return value;
+    }
+
+    private TestPluginConfigLoader() {
     }
 }

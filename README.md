@@ -44,7 +44,7 @@ the extension will go thru the parent modules (till root) and try to find it the
       "env.GITHUB_JOB",
       "env.GITHUB_SHA"
     ],
-    "cacheExcludes": ["com.acme:core"]
+    "excludeModules": ["com.acme:core"]
   },
   "surefire": {
     "artifacts": {

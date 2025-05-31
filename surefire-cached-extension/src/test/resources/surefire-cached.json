@@ -1,6 +1,6 @@
 {
   "common": {
-    "cacheExcludes": [
+    "excludeModules": [
       "com.acme:core"
     ]
   },

@@ -36,7 +36,7 @@ public final class JsonSerializers {
         try {
             return mapper.readValue(content, type);
         } catch (IOException e) {
-            throw new UncheckedIOException("Failed to deserialize " + fileName, e);
+            throw new UncheckedIOException("Failed to deserialize " + fileName + " " + e, e);
         }
     }
 

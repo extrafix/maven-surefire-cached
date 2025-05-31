@@ -13,7 +13,7 @@ public class TestPluginConfig {
     static final TestPluginConfig DEFAULT_CONFIG = new TestPluginConfig()
         .setInputProperties(List.of("java.specification.version"))
         .setInputIgnoredProperties(List.of())
-        .setCacheExcludes(List.of())
+        .setExcludeModules(List.of())
         .setArtifacts(Map.of());
 
     /**
@@ -41,7 +41,7 @@ public class TestPluginConfig {
     /**
      * List of "$groupId:$artifactId" for modules that should be excluded from cache key calculation
      */
-    private List<String> cacheExcludes;
+    private List<String> excludeModules;
 
     private Map<String, SurefireCachedConfig.ArtifactsConfig> artifacts;
 
@@ -55,8 +55,8 @@ public class TestPluginConfig {
         return this;
     }
 
-    public TestPluginConfig setCacheExcludes(List<String> cacheExcludes) {
-        this.cacheExcludes = cacheExcludes;
+    public TestPluginConfig setExcludeModules(List<String> excludeModules) {
+        this.excludeModules = excludeModules;
         return this;
     }
 
@@ -73,8 +73,8 @@ public class TestPluginConfig {
         return inputIgnoredProperties;
     }
 
-    public List<String> getCacheExcludes() {
-        return cacheExcludes;
+    public List<String> getExcludeModules() {
+        return excludeModules;
     }
 
     public Map<String, SurefireCachedConfig.ArtifactsConfig> getArtifacts() {
@@ -86,7 +86,7 @@ public class TestPluginConfig {
         return "TestPluginConfig{" +
             "inputProperties=" + inputProperties +
             ", inputIgnoredProperties=" + inputIgnoredProperties +
-            ", cacheExcludes=" + cacheExcludes +
+            ", excludeModules=" + excludeModules +
             ", artifacts=" + artifacts +
             '}';
     }

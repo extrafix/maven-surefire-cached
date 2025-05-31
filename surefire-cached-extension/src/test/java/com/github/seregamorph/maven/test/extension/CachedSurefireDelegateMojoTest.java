@@ -44,7 +44,7 @@ public class CachedSurefireDelegateMojoTest {
             session, project, delegate, pluginName);
 
         var config = cachedDelegateMojo.loadEffectiveTestPluginConfig(pluginName);
-        assertEquals(List.of("com.acme:core"), config.getCacheExcludes());
+        assertEquals(List.of("com.acme:core"), config.getExcludeModules());
         assertEquals(List.of("surefire-reports/TEST-*.xml"), config.getArtifacts().get("surefire-reports").getIncludes());
         assertEquals(List.of("jacoco-*.exec"), config.getArtifacts().get("jacoco").getIncludes());
     }
