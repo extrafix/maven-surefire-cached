@@ -77,7 +77,7 @@ the extension will go thru the parent modules (till root) and try to find it the
 ```
 
 Sample adoption:
-* https://github.com/seregamorph/spring-test-smart-context/pull/6
+* https://github.com/seregamorph/spring-test-smart-context/pull/23
 * https://github.com/seregamorph/rest-api-framework/pull/2
 
 ## Running with the local cache
