@@ -6,6 +6,7 @@ import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.testcacheserver.service.TestCacheService;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,6 +59,12 @@ public class TestCacheController {
         if (body == null) {
             return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(body);
+        return ResponseEntity.ok()
+            .contentType(getContentType(fileName))
+            .body(body);
+    }
+
+    private static MediaType getContentType(String fileName) {
+        return fileName.endsWith(".json") ? MediaType.APPLICATION_JSON : MediaType.APPLICATION_OCTET_STREAM;
     }
 }
