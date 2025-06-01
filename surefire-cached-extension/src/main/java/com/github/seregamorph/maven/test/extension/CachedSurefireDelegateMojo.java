@@ -270,6 +270,9 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             totalTests += testSuiteSummary.tests();
             totalErrors += testSuiteSummary.errors();
             totalFailures += testSuiteSummary.failures();
+            if (testSuiteSummary.errors() > 0 || testSuiteSummary.failures() > 0) {
+                log.warn(testReport + " has errors or failures, skipping cache");
+            }
         }
 
         var files = new TreeMap<String, String>();
