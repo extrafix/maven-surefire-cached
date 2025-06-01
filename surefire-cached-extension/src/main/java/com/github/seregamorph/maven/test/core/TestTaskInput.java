@@ -51,20 +51,23 @@ public final class TestTaskInput {
     private final SortedMap<String, String> properties = new TreeMap<>();
 
     /**
-     * "$groupId:$artifactId[:$classifier]:$version" (optional classifier) -> file hash Note: artifactName is not
-     * included in hash, only file hash with classpath sensitivity (ignore timestamp)
+     * "$groupId:$artifactId[:$classifier]:$version" (optional classifier) -> file hash
+     * <p>
+     * Note: artifactName is not included in hash, only file hash with classpath sensitivity (ignore timestamp)
      */
     private final SortedMap<String, String> pluginArtifactHashes = new TreeMap<>();
 
     /**
-     * "$groupId:$artifactId" (no version and no classifier) -> file hash Note: artifactName is not included in hash,
-     * only file hash with classpath sensitivity (ignore timestamp)
+     * "$groupId:$artifactId" (no version and no classifier) -> file hash
+     * <p>
+     * Note: artifactName is not included in hash, only file hash with classpath sensitivity (ignore timestamp)
      */
     private final SortedMap<String, String> moduleArtifactHashes = new TreeMap<>();
 
     /**
-     * "$groupId:$artifactId[:$classifier]:$version" (optional classifier) -> file hash Note: artifactName is not
-     * included in hash, only file hash with classpath sensitivity (ignore timestamp)
+     * "$groupId:$artifactId[:$classifier]:$version" (optional classifier) -> file hash
+     * <p>
+     * Note: artifactName is not included in hash, only file hash with classpath sensitivity (ignore timestamp)
      */
     private final SortedMap<String, String> libraryArtifactHashes = new TreeMap<>();
 
