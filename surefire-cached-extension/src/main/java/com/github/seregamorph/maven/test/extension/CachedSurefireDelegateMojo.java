@@ -150,6 +150,10 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         try {
             delegate.execute();
             success = true;
+        } catch (Error e) {
+            // e.g. OutOfMemoryError
+            log.error("Test execution failed", e);
+            throw e;
         } finally {
             var testTaskOutput = getTaskOutput(testPluginConfig, startTime, Instant.now());
             MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
