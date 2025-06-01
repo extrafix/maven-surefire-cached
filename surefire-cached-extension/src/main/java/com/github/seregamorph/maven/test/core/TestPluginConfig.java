@@ -10,19 +10,6 @@ import java.util.Map;
  */
 public class TestPluginConfig {
 
-    static final TestPluginConfig DEFAULT_CONFIG = new TestPluginConfig()
-        .setInputProperties(List.of("java.specification.version"))
-        .setInputIgnoredProperties(List.of())
-        .setExcludeModules(List.of())
-        // remove MANIFEST.MF and default maven descriptors with version
-        // from the hash to unify hash calculation for jar files and classes directories
-        .setExcludeClasspathResources(List.of(
-            "META-INF/MANIFEST.MF",
-            "META-INF/maven/**/pom.properties",
-            "META-INF/maven/**/pom.xml"
-        ))
-        .setArtifacts(Map.of());
-
     /**
      * Properties that should be included into cache key calculation.
      * <p>

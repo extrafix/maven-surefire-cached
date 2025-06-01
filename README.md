@@ -28,8 +28,10 @@ Add to the `.mvn/extensions.xml` of your project:
 This extension will print the cache statistics after the build.
 
 ## Configuration
-It's mandatory to define `surefire-cached.json` file for the module. If the file is not found,
-the extension will go thru the parent modules (till root) and try to find it there. Sample configuration file:
+It's possible to define `surefire-cached.json` file for the module. If the file is not found,
+the extension will go thru the parent modules (till root) and try to find it there.
+
+If no configuration is provided, the default configuration is used
 ```json
 {
   "common": {
@@ -44,7 +46,10 @@ the extension will go thru the parent modules (till root) and try to find it the
       "env.GITHUB_JOB",
       "env.GITHUB_SHA"
     ],
-    "excludeModules": ["com.acme:core"],
+    "inputProperties": [
+      "java.specification.version"
+    ],
+    "excludeModules": [],
     "excludeClasspathResources": [
       "META-INF/MANIFEST.MF",
       "META-INF/maven/**/pom.properties",
@@ -56,10 +61,34 @@ the extension will go thru the parent modules (till root) and try to find it the
   "surefire": {
     "artifacts": {
       "surefire-reports": {
+        "includes": ["surefire-reports/TEST-*.xml", "surefire-reports/testng-results.xml"]
+      }
+    }
+  },
+  "failsafe": {
+    "artifacts": {
+      "failsafe-reports": {
+        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/testng-results.xml"]
+      }
+    }
+  }
+}
+```
+It's possible to customize parameters overriding (no appending) default, e.g. specify modules which should be
+excluded from hash calculation (e.g. modules with `git.properties` containing build timestamp and commit hash) and
+custom artifacts to be cached (separate for surefire and failsafe):
+```json
+{
+  "common": {
+    "excludeModules": ["com.acme:module-build-version-timestamp"]
+  },
+  "surefire": {
+    "artifacts": {
+      "surefire-reports": {
         "includes": ["surefire-reports/TEST-*.xml"]
       },
       "jacoco": {
-        "includes": ["jacoco-surefire-*.exec"]
+        "includes": ["jacoco-surefire.exec"]
       }
     }
   },
@@ -69,7 +98,7 @@ the extension will go thru the parent modules (till root) and try to find it the
         "includes": ["failsafe-reports/TEST-*.xml"]
       },
       "jacoco": {
-        "includes": ["jacoco-failsafe-*.exec"]
+        "includes": ["jacoco-failsafe.exec"]
       }
     }
   }
@@ -97,7 +126,7 @@ Or via phase
 mvn test
 ```
 
-Then run integration tests
+Then run integration tests of your project
 ```shell
 mvn clean install -DskipTests=true
 mvn failsafe:integration-test -Dit.test=SampleIT
@@ -116,7 +145,7 @@ docker compose up
 
 Build your project with the extension using the remote cache
 ```shell
-mvn clean install -DcacheStorageUrl=http://localhost:8080/cache
+mvn clean verify -DcacheStorageUrl=http://localhost:8080/cache
 ```
 
 Actuator endpoints are available at http://localhost:8080/actuator, see http://localhost:8080/actuator/prometheus

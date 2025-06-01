@@ -30,6 +30,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.sisu.Priority;
 
 /**
+ * Custom {@link MavenPluginManager} that wraps surefire and failsafe plugin Mojos to support build cache.
+ *
  * @author Sergey Chernov
  */
 @Named
