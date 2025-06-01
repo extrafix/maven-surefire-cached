@@ -12,7 +12,7 @@ It can cover a wide range of typical scenarios, however, it's not a good choice 
 test phases. It does not properly handle test reports, does not support flexible test filtering for test distribution 
 (caching them separately depending on filtered test subset) for multi-job execution.
 Also it does not cache so called CLI executions like `mvn surefire:test`, only lifecycle executions
-like `mvn clean test`, which is also not always convenient.
+like `mvn clean verify`, which is also not always convenient especially for large scale projects.
 
 ## Adoption
 Add to the `.mvn/extensions.xml` of your project:
@@ -179,3 +179,9 @@ which calculates task inputs (classpath elements hash codes) and reuses existing
 The default Maven multi-module build does not do an efficient multi-core CPU utilization.
 See [turbo-builder](https://github.com/seregamorph/maven-turbo-reactor) for more details. This extension is
 compatible with maven-surefire-cached extension.
+
+### Test distribution
+By default Maven executes unit and integration tests (via surefire and failsafe plugins) in a single execution,
+however at large scale it makes sense to split huge test suites to smaller pieces (test distribution).
+See [test-distribution](https://github.com/seregamorph/test-distribution) for more details. This extension
+is also compatible with maven-surefire-cached extension.
