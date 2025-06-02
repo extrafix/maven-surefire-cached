@@ -53,29 +53,27 @@ If no configuration is provided, the default configuration is used
     "excludeClasspathResources": [
       "META-INF/MANIFEST.MF",
       "META-INF/maven/**/pom.properties",
-      "META-INF/maven/**/pom.xml",
-      "META-INF/maven/plugin.xml",
-      "META-INF/maven/**/plugin-help.xml"
+      "META-INF/maven/**/pom.xml"
     ]
   },
   "surefire": {
     "artifacts": {
       "surefire-reports": {
-        "includes": ["surefire-reports/TEST-*.xml", "surefire-reports/testng-results.xml"]
+        "includes": ["surefire-reports/TEST-*.xml"]
       }
     }
   },
   "failsafe": {
     "artifacts": {
       "failsafe-reports": {
-        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/testng-results.xml"]
+        "includes": ["failsafe-reports/TEST-*.xml"]
       }
     }
   }
 }
 ```
-It's possible to customize parameters overriding (no appending) default, e.g. specify modules which should be
-excluded from hash calculation (e.g. modules with `git.properties` containing build timestamp and commit hash) and
+It's possible to customize parameters overriding (no appending) default. E.g. specify modules which should be
+excluded from hash calculation (like modules with `git.properties` containing build timestamp and commit hash). Or
 custom artifacts to be cached (separate for surefire and failsafe):
 ```json
 {
@@ -85,7 +83,7 @@ custom artifacts to be cached (separate for surefire and failsafe):
   "surefire": {
     "artifacts": {
       "surefire-reports": {
-        "includes": ["surefire-reports/TEST-*.xml"]
+        "includes": ["surefire-reports/TEST-*.xml", "surefire-reports/testng-results.xml"]
       },
       "jacoco": {
         "includes": ["jacoco-surefire.exec"]
@@ -95,7 +93,7 @@ custom artifacts to be cached (separate for surefire and failsafe):
   "failsafe": {
     "artifacts": {
       "failsafe-reports": {
-        "includes": ["failsafe-reports/TEST-*.xml"]
+        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/testng-results.xml"]
       },
       "jacoco": {
         "includes": ["jacoco-failsafe.exec"]

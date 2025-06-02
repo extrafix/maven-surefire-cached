@@ -43,9 +43,7 @@ public class TestPluginConfigLoader {
         .setExcludeClasspathResources(List.of(
             "META-INF/MANIFEST.MF",
             "META-INF/maven/**/pom.properties",
-            "META-INF/maven/**/pom.xml",
-            "META-INF/maven/plugin.xml",
-            "META-INF/maven/**/plugin-help.xml"
+            "META-INF/maven/**/pom.xml"
         ));
 
     private static final TestPluginConfig DEFAULT_SUREFIRE_CONFIG = merge(
@@ -53,8 +51,7 @@ public class TestPluginConfigLoader {
             .setArtifacts(Map.of(
                 "surefire-reports", new SurefireCachedConfig.ArtifactsConfig()
                     .setIncludes(List.of(
-                        "surefire-reports/TEST-*.xml",
-                        "surefire-reports/testng-results.xml"
+                        "surefire-reports/TEST-*.xml"
                     )))),
         DEFAULT_COMMON_CONFIG);
 
@@ -63,8 +60,7 @@ public class TestPluginConfigLoader {
             .setArtifacts(Map.of(
                 "failsafe-reports", new SurefireCachedConfig.ArtifactsConfig()
                     .setIncludes(List.of(
-                        "failsafe-reports/TEST-*.xml",
-                        "failsafe-reports/testng-results.xml"
+                        "failsafe-reports/TEST-*.xml"
                     )))),
         DEFAULT_COMMON_CONFIG);
 
