@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
  * @author Sergey Chernov
  */
 @JsonPropertyOrder({
+    "hash",
     "version",
     "moduleName",
     "timestamp",
@@ -45,6 +46,8 @@ public final class TestTaskInput {
      * Updated on each breaking change
      */
     private static final int VERSION = 1;
+
+    private String hash;
 
     private final SortedMap<String, String> ignoredProperties = new TreeMap<>();
 
@@ -220,6 +223,14 @@ public final class TestTaskInput {
 
     public void setExcludes(List<String> excludes) {
         this.excludes = excludes;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 
     public int getVersion() {

@@ -124,10 +124,12 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         MoreFileUtils.delete(taskOutputFile);
 
         var testTaskInput = testTaskCacheHelper.getTestTaskInput(session, project, this.delegate, testPluginConfig);
+        var hash = testTaskInput.hash();
+        testTaskInput.setHash(hash);
         var testTaskInputBytes = JsonSerializers.serialize(testTaskInput);
         log.debug(new String(testTaskInputBytes, UTF_8));
         MoreFileUtils.write(taskInputFile, testTaskInputBytes);
-        var cacheEntryKey = getLayoutKey(testTaskInput);
+        var cacheEntryKey = new CacheEntryKey(pluginName, getGroupArtifactId(project), hash);
 
         // TODO calculate cache operation time (hash, load, store, etc.)
         var entryCalculatedTime = Instant.now();
@@ -237,13 +239,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             ZipUtils.unpackDirectory(packFile, projectBuildDirectory);
             MoreFileUtils.delete(packFile);
         }
-    }
-
-    private CacheEntryKey getLayoutKey(TestTaskInput testTaskInput) {
-        return new CacheEntryKey(
-            pluginName,
-            new GroupArtifactId(project.getGroupId(), project.getArtifactId()),
-            testTaskInput.hash());
     }
 
     private TestTaskOutput getTaskOutput(
