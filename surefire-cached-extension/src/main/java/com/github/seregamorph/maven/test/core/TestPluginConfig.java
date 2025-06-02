@@ -1,5 +1,6 @@
 package com.github.seregamorph.maven.test.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import java.util.Map;
 
@@ -8,6 +9,9 @@ import java.util.Map;
  *
  * @author Sergey Chernov
  */
+@JsonIgnoreProperties({
+    "//" // for comments
+})
 public class TestPluginConfig {
 
     /**
