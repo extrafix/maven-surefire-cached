@@ -60,7 +60,8 @@ public class TestPluginConfigLoader {
             .setArtifacts(Map.of(
                 "failsafe-reports", new SurefireCachedConfig.ArtifactsConfig()
                     .setIncludes(List.of(
-                        "failsafe-reports/TEST-*.xml"
+                        "failsafe-reports/TEST-*.xml",
+                        "failsafe-reports/failsafe-summary.xml"
                     )))),
         DEFAULT_COMMON_CONFIG);
 

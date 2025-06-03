@@ -66,7 +66,7 @@ If no configuration is provided, the default configuration is used
   "failsafe": {
     "artifacts": {
       "failsafe-reports": {
-        "includes": ["failsafe-reports/TEST-*.xml"]
+        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/failsafe-summary.xml"]
       }
     }
   }
@@ -93,7 +93,7 @@ custom artifacts to be cached (separate for surefire and failsafe):
   "failsafe": {
     "artifacts": {
       "failsafe-reports": {
-        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/testng-results.xml"]
+        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/failsafe-summary.xml", "failsafe-reports/testng-results.xml"]
       },
       "jacoco": {
         "includes": ["jacoco-failsafe.exec"]
