@@ -21,7 +21,7 @@ Add to the `.mvn/extensions.xml` of your project:
     <extension>
         <groupId>com.github.seregamorph</groupId>
         <artifactId>surefire-cached-extension</artifactId>
-        <version>0.15</version>
+        <version>0.16</version>
     </extension>
 </extensions>
 ```
@@ -174,6 +174,10 @@ Json report can be found in `target/surefire-cache-report.json` of the build roo
       "FROM_CACHE" : {
         "totalModules" : 3,
         "totalTimeSec" : 36.281
+      },
+      "SKIPPED_CACHE" : {
+        "totalModules" : 1,
+        "totalTimeSec" : 5.420
       }
     }
   },
