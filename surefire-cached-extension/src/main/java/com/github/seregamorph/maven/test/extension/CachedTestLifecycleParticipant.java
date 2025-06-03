@@ -24,17 +24,6 @@ import org.apache.maven.execution.MavenSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/*
-Hint: monitor values Dashboard
-* Stored entries
-* Evicted entries
-* Cache hits
-* Cache misses
-* Cache hit rate
-* Data Received
-* Data Sent
- */
-
 /**
  * @author Sergey Chernov
  */

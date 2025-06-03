@@ -192,7 +192,8 @@ public class TestTaskCacheHelper {
     }
 
     private static TestClasspath getTestClasspath(MavenProject project) {
-        // todo respect getClasspathDependencyExcludes, getClasspathDependencyScopeExclude
+        // todo respect getClasspathDependencyExcludes, getClasspathDependencyScopeExclude,
+        // getAdditionalClasspathElements
         var artifacts = project.getArtifacts();
         var classesDir = new File(project.getBuild().getOutputDirectory());
         var testClassesDir = new File(project.getBuild().getTestOutputDirectory());
