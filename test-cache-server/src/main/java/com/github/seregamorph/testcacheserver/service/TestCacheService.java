@@ -48,25 +48,35 @@ public class TestCacheService {
     public byte[] getCache(CacheEntryKey cacheEntryKey, String fileName) {
         var body = cacheStorage.read(cacheEntryKey, fileName);
         var pluginName = cacheEntryKey.pluginName().name();
-        if (body == null) {
-            Counter.builder("get_cache_miss")
+
+        if (body != null) {
+            Counter.builder("get_cache_size")
                 .tag("pluginName", pluginName)
                 .register(meterRegistry)
-                .increment();
-            return null;
+                .increment(body.length);
         }
 
-        Counter.builder("get_cache_hit")
+        // this is different from "get_cache_hit" - calculate all returned files
+        Counter.builder("get_cache_files")
             .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment();
 
-        Counter.builder("get_cache_size")
-            .tag("pluginName", pluginName)
-            .register(meterRegistry)
-            .increment(body.length);
-
         if (TRACKED_TASK_OUTPUTS.contains(fileName)) {
+            // "get_cache_miss" and "get_cache_hit" calculate once per test execution entity
+            if (body == null) {
+                Counter.builder("get_cache_miss")
+                    .tag("pluginName", pluginName)
+                    .register(meterRegistry)
+                    .increment();
+                return null;
+            }
+
+            Counter.builder("get_cache_hit")
+                .tag("pluginName", pluginName)
+                .register(meterRegistry)
+                .increment();
+
             var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class, fileName);
             Counter.builder("cache_saved_time_seconds")
                 .tag("pluginName", pluginName)
