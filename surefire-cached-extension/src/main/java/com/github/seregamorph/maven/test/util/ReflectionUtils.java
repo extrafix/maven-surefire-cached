@@ -5,6 +5,16 @@ package com.github.seregamorph.maven.test.util;
  */
 public final class ReflectionUtils {
 
+    public static <T> T callProtected(Object obj, Class<T> returnType, String name) {
+        try {
+            var method = obj.getClass().getDeclaredMethod(name);
+            method.setAccessible(true);
+            return returnType.cast(method.invoke(obj));
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static <T> T call(Object obj, Class<T> returnType, String name) {
         try {
             var method = obj.getClass().getMethod(name);

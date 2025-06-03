@@ -2,6 +2,7 @@ package com.github.seregamorph.maven.test.extension;
 
 import static com.github.seregamorph.maven.test.util.MavenPropertyUtils.isEmptyOrTrue;
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
+import static com.github.seregamorph.maven.test.util.ReflectionUtils.callProtected;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
@@ -93,9 +94,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        if (call(this.delegate, Boolean.class, "isSkip")
-            || call(this.delegate, Boolean.class, "isSkipTests")
-            || call(this.delegate, Boolean.class, "isSkipExec")
+        if (callProtected(this.delegate, Boolean.class, "isSkipExecution")
             || "pom".equals(project.getPackaging())
             || !projectBuildDirectory.exists()) {
             delegate.execute();
