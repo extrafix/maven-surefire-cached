@@ -31,17 +31,31 @@ public class TestCacheService {
 
     public void putCache(CacheEntryKey cacheEntryKey, String fileName, byte[] body) {
         cacheStorage.write(cacheEntryKey, fileName, body);
-
         var pluginName = cacheEntryKey.pluginName().name();
-        Counter.builder("put_cache")
-            .tag("pluginName", pluginName)
-            .register(meterRegistry)
-            .increment();
 
         Counter.builder("put_cache_size")
             .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment(body.length);
+
+        Counter.builder("put_cache_files")
+            .tag("pluginName", pluginName)
+            .register(meterRegistry)
+            .increment();
+
+        if (TRACKED_TASK_OUTPUTS.contains(fileName)) {
+            Counter.builder("put_cache")
+                .tag("pluginName", pluginName)
+                .register(meterRegistry)
+                .increment();
+
+            var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class, fileName);
+            var totalTimeSeconds = testTaskOutput.totalTimeSeconds();
+            Counter.builder("cache_spent_time_seconds")
+                .tag("pluginName", pluginName)
+                .register(meterRegistry)
+                .increment(totalTimeSeconds.doubleValue());
+        }
     }
 
     @Nullable
@@ -59,6 +73,7 @@ public class TestCacheService {
         // this is different from "get_cache_hit" - calculate all returned files
         Counter.builder("get_cache_files")
             .tag("pluginName", pluginName)
+            .tag("exist", Boolean.toString(body != null))
             .register(meterRegistry)
             .increment();
 
