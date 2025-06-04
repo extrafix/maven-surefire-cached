@@ -2,7 +2,6 @@ package com.github.seregamorph.maven.test.common;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -27,10 +26,5 @@ public record TestTaskOutput(
     // alias -> packed target name
     Map<String, String> files
 ) {
-    public static TestTaskOutput empty() {
-        return new TestTaskOutput(
-            Instant.now(), Instant.now(), BigDecimal.ZERO,
-            0, BigDecimal.ZERO,
-            0, 0, 0, Collections.emptyMap());
-    }
+
 }

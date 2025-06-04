@@ -249,7 +249,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             name.startsWith("TEST-") && name.endsWith(".xml"));
 
         if (testReports == null) {
-            return TestTaskOutput.empty();
+            testReports = new File[0];
         }
 
         int totalClasses = 0;
