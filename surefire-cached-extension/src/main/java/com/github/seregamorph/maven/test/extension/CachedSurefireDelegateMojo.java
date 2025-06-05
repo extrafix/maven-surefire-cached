@@ -9,10 +9,10 @@ import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
-import com.github.seregamorph.maven.test.core.SurefireCachedConfig;
+import com.github.seregamorph.maven.test.config.ArtifactsConfig;
+import com.github.seregamorph.maven.test.config.TestPluginConfig;
+import com.github.seregamorph.maven.test.config.TestPluginConfigLoader;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
-import com.github.seregamorph.maven.test.core.TestPluginConfig;
-import com.github.seregamorph.maven.test.core.TestPluginConfigLoader;
 import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
@@ -210,8 +210,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     ) {
         int deleted = cacheService.write(cacheEntryKey, getTaskInputFileName(),
             JsonSerializers.serialize(testTaskInput));
-        for (Map.Entry<String, SurefireCachedConfig.ArtifactsConfig> entry :
-            testPluginConfig.getArtifacts().entrySet()) {
+        for (Map.Entry<String, ArtifactsConfig> entry : testPluginConfig.getArtifacts().entrySet()) {
             var alias = entry.getKey();
             var artifactsConfig = entry.getValue();
             var artifactPackName = getArtifactPackName(alias);

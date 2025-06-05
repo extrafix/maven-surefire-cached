@@ -1,4 +1,4 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
@@ -48,7 +48,7 @@ public class TestPluginConfig {
      */
     private List<String> excludeClasspathResources;
 
-    private Map<String, SurefireCachedConfig.ArtifactsConfig> artifacts;
+    private Map<String, ArtifactsConfig> artifacts;
 
     public TestPluginConfig setInputProperties(List<String> inputProperties) {
         this.inputProperties = inputProperties;
@@ -70,7 +70,7 @@ public class TestPluginConfig {
         return this;
     }
 
-    public TestPluginConfig setArtifacts(Map<String, SurefireCachedConfig.ArtifactsConfig> artifacts) {
+    public TestPluginConfig setArtifacts(Map<String, ArtifactsConfig> artifacts) {
         this.artifacts = artifacts;
         return this;
     }
@@ -91,7 +91,7 @@ public class TestPluginConfig {
         return excludeClasspathResources;
     }
 
-    public Map<String, SurefireCachedConfig.ArtifactsConfig> getArtifacts() {
+    public Map<String, ArtifactsConfig> getArtifacts() {
         return artifacts;
     }
 

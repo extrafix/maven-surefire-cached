@@ -1,4 +1,4 @@
-package com.github.seregamorph.maven.test.core;
+package com.github.seregamorph.maven.test.config;
 
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.util.JsonSerializers;
@@ -49,7 +49,7 @@ public class TestPluginConfigLoader {
     private static final TestPluginConfig DEFAULT_SUREFIRE_CONFIG = merge(
         new TestPluginConfig()
             .setArtifacts(Map.of(
-                "surefire-reports", new SurefireCachedConfig.ArtifactsConfig()
+                "surefire-reports", new ArtifactsConfig()
                     .setIncludes(List.of(
                         "surefire-reports/TEST-*.xml"
                     )))),
@@ -58,7 +58,7 @@ public class TestPluginConfigLoader {
     private static final TestPluginConfig DEFAULT_FAILSAFE_CONFIG = merge(
         new TestPluginConfig()
             .setArtifacts(Map.of(
-                "failsafe-reports", new SurefireCachedConfig.ArtifactsConfig()
+                "failsafe-reports", new ArtifactsConfig()
                     .setIncludes(List.of(
                         "failsafe-reports/TEST-*.xml",
                         "failsafe-reports/failsafe-summary.xml"

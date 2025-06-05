@@ -3,8 +3,8 @@ package com.github.seregamorph.maven.test.extension;
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
+import com.github.seregamorph.maven.test.config.TestPluginConfig;
 import com.github.seregamorph.maven.test.core.FileHashCache;
-import com.github.seregamorph.maven.test.core.TestPluginConfig;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
@@ -148,6 +148,7 @@ public class TestTaskCacheHelper {
                 var file = artifact.getFile();
                 var hash = fileHashCache.getClasspathElementHash(file, testPluginConfig.getExcludeClasspathResources());
                 var groupArtifactId = groupArtifactId(artifact);
+                // todo classifier
                 var suffix = file.isDirectory() ? "@dir" : "@" + artifact.getType();
                 if (modules.contains(groupArtifactId)) {
                     testTaskInput.addModuleArtifactHash(groupArtifactId + suffix, hash);

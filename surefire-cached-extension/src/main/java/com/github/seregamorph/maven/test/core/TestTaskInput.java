@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
+import com.github.seregamorph.maven.test.config.ArtifactsConfig;
 import com.github.seregamorph.maven.test.util.HashUtils;
 import com.github.seregamorph.maven.test.util.JsonSerializers;
 import java.io.PrintWriter;
@@ -85,7 +86,7 @@ public final class TestTaskInput {
     private String test;
     // ignore in hash calculation as it's already affecting it
     private List<String> excludeClasspathResources;
-    private Map<String, SurefireCachedConfig.ArtifactsConfig> artifactConfigs;
+    private Map<String, ArtifactsConfig> artifactConfigs;
     private String groups;
     private String excludedGroups;
     private List<String> excludes;
@@ -209,7 +210,7 @@ public final class TestTaskInput {
         this.excludeClasspathResources = excludeClasspathResources;
     }
 
-    public void setArtifactConfigs(Map<String, SurefireCachedConfig.ArtifactsConfig> artifactConfigs) {
+    public void setArtifactConfigs(Map<String, ArtifactsConfig> artifactConfigs) {
         this.artifactConfigs = artifactConfigs;
     }
 
@@ -285,7 +286,7 @@ public final class TestTaskInput {
         return excludeClasspathResources;
     }
 
-    public Map<String, SurefireCachedConfig.ArtifactsConfig> getArtifactConfigs() {
+    public Map<String, ArtifactsConfig> getArtifactConfigs() {
         return artifactConfigs;
     }
 
