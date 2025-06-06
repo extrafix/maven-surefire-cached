@@ -78,7 +78,14 @@ custom artifacts to be cached (separate for surefire and failsafe):
 ```json
 {
   "common": {
-    "excludeModules": ["com.acme:module-build-version-timestamp"]
+    "//": "Exclude modules with timestamp or git.properties",
+    "excludeModules": ["com.acme:module-build-version-timestamp"],
+    "excludeClasspathResources": [
+      "META-INF/MANIFEST.MF",
+      "META-INF/maven/**/pom.properties",
+      "META-INF/maven/**/pom.xml",
+      "git.properties"
+    ]
   },
   "surefire": {
     "artifacts": {
