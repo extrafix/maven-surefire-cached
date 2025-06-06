@@ -4,6 +4,7 @@ import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.TestTaskOutput;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.util.JsonSerializers;
+import com.github.seregamorph.maven.test.util.ValidatorUtils;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
@@ -30,6 +31,7 @@ public class TestCacheService {
     }
 
     public void putCache(CacheEntryKey cacheEntryKey, String fileName, byte[] body) {
+        ValidatorUtils.validateFileName(fileName);
         cacheStorage.write(cacheEntryKey, fileName, body);
         var pluginName = cacheEntryKey.pluginName().name();
 
@@ -60,6 +62,7 @@ public class TestCacheService {
 
     @Nullable
     public byte[] getCache(CacheEntryKey cacheEntryKey, String fileName) {
+        ValidatorUtils.validateFileName(fileName);
         var body = cacheStorage.read(cacheEntryKey, fileName);
         var pluginName = cacheEntryKey.pluginName().name();
 
