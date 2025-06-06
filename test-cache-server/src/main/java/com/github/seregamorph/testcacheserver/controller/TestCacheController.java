@@ -6,6 +6,7 @@ import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.testcacheserver.service.TestCacheService;
 import io.micrometer.core.annotation.Counted;
 import io.micrometer.core.annotation.Timed;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -30,13 +31,13 @@ public class TestCacheController {
 
     @Timed(value = "putCache")
     @Counted(value = "putCache")
-    @PutMapping("/{pluginName}/{groupId}/{artifactId}/{hash}/{file}")
+    @PutMapping("/{pluginName}/{groupId}/{artifactId}/{hash}/{fileName}")
     public ResponseEntity<?> putCache(
         @PathVariable("pluginName") PluginName pluginName,
         @PathVariable("groupId") String groupId,
         @PathVariable("artifactId") String artifactId,
         @PathVariable("hash") String hash,
-        @PathVariable("file") String fileName,
+        @PathVariable("fileName") String fileName,
         @RequestBody byte[] body
     ) {
         var cacheEntryKey = new CacheEntryKey(pluginName, new GroupArtifactId(groupId, artifactId), hash);
@@ -46,13 +47,13 @@ public class TestCacheController {
 
     @Timed(value = "getCache")
     @Counted(value = "getCache")
-    @GetMapping("/{pluginName}/{groupId}/{artifactId}/{hash}/{file}")
+    @GetMapping("/{pluginName}/{groupId}/{artifactId}/{hash}/{fileName}")
     public ResponseEntity<byte[]> getCache(
         @PathVariable("pluginName") PluginName pluginName,
         @PathVariable("groupId") String groupId,
         @PathVariable("artifactId") String artifactId,
         @PathVariable("hash") String hash,
-        @PathVariable("file") String fileName
+        @PathVariable("fileName") String fileName
     ) {
         var cacheEntryKey = new CacheEntryKey(pluginName, new GroupArtifactId(groupId, artifactId), hash);
         var body = testCacheService.getCache(cacheEntryKey, fileName);
@@ -61,6 +62,7 @@ public class TestCacheController {
         }
         return ResponseEntity.ok()
             .contentType(getContentType(fileName))
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
             .body(body);
     }
 
