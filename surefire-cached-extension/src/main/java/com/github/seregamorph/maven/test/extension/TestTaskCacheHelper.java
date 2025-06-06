@@ -148,10 +148,11 @@ public class TestTaskCacheHelper {
                 var file = artifact.getFile();
                 var hash = fileHashCache.getClasspathElementHash(file, testPluginConfig.getExcludeClasspathResources());
                 var groupArtifactId = groupArtifactId(artifact);
-                // todo classifier
-                var suffix = file.isDirectory() ? "@dir" : "@" + artifact.getType();
+                var classifier = artifact.getClassifier();
+                var classifierSuffix = classifier == null || classifier.isEmpty() ? "" : ":" + classifier;
+                var fileTypeSuffix = file.isDirectory() ? "@dir" : "@" + artifact.getType();
                 if (modules.contains(groupArtifactId)) {
-                    testTaskInput.addModuleArtifactHash(groupArtifactId + suffix, hash);
+                    testTaskInput.addModuleArtifactHash(groupArtifactId + classifierSuffix + fileTypeSuffix, hash);
                 } else {
                     testTaskInput.addLibraryArtifactHash(groupArtifactId, artifact.getClassifier(),
                         artifact.getVersion(), hash);
