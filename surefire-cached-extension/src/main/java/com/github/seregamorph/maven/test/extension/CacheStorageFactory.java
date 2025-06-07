@@ -5,13 +5,20 @@ import com.github.seregamorph.maven.test.storage.FileCacheStorage;
 import com.github.seregamorph.maven.test.storage.HttpCacheStorage;
 import java.io.File;
 import java.net.URI;
+import org.apache.maven.execution.MavenSession;
 
 /**
  * @author Sergey Chernov
  */
-public class CacheStorageFactory {
+class CacheStorageFactory {
 
-    public static CacheStorage createCacheStorage(String cacheStorageUrl) {
+    private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
+
+    static CacheStorage createCacheStorage(MavenSession session) {
+        String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
+        if (cacheStorageUrl == null) {
+            cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
+        }
         //noinspection HttpUrlsUsage
         if (cacheStorageUrl.startsWith("http://") || cacheStorageUrl.startsWith("https://")) {
             // todo configuration

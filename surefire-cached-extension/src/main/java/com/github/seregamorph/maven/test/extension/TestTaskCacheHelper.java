@@ -33,8 +33,6 @@ import org.apache.maven.project.MavenProject;
 @Singleton
 public class TestTaskCacheHelper {
 
-    private static final String PROP_CACHE_STORAGE_URL = "cacheStorageUrl";
-
     private FileHashCache fileHashCache;
     private SortedSet<GroupArtifactId> modules;
     private CacheServiceMetrics metrics;
@@ -49,7 +47,7 @@ public class TestTaskCacheHelper {
             .collect(Collectors.toCollection(TreeSet::new));
 
         this.metrics = new CacheServiceMetrics();
-        this.cacheStorage = createCacheStorage(session);
+        this.cacheStorage = CacheStorageFactory.createCacheStorage(session);
         this.cacheService = new CacheService(cacheStorage, metrics, 2);
         this.cacheReport = new CacheReport();
     }
@@ -89,14 +87,6 @@ public class TestTaskCacheHelper {
             throw new IllegalStateException("cacheReport is not initialized");
         }
         return cacheReport;
-    }
-
-    private static CacheStorage createCacheStorage(MavenSession session) {
-        String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
-        if (cacheStorageUrl == null) {
-            cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
-        }
-        return CacheStorageFactory.createCacheStorage(cacheStorageUrl);
     }
 
     public TestTaskInput getTestTaskInput(
