@@ -3,6 +3,7 @@ package com.github.seregamorph.maven.test.extension;
 import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.storage.FileCacheStorage;
 import com.github.seregamorph.maven.test.storage.HttpCacheStorage;
+import com.github.seregamorph.maven.test.storage.HttpCacheStorageConfig;
 import java.io.File;
 import java.net.URI;
 import org.apache.maven.execution.MavenSession;
@@ -22,7 +23,8 @@ class CacheStorageFactory {
         //noinspection HttpUrlsUsage
         if (cacheStorageUrl.startsWith("http://") || cacheStorageUrl.startsWith("https://")) {
             // todo configuration
-            return new HttpCacheStorage(URI.create(cacheStorageUrl));
+            var httpCacheStorageConfig = new HttpCacheStorageConfig(URI.create(cacheStorageUrl));
+            return new HttpCacheStorage(httpCacheStorageConfig);
         }
 
         return new FileCacheStorage(new File(cacheStorageUrl));

@@ -4,7 +4,6 @@ import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.util.ResponseBodyUtils;
 import java.io.IOException;
 import java.net.URI;
-import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -30,18 +29,16 @@ public class HttpCacheStorage implements CacheStorage {
 
     private final OkHttpClient client;
 
-    public HttpCacheStorage(URI baseUrl) {
-        this.baseUrl = baseUrl;
-
-        // todo configurable
-        this.client = createHttpClient();
+    public HttpCacheStorage(HttpCacheStorageConfig config) {
+        this.baseUrl = config.baseUrl();
+        this.client = createHttpClient(config);
     }
 
-    private static OkHttpClient createHttpClient() {
+    private static OkHttpClient createHttpClient(HttpCacheStorageConfig config) {
         return new OkHttpClient.Builder()
-            .connectTimeout(5L, TimeUnit.SECONDS)
-            .readTimeout(10L, TimeUnit.SECONDS)
-            .writeTimeout(10L, TimeUnit.SECONDS)
+            .connectTimeout(config.connectTimeout())
+            .readTimeout(config.readTimeout())
+            .writeTimeout(config.writeTimeout())
             .build();
     }
 
