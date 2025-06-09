@@ -7,8 +7,13 @@ import javax.annotation.Nullable;
  */
 public class MinServerProtocolVersionException extends RuntimeException {
 
-    public MinServerProtocolVersionException(String message, @Nullable Integer serverVersion, int minServerVersion) {
-        super(message + ", serverVersion: " + (serverVersion == null ? "<empty>" : serverVersion.toString()) + ", "
-            + "minServerVersion: " + minServerVersion);
+    public MinServerProtocolVersionException(
+        String message,
+        @Nullable Integer serverProtocolVersion,
+        int minServerProtocolVersion
+    ) {
+        super(message + ", serverProtocolVersion: "
+            + (serverProtocolVersion == null ? "<empty>" : serverProtocolVersion.toString()) + ", "
+            + "minServerProtocolVersion: " + minServerProtocolVersion);
     }
 }
