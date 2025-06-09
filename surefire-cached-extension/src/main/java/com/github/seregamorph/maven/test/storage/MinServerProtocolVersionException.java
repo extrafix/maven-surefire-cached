@@ -9,11 +9,11 @@ public class MinServerProtocolVersionException extends RuntimeException {
 
     public MinServerProtocolVersionException(
         String message,
-        @Nullable Integer serverProtocolVersion,
+        @Nullable String serverProtocolVersionStr,
         int minServerProtocolVersion
     ) {
         super(message + ", serverProtocolVersion: "
-            + (serverProtocolVersion == null ? "<empty>" : serverProtocolVersion.toString()) + ", "
+            + (serverProtocolVersionStr == null ? "<empty>" : serverProtocolVersionStr) + ", "
             + "minServerProtocolVersion: " + minServerProtocolVersion);
     }
 }

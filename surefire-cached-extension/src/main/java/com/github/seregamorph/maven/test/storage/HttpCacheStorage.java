@@ -111,14 +111,23 @@ public class HttpCacheStorage implements CacheStorage {
     }
 
     private void checkServerVersion(Response response) {
-        var serverVersionStr = response.header(ServerProtocolVersion.HEADER_SERVER_PROTOCOL_VERSION);
-        @Nullable var serverVersion = serverVersionStr == null || serverVersionStr.isEmpty() ?
-            null : Integer.parseInt(serverVersionStr);
-        if (serverVersion == null || serverVersion < ServerProtocolVersion.MIN_SERVER_PROTOCOL_VERSION) {
+        var serverProtocolVersionStr = response.header(ServerProtocolVersion.HEADER_SERVER_PROTOCOL_VERSION);
+        @Nullable Integer serverProtocolVersion = null;
+        if (serverProtocolVersionStr != null) {
+            try {
+                serverProtocolVersion = Integer.parseInt(serverProtocolVersionStr);
+            } catch (NumberFormatException e) {
+                throw new MinServerProtocolVersionException("surefire-cached-extension is not compatible with server "
+                    + "at " + baseUrl + ", "
+                    + "please update both extension and test-cache-server", serverProtocolVersionStr,
+                    ServerProtocolVersion.MIN_SERVER_PROTOCOL_VERSION);
+            }
+        }
+        if (serverProtocolVersion == null || serverProtocolVersion < ServerProtocolVersion.MIN_SERVER_PROTOCOL_VERSION) {
             // this way we prevent failures caused by a breaking change with the new structure of TestTaskOutput
             throw new MinServerProtocolVersionException("surefire-cached-extension is not compatible with server "
                 + "at " + baseUrl + ", "
-                + "please update test-cache-server first", serverVersion,
+                + "please update test-cache-server first", serverProtocolVersionStr,
                 ServerProtocolVersion.MIN_SERVER_PROTOCOL_VERSION);
         }
     }
