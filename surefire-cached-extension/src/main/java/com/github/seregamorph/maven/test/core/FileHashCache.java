@@ -1,8 +1,8 @@
 package com.github.seregamorph.maven.test.core;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.seregamorph.maven.test.util.HashUtils;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -10,8 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,8 +31,8 @@ public class FileHashCache {
     private final Cache<CacheKey, DirHashValue> cacheDirectories;
 
     public FileHashCache() {
-        cacheFiles = CacheBuilder.newBuilder().build();
-        cacheDirectories = CacheBuilder.newBuilder().build();
+        cacheFiles = Caffeine.newBuilder().build();
+        cacheDirectories = Caffeine.newBuilder().build();
     }
 
     /**
@@ -52,11 +51,12 @@ public class FileHashCache {
             var cacheKey = new CacheKey(file.getCanonicalFile().getAbsolutePath(),
                 new ArrayList<>(excludePathPatterns));
             if (file.isDirectory()) {
-                Callable<DirHashValue> loader = () -> {
+                Function<CacheKey, DirHashValue> loader =$ -> {
                     var hash = plainHash(HashUtils.hashDirectory(file, excludePathPatterns));
                     return new DirHashValue(hash, file.lastModified());
                 };
                 var fileHashValue = cacheDirectories.get(cacheKey, loader);
+                assert fileHashValue != null;
                 if (fileHashValue.fileLastModified() != file.lastModified()) {
                     log.warn("Invalidating cache of: {}", cacheKey);
                     cacheDirectories.invalidate(cacheKey);
@@ -64,7 +64,7 @@ public class FileHashCache {
                 }
                 return fileHashValue.hash();
             } else if (file.exists()) {
-                Callable<FileHashValue> loader = () -> {
+                Function<CacheKey, FileHashValue> loader = $ -> {
                     // calculate has hums of zip entries ignoring timestamps
                     var hash = plainHash(HashUtils.hashZipFile(file, excludePathPatterns));
                     return new FileHashValue(hash, file.length(), file.lastModified());
@@ -82,8 +82,6 @@ public class FileHashCache {
                 // this can be a non-existing classes directory for modules with empty sourceSet
                 return HashUtils.HASH_EMPTY_FILE_COLLECTION;
             }
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
