@@ -18,7 +18,12 @@ public class CacheStorageConfiguration {
 
     @Bean
     public CacheStorage cacheStorage() {
-        var baseDir = new File(System.getProperty("user.home"), ".m2/test-cache-server");
+        String userHome = System.getProperty("user.home");
+        if (userHome == null) {
+            throw new IllegalStateException("Could not resolve default cacheStorageUrl, user.home is not defined.\n"
+                + "Please provide custom CacheStorageConfiguration.");
+        }
+        var baseDir = new File(userHome, ".m2/test-cache-server");
         logger.info("Using cache storage located at {}", baseDir);
         return new FileCacheStorage(baseDir, 16);
     }
