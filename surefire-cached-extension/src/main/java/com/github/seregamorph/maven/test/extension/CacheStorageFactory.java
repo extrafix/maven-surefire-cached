@@ -27,7 +27,12 @@ class CacheStorageFactory {
     CacheStorage createCacheStorage() {
         String cacheStorageUrl = getProperty(session, PROP_CACHE_STORAGE_URL);
         if (cacheStorageUrl == null) {
-            cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
+            String userHome = System.getProperty("user.home");
+            if (userHome == null) {
+                throw new IllegalStateException("Could not resolve default cacheStorageUrl, user.home is not defined.\n"
+                    + "Please provide -DcacheStorageUrl= with directory or HTTP/HTTPS url of cache");
+            }
+            cacheStorageUrl = userHome + "/.m2/test-cache";
         }
         //noinspection HttpUrlsUsage
         if (cacheStorageUrl.startsWith("http://") || cacheStorageUrl.startsWith("https://")) {
