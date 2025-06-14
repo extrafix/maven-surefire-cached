@@ -36,6 +36,7 @@ public class CachedSurefireDelegateMojoTest {
 
         var userProperties = new Properties();
         var session = mock(MavenSession.class);
+        when(session.getSystemProperties()).thenReturn(new Properties());
         when(session.getUserProperties()).thenReturn(userProperties);
         when(session.getAllProjects()).thenReturn(List.of(project));
         var delegate = mock(TestSurefireMojo.class);

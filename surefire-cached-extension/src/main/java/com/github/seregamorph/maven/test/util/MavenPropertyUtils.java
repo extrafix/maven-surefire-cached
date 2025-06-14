@@ -10,16 +10,25 @@ import org.apache.maven.project.MavenProject;
 public final class MavenPropertyUtils {
 
     @Nullable
-    public static String getProperty(MavenSession session, MavenProject project, String propertyName) {
+    public static String getProperty(MavenSession session, String propertyName) {
         String propertyValue = session.getSystemProperties().getProperty(propertyName);
+        if (propertyValue == null) {
+            propertyValue = session.getUserProperties().getProperty(propertyName);
+        }
+        return propertyValue;
+    }
+
+    @Nullable
+    public static String getProperty(MavenSession session, MavenProject project, String propertyName) {
+        String propertyValue = getProperty(session, propertyName);
         if (propertyValue == null) {
             propertyValue = project.getProperties().getProperty(propertyName);
         }
         return propertyValue;
     }
 
-    public static boolean isEmptyOrTrue(String value) {
-        return "".equals(value) || "true".equals(value);
+    public static boolean isTrue(String value) {
+        return "true".equals(value);
     }
 
     private MavenPropertyUtils() {

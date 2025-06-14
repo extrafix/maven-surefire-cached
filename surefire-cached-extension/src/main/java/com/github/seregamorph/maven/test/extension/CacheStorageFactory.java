@@ -1,5 +1,7 @@
 package com.github.seregamorph.maven.test.extension;
 
+import static com.github.seregamorph.maven.test.util.MavenPropertyUtils.getProperty;
+
 import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.storage.FileCacheStorage;
 import com.github.seregamorph.maven.test.storage.HttpCacheStorage;
@@ -23,7 +25,7 @@ class CacheStorageFactory {
     }
 
     CacheStorage createCacheStorage() {
-        String cacheStorageUrl = session.getUserProperties().getProperty(PROP_CACHE_STORAGE_URL);
+        String cacheStorageUrl = getProperty(session, PROP_CACHE_STORAGE_URL);
         if (cacheStorageUrl == null) {
             cacheStorageUrl = System.getProperty("user.home") + "/.m2/test-cache";
         }

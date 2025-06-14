@@ -1,6 +1,7 @@
 package com.github.seregamorph.maven.test.extension;
 
-import static com.github.seregamorph.maven.test.util.MavenPropertyUtils.isEmptyOrTrue;
+import static com.github.seregamorph.maven.test.util.MavenPropertyUtils.getProperty;
+import static com.github.seregamorph.maven.test.util.MavenPropertyUtils.isTrue;
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.call;
 import static com.github.seregamorph.maven.test.util.ReflectionUtils.callProtected;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -18,7 +19,6 @@ import com.github.seregamorph.maven.test.core.TestSuiteReport;
 import com.github.seregamorph.maven.test.core.TestTaskInput;
 import com.github.seregamorph.maven.test.storage.CacheService;
 import com.github.seregamorph.maven.test.util.JsonSerializers;
-import com.github.seregamorph.maven.test.util.MavenPropertyUtils;
 import com.github.seregamorph.maven.test.util.MoreFileUtils;
 import com.github.seregamorph.maven.test.util.TimeFormatUtils;
 import com.github.seregamorph.maven.test.util.ZipUtils;
@@ -105,7 +105,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
         MoreFileUtils.delete(reportsDirectory);
 
-        var skipCache = isEmptyOrTrue(MavenPropertyUtils.getProperty(session, project, "skipCache"));
+        var skipCache = isTrue(getProperty(session, project, "skipCache"));
         if (skipCache) {
             log.info("Skipping cache for " + project.getGroupId() + ":" + project.getArtifactId());
             delegate.execute();
