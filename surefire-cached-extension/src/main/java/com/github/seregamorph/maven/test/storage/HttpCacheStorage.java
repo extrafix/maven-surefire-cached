@@ -55,10 +55,12 @@ public class HttpCacheStorage implements CacheStorage {
                 .build();
             LOGGER.info("Fetching from cache: {}", url);
             try (Response response = client.newCall(request).execute()) {
-                if (checkServerVersion) {
+                boolean isHttp2xx = response.code() / 100 == 2;
+                boolean isHttp404 = response.code() == 404;
+                if ((isHttp2xx || isHttp404) && checkServerVersion) {
                     checkServerVersion(response);
                 }
-                if (response.code() == 404) {
+                if (isHttp404) {
                     return null;
                 }
                 ResponseBody responseBody = response.body();
