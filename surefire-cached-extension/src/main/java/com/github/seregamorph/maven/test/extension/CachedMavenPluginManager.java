@@ -39,8 +39,12 @@ import org.eclipse.aether.repository.RemoteRepository;
 @org.apache.maven.api.di.Priority(10) // maven 4
 public class CachedMavenPluginManager implements MavenPluginManager {
 
+    private final Object delegateSync = new Object();
+
     private final Provider<DefaultMavenPluginManager> defaultMavenPluginManagerProvider;
     private final TestTaskCacheHelper testTaskCacheHelper;
+
+    private DefaultMavenPluginManager delegate;
 
     @Inject
     public CachedMavenPluginManager(
@@ -124,6 +128,11 @@ public class CachedMavenPluginManager implements MavenPluginManager {
     }
 
     private MavenPluginManager delegate() {
-        return defaultMavenPluginManagerProvider.get();
+        synchronized (delegateSync) {
+            if (delegate == null) {
+                delegate = defaultMavenPluginManagerProvider.get();
+            }
+            return delegate;
+        }
     }
 }
