@@ -79,6 +79,10 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         this.reportsDirectory = call(delegate, File.class, "getReportsDirectory");
     }
 
+    Mojo getDelegate() {
+        return delegate;
+    }
+
     private void reportCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput) {
         reportCachedExecution(result, testTaskOutput, 0);
     }

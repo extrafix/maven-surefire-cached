@@ -57,7 +57,8 @@ public class CachedMavenPluginManager implements MavenPluginManager {
 
     @Override
     public PluginDescriptor getPluginDescriptor(
-        Plugin plugin, List<RemoteRepository> repositories,
+        Plugin plugin,
+        List<RemoteRepository> repositories,
         RepositorySystemSession session
     ) throws PluginResolutionException, PluginDescriptorParsingException, InvalidPluginDescriptorException {
         return delegate().getPluginDescriptor(plugin, repositories, session);
@@ -65,7 +66,9 @@ public class CachedMavenPluginManager implements MavenPluginManager {
 
     @Override
     public MojoDescriptor getMojoDescriptor(
-        Plugin plugin, String goal, List<RemoteRepository> repositories,
+        Plugin plugin,
+        String goal,
+        List<RemoteRepository> repositories,
         RepositorySystemSession session
     ) throws MojoNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
         InvalidPluginDescriptorException {
@@ -118,7 +121,12 @@ public class CachedMavenPluginManager implements MavenPluginManager {
 
     @Override
     public void releaseMojo(Object mojo, MojoExecution mojoExecution) {
-        delegate().releaseMojo(mojo, mojoExecution);
+        Object mojoToRelease = mojo;
+        if (mojo instanceof CachedSurefireDelegateMojo) {
+            CachedSurefireDelegateMojo delegateMojo = (CachedSurefireDelegateMojo) mojo;
+            mojoToRelease = delegateMojo.getDelegate();
+        }
+        delegate().releaseMojo(mojoToRelease, mojoExecution);
     }
 
     // this method exists only in Maven 4
