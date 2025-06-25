@@ -114,7 +114,7 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         JsonCacheReport jsonCacheReport = new JsonCacheReport(pluginResults, testTaskCacheHelper.getMetrics());
         File dir = new File(session.getExecutionRootDirectory(), "target");
         dir.mkdir();
-        MoreFileUtils.write(new File(dir, "surefire-cache-report.json"), JsonSerializers.serialize(jsonCacheReport));
+        MoreFileUtils.write(new File(dir, "surefire-cached-report.json"), JsonSerializers.serialize(jsonCacheReport));
     }
 
     private static final class JsonCacheReport {

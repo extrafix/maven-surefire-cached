@@ -169,7 +169,7 @@ Sample text report:
 [INFO] Cache miss read operations: 5, time: 0.022s
 [INFO] Cache write operations: 20, time: 0.141s, size: 13.81 MB
 ```
-Json report can be found in `target/surefire-cache-report.json` of the build root module. Sample:
+Json report can be found in `target/surefire-cached-report.json` of the build root module. Sample:
 ```json
 {
   "pluginResults" : {
