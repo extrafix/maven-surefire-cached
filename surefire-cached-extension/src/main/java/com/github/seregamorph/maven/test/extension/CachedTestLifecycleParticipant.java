@@ -4,6 +4,7 @@ import static com.github.seregamorph.maven.test.util.ByteSizeFormatUtils.formatB
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.formatTime;
 import static com.github.seregamorph.maven.test.util.TimeFormatUtils.toSeconds;
 
+import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.PluginName;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
 import com.github.seregamorph.maven.test.storage.CacheServiceMetrics;
@@ -16,7 +17,10 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
@@ -36,22 +40,21 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
     private static final class AggResult {
 
-        private static final AggResult EMPTY = new AggResult(0, BigDecimal.ZERO);
+        private final SortedSet<GroupArtifactId> modules = new TreeSet<>();
 
-        private final int totalModules;
-        private final BigDecimal totalTimeSec;
+        private BigDecimal totalTimeSec = BigDecimal.ZERO;
 
-        private AggResult(int totalModules, BigDecimal totalTimeSec) {
-            this.totalModules = totalModules;
-            this.totalTimeSec = totalTimeSec;
+        void add(GroupArtifactId groupArtifactId, BigDecimal time) {
+            modules.add(groupArtifactId);
+            totalTimeSec = totalTimeSec.add(time);
         }
 
-        AggResult add(BigDecimal time) {
-            return new AggResult(totalModules + 1, totalTimeSec.add(time));
+        public SortedSet<GroupArtifactId> getModules() {
+            return modules;
         }
 
         public int getTotalModules() {
-            return totalModules;
+            return modules.size();
         }
 
         public BigDecimal getTotalTimeSec() {
@@ -74,29 +77,33 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
     @Override
     public void afterSessionEnd(MavenSession session) {
         CacheReport cacheReport = testTaskCacheHelper.getCacheReport();
-        Map<String, Map<TaskOutcome, AggResult>> pluginResults = new TreeMap<>();
+        Map<PluginName, Map<TaskOutcome, AggResult>> pluginResults = new TreeMap<>();
         for (PluginName pluginName : Arrays.asList(PluginName.SUREFIRE_CACHED, PluginName.FAILSAFE_CACHED)) {
             Map<TaskOutcome, AggResult> pluginResult = new TreeMap<>();
             int deleted = 0;
             List<CacheReport.ModuleTestResult> executionResults = cacheReport.getExecutionResults(pluginName);
             for (CacheReport.ModuleTestResult executionResult : executionResults) {
-                pluginResult.compute(executionResult.getResult(),
-                    (k, v) -> (v == null ? AggResult.EMPTY : v).add(executionResult.getTotalTimeSeconds()));
+                pluginResult.computeIfAbsent(executionResult.getResult(), $ -> new AggResult())
+                        .add(executionResult.getGroupArtifactId(), executionResult.getTotalTimeSeconds());
                 deleted += executionResult.getDeletedCacheEntries();
             }
             if (!pluginResult.isEmpty()) {
-                logger.info("Total test cached results ({}):", pluginName);
+                AtomicBoolean headerPrinted =  new AtomicBoolean(false);
                 pluginResult.forEach((k, v) -> {
                     if (k.isPrint()) {
                         String suffix = k.suffix();
-                        logger.info("{} ({} modules): {}{}", k, v.totalModules,
+                        if (headerPrinted.compareAndSet(false, true)) {
+                            // print only if needed, but not more than once
+                            logger.info("Total test cached results ({}):", pluginName);
+                        }
+                        logger.info("{} ({} modules): {}{}", k, v.getTotalModules(),
                             formatTime(v.totalTimeSec), suffix == null ? "" : " " + suffix);
                     }
                 });
                 if (deleted > 0) {
                     logger.info("Total deleted cache entries: {}", deleted);
                 }
-                pluginResults.put(pluginName.name(), pluginResult);
+                pluginResults.put(pluginName, pluginResult);
             }
         }
         if (isLogStorageMetrics(testTaskCacheHelper.getCacheStorage())) {
@@ -110,7 +117,7 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         return cacheStorage instanceof HttpCacheStorage;
     }
 
-    private void saveJsonReport(MavenSession session, Map<String, Map<TaskOutcome, AggResult>> pluginResults) {
+    private void saveJsonReport(MavenSession session, Map<PluginName, Map<TaskOutcome, AggResult>> pluginResults) {
         JsonCacheReport jsonCacheReport = new JsonCacheReport(pluginResults, testTaskCacheHelper.getMetrics());
         File dir = new File(session.getExecutionRootDirectory(), "target");
         dir.mkdir();
@@ -119,17 +126,17 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
     private static final class JsonCacheReport {
 
-        private final Map<String, Map<TaskOutcome, AggResult>> pluginResults;
+        private final Map<PluginName, Map<TaskOutcome, AggResult>> pluginResults;
         private final CacheServiceMetrics cacheServiceMetrics;
 
         private JsonCacheReport(
-            Map<String, Map<TaskOutcome, AggResult>> pluginResults,
+            Map<PluginName, Map<TaskOutcome, AggResult>> pluginResults,
             CacheServiceMetrics cacheServiceMetrics) {
             this.pluginResults = pluginResults;
             this.cacheServiceMetrics = cacheServiceMetrics;
         }
 
-        public Map<String, Map<TaskOutcome, AggResult>> getPluginResults() {
+        public Map<PluginName, Map<TaskOutcome, AggResult>> getPluginResults() {
             return pluginResults;
         }
 

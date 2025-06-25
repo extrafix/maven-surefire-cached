@@ -1,5 +1,7 @@
 package com.github.seregamorph.maven.test.common;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 /**
  * @author Sergey Chernov
  */
@@ -16,12 +18,13 @@ public final class PluginName implements Comparable<PluginName>{
         this.name = name;
     }
 
+    @JsonValue
     public String name() {
         return name;
     }
 
     /**
-     * To support auto-convertion e.g. as a spring webmvc Controller parameter without additional converter
+     * To support auto-conversion e.g., as a spring webmvc Controller parameter without additional converter
      * configuration
      *
      * @param pluginName

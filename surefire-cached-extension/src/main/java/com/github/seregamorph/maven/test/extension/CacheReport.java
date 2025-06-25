@@ -36,7 +36,7 @@ public class CacheReport {
         synchronized (executionResults) {
             executionResults.computeIfAbsent(groupArtifactId, k -> new TreeMap<>())
                 .computeIfAbsent(pluginName, k -> new ArrayList<>())
-                .add(new ModuleTestResult(result, totalTimeSeconds, deletedCacheEntries));
+                .add(new ModuleTestResult(groupArtifactId, result, totalTimeSeconds, deletedCacheEntries));
         }
     }
 
@@ -50,14 +50,25 @@ public class CacheReport {
 
     public static final class ModuleTestResult {
 
+        private final GroupArtifactId groupArtifactId;
         private final TaskOutcome result;
         private final BigDecimal totalTimeSeconds;
         private final int deletedCacheEntries;
 
-        public ModuleTestResult(TaskOutcome result, BigDecimal totalTimeSeconds, int deletedCacheEntries) {
+        public ModuleTestResult(
+            GroupArtifactId groupArtifactId,
+            TaskOutcome result,
+            BigDecimal totalTimeSeconds,
+            int deletedCacheEntries
+        ) {
+            this.groupArtifactId = groupArtifactId;
             this.result = result;
             this.totalTimeSeconds = totalTimeSeconds;
             this.deletedCacheEntries = deletedCacheEntries;
+        }
+
+        public GroupArtifactId getGroupArtifactId() {
+            return groupArtifactId;
         }
 
         public TaskOutcome getResult() {
@@ -75,8 +86,10 @@ public class CacheReport {
         @Override
         public String toString() {
             return "ModuleTestResult{" +
-                "result=" + result +
+                "groupArtifactId=" + groupArtifactId +
+                ", result=" + result +
                 ", totalTimeSeconds=" + totalTimeSeconds +
+                ", deletedCacheEntries=" + deletedCacheEntries +
                 '}';
         }
     }

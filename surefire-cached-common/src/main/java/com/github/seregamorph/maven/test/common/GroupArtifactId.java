@@ -1,5 +1,6 @@
 package com.github.seregamorph.maven.test.common;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.github.seregamorph.maven.test.util.ValidatorUtils;
 import java.util.Objects;
 
@@ -54,6 +55,7 @@ public final class GroupArtifactId implements Comparable<GroupArtifactId>{
         return Objects.hash(groupId, artifactId);
     }
 
+    @JsonValue
     @Override
     public String toString() {
         return groupId + ':' + artifactId;
