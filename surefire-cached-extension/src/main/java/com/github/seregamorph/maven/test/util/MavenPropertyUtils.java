@@ -22,6 +22,9 @@ public final class MavenPropertyUtils {
     public static String getProperty(MavenSession session, MavenProject project, String propertyName) {
         String propertyValue = getProperty(session, propertyName);
         if (propertyValue == null) {
+            if ("project.version".equals(propertyName)) {
+                return project.getVersion();
+            }
             propertyValue = project.getProperties().getProperty(propertyName);
         }
         return propertyValue;

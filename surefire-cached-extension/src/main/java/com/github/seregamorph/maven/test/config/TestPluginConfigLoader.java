@@ -34,7 +34,8 @@ public class TestPluginConfigLoader {
             "env.GITHUB_REF",
             "env.GITHUB_RUN_ID",
             "env.GITHUB_JOB",
-            "env.GITHUB_SHA"
+            "env.GITHUB_SHA",
+            "project.version"
         ))
         .setInputProperties(Arrays.asList("java.specification.version"))
         .setExcludeModules(Arrays.asList())

@@ -44,7 +44,8 @@ If no configuration is provided, the default configuration is used
       "env.GITHUB_REF",
       "env.GITHUB_RUN_ID",
       "env.GITHUB_JOB",
-      "env.GITHUB_SHA"
+      "env.GITHUB_SHA",
+      "project.version"
     ],
     "inputProperties": [
       "java.specification.version"
