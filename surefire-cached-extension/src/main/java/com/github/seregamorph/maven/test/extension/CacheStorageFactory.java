@@ -38,7 +38,8 @@ class CacheStorageFactory {
         if (cacheStorageUrl.startsWith("http://") || cacheStorageUrl.startsWith("https://")) {
             // todo support custom configuration, auth, etc.
             HttpCacheStorageConfig httpCacheStorageConfig = new HttpCacheStorageConfig(URI.create(cacheStorageUrl),
-                true, Duration.ofSeconds(5L), Duration.ofSeconds(10L), Duration.ofSeconds(10L));
+                true, Duration.ofSeconds(5L), Duration.ofSeconds(10L), Duration.ofSeconds(10L),
+                propertyName -> getProperty(session, propertyName));
             return new HttpCacheStorage(httpCacheStorageConfig);
         }
 
