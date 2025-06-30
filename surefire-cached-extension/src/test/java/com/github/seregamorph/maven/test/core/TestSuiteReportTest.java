@@ -19,6 +19,8 @@ class TestSuiteReportTest {
         assertEquals(1, testSuiteReport.tests());
         assertEquals(0, testSuiteReport.errors());
         assertEquals(0, testSuiteReport.failures());
+        assertEquals(0, testSuiteReport.testcaseFlakyErrors());
+        assertEquals(0, testSuiteReport.testcaseErrors());
     }
 
     @Test
@@ -31,6 +33,22 @@ class TestSuiteReportTest {
         assertEquals(1, testSuiteReport.tests());
         assertEquals(0, testSuiteReport.errors());
         assertEquals(0, testSuiteReport.failures());
+        assertEquals(0, testSuiteReport.testcaseFlakyErrors());
+        assertEquals(0, testSuiteReport.testcaseErrors());
+    }
+
+    @Test
+    public void testSurefireFlakyReports() {
+        var testSuiteReport = TestSuiteReport.fromFile(getResourceFile(
+            "surefire-reports/TEST-com.github.seregamorph.testsmartcontext.demo.FlakyTest.xml"));
+
+        assertEquals("com.github.seregamorph.testsmartcontext.demo.FlakyTest", testSuiteReport.name());
+        assertEquals(new BigDecimal("0.005"), testSuiteReport.timeSeconds());
+        assertEquals(1, testSuiteReport.tests());
+        assertEquals(0, testSuiteReport.errors());
+        assertEquals(0, testSuiteReport.failures());
+        assertEquals(1, testSuiteReport.testcaseFlakyErrors());
+        assertEquals(1, testSuiteReport.testcaseErrors());
     }
 
     private static File getResourceFile(String name) {

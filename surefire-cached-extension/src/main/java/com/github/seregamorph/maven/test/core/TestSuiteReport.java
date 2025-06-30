@@ -5,6 +5,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * surefire/failsafe report files TEST-*.xml ("testsuite" tag)
@@ -18,13 +19,25 @@ public final class TestSuiteReport {
     private final int tests;
     private final int errors;
     private final int failures;
+    private final int testcaseFlakyErrors;
+    private final int testcaseErrors;
 
-    public TestSuiteReport(String name, BigDecimal timeSeconds, int tests, int errors, int failures) {
+    public TestSuiteReport(
+        String name,
+        BigDecimal timeSeconds,
+        int tests,
+        int errors,
+        int failures,
+        int testcaseFlakyErrors,
+        int testcaseErrors
+    ) {
         this.name = name;
         this.timeSeconds = timeSeconds;
         this.tests = tests;
         this.errors = errors;
         this.failures = failures;
+        this.testcaseFlakyErrors = testcaseFlakyErrors;
+        this.testcaseErrors = testcaseErrors;
     }
 
     public static TestSuiteReport fromFile(File file) {
@@ -43,7 +56,20 @@ public final class TestSuiteReport {
         int errors = Integer.parseInt(rootElement.getAttribute("errors"));
         int failures = Integer.parseInt(rootElement.getAttribute("failures"));
 
-        return new TestSuiteReport(name, timeSeconds, tests, errors, failures);
+        NodeList testcaseList = rootElement.getElementsByTagName("testcase");
+        int testcaseFlakyErrors = 0;
+        int testcaseErrors = 0;
+        for (int i = 0; i < testcaseList.getLength(); i++) {
+            Element testcaseNode = (Element) testcaseList.item(i);
+
+            NodeList flakyErrorList = testcaseNode.getElementsByTagName("flakyError");
+            testcaseFlakyErrors += flakyErrorList.getLength();
+
+            NodeList errorList = testcaseNode.getElementsByTagName("error");
+            testcaseErrors += errorList.getLength();
+        }
+
+        return new TestSuiteReport(name, timeSeconds, tests, errors, failures, testcaseFlakyErrors, testcaseErrors);
     }
 
     public String name() {
@@ -66,13 +92,24 @@ public final class TestSuiteReport {
         return failures;
     }
 
+    public int testcaseFlakyErrors() {
+        return testcaseFlakyErrors;
+    }
+
+    public int testcaseErrors() {
+        return testcaseErrors;
+    }
+
     @Override
     public String toString() {
-        return "TestSuiteReport[" +
-            "name=" + name + ", " +
-            "timeSeconds=" + timeSeconds + ", " +
-            "tests=" + tests + ", " +
-            "errors=" + errors + ", " +
-            "failures=" + failures + ']';
+        return "TestSuiteReport{" +
+            "name='" + name + '\'' +
+            ", timeSeconds=" + timeSeconds +
+            ", tests=" + tests +
+            ", errors=" + errors +
+            ", failures=" + failures +
+            ", testcaseFlakyErrors=" + testcaseFlakyErrors +
+            ", testcaseErrors=" + testcaseErrors +
+            '}';
     }
 }

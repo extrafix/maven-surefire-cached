@@ -164,8 +164,12 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             TestTaskOutput testTaskOutput = getTaskOutput(startTime, Instant.now());
             MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
             // note that failsafe plugin does not throw exceptions on test failures
-            if (testTaskOutput.getTotalErrors() > 0 || testTaskOutput.getTotalFailures() > 0) {
-                log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
+            // TODO configure
+            boolean cacheIfTestcaseFlakyErrors = true;
+            if (testTaskOutput.getTotalErrors() > 0 || testTaskOutput.getTotalFailures() > 0
+                || testTaskOutput.getTotalTestcaseErrors() > 0
+                || (!cacheIfTestcaseFlakyErrors && testTaskOutput.getTotalTestcaseFlakyErrors() > 0)) {
+                log.warn("Tests failed or have testcase errors, not storing to cache. See " + reportsDirectory);
                 reportCachedExecution(TaskOutcome.FAILED, testTaskOutput);
             } else if (success) {
                 if (testTaskOutput.getTotalTests() == 0) {
@@ -264,6 +268,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         int totalTests = 0;
         int totalErrors = 0;
         int totalFailures = 0;
+        int totalTestcaseFlakyErrors = 0;
+        int totalTestcaseErrors = 0;
         for (File testReport : testReports) {
             TestSuiteReport testSuiteSummary = TestSuiteReport.fromFile(testReport);
             totalClasses++;
@@ -271,15 +277,22 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             totalTests += testSuiteSummary.tests();
             totalErrors += testSuiteSummary.errors();
             totalFailures += testSuiteSummary.failures();
-            if (testSuiteSummary.errors() > 0 || testSuiteSummary.failures() > 0) {
+            totalTestcaseFlakyErrors += testSuiteSummary.testcaseFlakyErrors();
+            totalTestcaseErrors += testSuiteSummary.testcaseErrors();
+            if (testSuiteSummary.errors() > 0 || testSuiteSummary.failures() > 0
+                || testSuiteSummary.testcaseErrors() > 0) {
                 log.warn(testReport + " has errors or failures, skipping cache");
+            } else if (testSuiteSummary.testcaseFlakyErrors() > 0) {
+                log.warn(testReport + " has flaky errors");
             }
         }
 
         // artifacts are filled before saving
         Map<String, OutputArtifact> artifacts = new TreeMap<>();
         return new TestTaskOutput(startTime, endTime, getTotalTimeSeconds(startTime, endTime),
-            totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures, artifacts);
+            totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures,
+            totalTestcaseFlakyErrors, totalTestcaseErrors,
+            artifacts);
     }
 
     private static String getArtifactPackName(String alias) {

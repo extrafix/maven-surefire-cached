@@ -30,6 +30,8 @@ public final class TestTaskOutput {
     private final int totalTests;
     private final int totalErrors;
     private final int totalFailures;
+    private final int totalTestcaseFlakyErrors;
+    private final int totalTestcaseErrors;
     // alias -> artifact
     private final Map<String, OutputArtifact> artifacts;
 
@@ -43,6 +45,8 @@ public final class TestTaskOutput {
         int totalTests,
         int totalErrors,
         int totalFailures,
+        int totalTestcaseFlakyErrors,
+        int totalTestcaseErrors,
         Map<String, OutputArtifact> artifacts
     ) {
         this.startTime = startTime;
@@ -53,6 +57,8 @@ public final class TestTaskOutput {
         this.totalTests = totalTests;
         this.totalErrors = totalErrors;
         this.totalFailures = totalFailures;
+        this.totalTestcaseFlakyErrors = totalTestcaseFlakyErrors;
+        this.totalTestcaseErrors = totalTestcaseErrors;
         this.artifacts = artifacts;
     }
 
@@ -88,21 +94,32 @@ public final class TestTaskOutput {
         return totalFailures;
     }
 
+    public int getTotalTestcaseFlakyErrors() {
+        return totalTestcaseFlakyErrors;
+    }
+
+    public int getTotalTestcaseErrors() {
+        return totalTestcaseErrors;
+    }
+
     public Map<String, OutputArtifact> getArtifacts() {
         return artifacts;
     }
 
     @Override
     public String toString() {
-        return "TestTaskOutput[" +
-            "startTime=" + startTime + ", " +
-            "endTime=" + endTime + ", " +
-            "totalTimeSeconds=" + totalTimeSeconds + ", " +
-            "totalClasses=" + totalClasses + ", " +
-            "totalTestTimeSeconds=" + totalTestTimeSeconds + ", " +
-            "totalTests=" + totalTests + ", " +
-            "totalErrors=" + totalErrors + ", " +
-            "totalFailures=" + totalFailures + ", " +
-            "artifacts=" + artifacts + ']';
+        return "TestTaskOutput{" +
+            "startTime=" + startTime +
+            ", endTime=" + endTime +
+            ", totalTimeSeconds=" + totalTimeSeconds +
+            ", totalClasses=" + totalClasses +
+            ", totalTestTimeSeconds=" + totalTestTimeSeconds +
+            ", totalTests=" + totalTests +
+            ", totalErrors=" + totalErrors +
+            ", totalFailures=" + totalFailures +
+            ", totalTestcaseFlakyErrors=" + totalTestcaseFlakyErrors +
+            ", totalTestcaseErrors=" + totalTestcaseErrors +
+            ", artifacts=" + artifacts +
+            '}';
     }
 }
