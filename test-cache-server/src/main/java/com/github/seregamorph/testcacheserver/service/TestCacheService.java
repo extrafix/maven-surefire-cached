@@ -35,25 +35,25 @@ public class TestCacheService {
         cacheStorage.write(cacheEntryKey, fileName, body);
         var pluginName = cacheEntryKey.pluginName().name();
 
-        Counter.builder("put_cache_size")
+        Counter.builder("put.cache.size")
             .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment(body.length);
 
-        Counter.builder("put_cache_files")
+        Counter.builder("put.cache.files")
             .tag("pluginName", pluginName)
             .register(meterRegistry)
             .increment();
 
         if (TRACKED_TASK_OUTPUTS.contains(fileName)) {
-            Counter.builder("put_cache")
+            Counter.builder("put.cache")
                 .tag("pluginName", pluginName)
                 .register(meterRegistry)
                 .increment();
 
             var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class, fileName);
             var totalTimeSeconds = testTaskOutput.getTotalTimeSeconds();
-            Counter.builder("cache_spent_time_seconds")
+            Counter.builder("cache.spent.time.seconds")
                 .tag("pluginName", pluginName)
                 .register(meterRegistry)
                 .increment(totalTimeSeconds.doubleValue());
@@ -67,14 +67,14 @@ public class TestCacheService {
         var pluginName = cacheEntryKey.pluginName().name();
 
         if (body != null) {
-            Counter.builder("get_cache_size")
+            Counter.builder("get.cache.size")
                 .tag("pluginName", pluginName)
                 .register(meterRegistry)
                 .increment(body.length);
         }
 
         // this is different from "get_cache_hit" - calculate all returned files
-        Counter.builder("get_cache_files")
+        Counter.builder("get.cache.files")
             .tag("pluginName", pluginName)
             .tag("exist", Boolean.toString(body != null))
             .register(meterRegistry)
@@ -83,20 +83,20 @@ public class TestCacheService {
         if (TRACKED_TASK_OUTPUTS.contains(fileName)) {
             // "get_cache_miss" and "get_cache_hit" calculate once per test execution entity
             if (body == null) {
-                Counter.builder("get_cache_miss")
+                Counter.builder("get.cache.miss")
                     .tag("pluginName", pluginName)
                     .register(meterRegistry)
                     .increment();
                 return null;
             }
 
-            Counter.builder("get_cache_hit")
+            Counter.builder("get.cache.hit")
                 .tag("pluginName", pluginName)
                 .register(meterRegistry)
                 .increment();
 
             var testTaskOutput = JsonSerializers.deserialize(body, TestTaskOutput.class, fileName);
-            Counter.builder("cache_saved_time_seconds")
+            Counter.builder("cache.saved.time.seconds")
                 .tag("pluginName", pluginName)
                 .register(meterRegistry)
                 .increment(testTaskOutput.getTotalTimeSeconds().doubleValue());
