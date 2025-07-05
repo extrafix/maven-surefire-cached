@@ -35,13 +35,16 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Sergey Chernov
  */
 public class CachedSurefireDelegateMojo extends AbstractMojo {
+
+    private static final Logger log = LoggerFactory.getLogger(CachedSurefireDelegateMojo.class);
 
     private final TestTaskCacheHelper testTaskCacheHelper;
     private final CacheService cacheService;
@@ -51,7 +54,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     private final Mojo delegate;
     private final PluginName pluginName;
 
-    private final Log log;
     private final File projectBuildDirectory;
     private final File reportsDirectory;
 
@@ -72,7 +74,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         this.delegate = delegate;
         this.pluginName = pluginName;
 
-        this.log = delegate.getLog();
         // "target" subdir of basedir
         this.projectBuildDirectory = new File(project.getBuild().getDirectory());
         // "target/surefire-reports" or "target/failsafe-reports"
@@ -92,9 +93,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             result, testTaskOutput.getTotalTimeSeconds(), deletedCacheEntries);
 
         String message = result.message(testTaskOutput);
-        log.info("Cached execution "
-            + project.getGroupId() + ":" + project.getArtifactId()
-            + " " + result + (message == null ? "" : " " + message));
+        log.info("Cached execution {}:{} {}{}", project.getGroupId(), project.getArtifactId(),
+            result, message == null ? "" : " " + message);
     }
 
     @Override
@@ -112,7 +112,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
         boolean skipCache = isTrue(getProperty(session, project, "skipCache"));
         if (skipCache) {
-            log.info("Skipping cache for " + project.getGroupId() + ":" + project.getArtifactId());
+            log.info("Skipping cache for {}:{}", project.getGroupId(), project.getArtifactId());
             delegate.execute();
             TestTaskOutput testTaskOutput = getTaskOutput(startTime, Instant.now());
             reportCachedExecution(TaskOutcome.SKIPPED_CACHE, testTaskOutput);
@@ -120,14 +120,15 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         }
 
         TestPluginConfig testPluginConfig = loadEffectiveTestPluginConfig(pluginName);
-        log.debug("Effective test plugin config " + testPluginConfig);
+        log.debug("Effective test plugin config {}", testPluginConfig);
 
         File taskInputFile = new File(projectBuildDirectory, getTaskInputFileName());
         File taskOutputFile = new File(projectBuildDirectory, getTaskOutputFileName());
         MoreFileUtils.delete(taskInputFile);
         MoreFileUtils.delete(taskOutputFile);
 
-        TestTaskInput testTaskInput = testTaskCacheHelper.getTestTaskInput(session, project, this.delegate, testPluginConfig);
+        TestTaskInput testTaskInput = testTaskCacheHelper.getTestTaskInput(session, project, this.delegate,
+            testPluginConfig);
         String hash = testTaskInput.hash();
         testTaskInput.setHash(hash);
         byte[] testTaskInputBytes = JsonSerializers.serialize(testTaskInput);
@@ -137,7 +138,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
 
         // TODO calculate cache operation time (hash, load, store, etc.)
         Instant entryCalculatedTime = Instant.now();
-        log.debug("Cache entry calculated in " + Duration.between(startTime, entryCalculatedTime));
+        log.debug("Cache entry calculated in {}", Duration.between(startTime, entryCalculatedTime));
 
         boolean testClassesEmpty = Optional.ofNullable(testTaskInput.getTestClassesHashes())
             .map(Map::isEmpty).orElse(true);
@@ -150,7 +151,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         if (testClassesEmpty) {
             log.info("Not test classes found");
         } else {
-            log.info("Cache miss " + cacheEntryKey);
+            log.info("Cache miss {}", cacheEntryKey);
         }
         boolean success = false;
         try {
@@ -166,18 +167,19 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             // note that failsafe plugin does not throw exceptions on test failures
             boolean cacheIfTestcaseFlakyErrors = isTrue(getProperty(session, "cacheIfTestcaseFlakyErrors"));
             if (testTaskOutput.getTotalErrors() > 0 || testTaskOutput.getTotalFailures() > 0) {
-                log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
+                log.warn("Tests failed, not storing to cache. See {}", reportsDirectory);
                 reportCachedExecution(TaskOutcome.FAILED, testTaskOutput);
             } else if (testTaskOutput.getTotalTestcaseErrors() > 0 ||
                 !cacheIfTestcaseFlakyErrors && testTaskOutput.getTotalTestcaseFlakyErrors() > 0) {
-                log.warn("Tests have testcase failures or flaky errors, not storing to cache. See " + reportsDirectory);
+                log.warn("Tests have testcase failures or flaky errors, not storing to cache. See {}",
+                    reportsDirectory);
                 reportCachedExecution(TaskOutcome.FLAKY, testTaskOutput);
             } else if (success) {
                 if (testTaskOutput.getTotalTests() == 0) {
                     log.info("No tests found, not storing to cache");
                     reportCachedExecution(TaskOutcome.EMPTY, testTaskOutput);
                 } else {
-                    log.info("Storing artifacts to cache from " + projectBuildDirectory);
+                    log.info("Storing artifacts to cache from {}", projectBuildDirectory);
                     int deleted = storeCache(testPluginConfig, cacheEntryKey, testTaskInput, testTaskOutput);
                     reportCachedExecution(TaskOutcome.SUCCESS, testTaskOutput, deleted);
                 }
@@ -192,10 +194,10 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         }
 
         MoreFileUtils.write(taskOutputFile, testTaskOutputBytes);
-        log.info("Cache hit " + cacheEntryKey);
+        log.info("Cache hit {}", cacheEntryKey);
         TestTaskOutput testTaskOutput = JsonSerializers.deserialize(testTaskOutputBytes, TestTaskOutput.class,
             getTaskOutputFileName());
-        log.info("Restoring artifacts from cache to " + projectBuildDirectory);
+        log.info("Restoring artifacts from cache to {}", projectBuildDirectory);
 
         try {
             restoreCache(cacheEntryKey, testTaskOutput);
@@ -226,7 +228,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             String fileName = getArtifactPackName(alias);
             File packFile = new File(projectBuildDirectory, fileName);
             MoreFileUtils.delete(packFile);
-            List<ZipUtils.PackedFile> packedFiles = ZipUtils.packDirectory(projectBuildDirectory, artifactsConfig.getIncludes(), packFile);
+            List<ZipUtils.PackedFile> packedFiles = ZipUtils.packDirectory(projectBuildDirectory,
+                artifactsConfig.getIncludes(), packFile);
             deleted += cacheService.write(cacheEntryKey, fileName, MoreFileUtils.read(packFile));
             long unpackedSize = packedFiles.stream().mapToLong(ZipUtils.PackedFile::unpackedSize).sum();
             OutputArtifact outputArtifact = new OutputArtifact(fileName, packedFiles.size(),
@@ -282,9 +285,9 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             totalTestcaseErrors += testSuiteSummary.testcaseErrors();
             if (testSuiteSummary.errors() > 0 || testSuiteSummary.failures() > 0
                 || testSuiteSummary.testcaseErrors() > 0) {
-                log.warn(testReport + " has errors or failures, skipping cache");
+                log.warn("{} has errors or failures, skipping cache", testReport);
             } else if (testSuiteSummary.testcaseFlakyErrors() > 0) {
-                log.warn(testReport + " has flaky errors");
+                log.warn("{} has flaky errors", testReport);
             }
         }
 
