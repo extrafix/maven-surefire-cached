@@ -16,6 +16,13 @@ public enum TaskOutcome {
                 + ", " + testTaskOutput.getTotalTestTimeSeconds() + "s)";
         }
     },
+    FLAKY("serial time", true) {
+        @Override
+        public String message(TestTaskOutput testTaskOutput) {
+            return "(flaky errors " + testTaskOutput.getTotalTestcaseFlakyErrors()
+                + ", failures " + testTaskOutput.getTotalTestcaseErrors() + ")";
+        }
+    },
     FAILED("serial time", true) {
         @Override
         public String message(TestTaskOutput testTaskOutput) {

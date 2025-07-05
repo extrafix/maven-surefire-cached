@@ -165,11 +165,13 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
             // note that failsafe plugin does not throw exceptions on test failures
             boolean cacheIfTestcaseFlakyErrors = isTrue(getProperty(session, "cacheIfTestcaseFlakyErrors"));
-            if (testTaskOutput.getTotalErrors() > 0 || testTaskOutput.getTotalFailures() > 0
-                || testTaskOutput.getTotalTestcaseErrors() > 0
-                || (!cacheIfTestcaseFlakyErrors && testTaskOutput.getTotalTestcaseFlakyErrors() > 0)) {
-                log.warn("Tests failed or have testcase errors, not storing to cache. See " + reportsDirectory);
+            if (testTaskOutput.getTotalErrors() > 0 || testTaskOutput.getTotalFailures() > 0) {
+                log.warn("Tests failed, not storing to cache. See " + reportsDirectory);
                 reportCachedExecution(TaskOutcome.FAILED, testTaskOutput);
+            } else if (testTaskOutput.getTotalTestcaseErrors() > 0 ||
+                !cacheIfTestcaseFlakyErrors && testTaskOutput.getTotalTestcaseFlakyErrors() > 0) {
+                log.warn("Tests have testcase failures or flaky errors, not storing to cache. See " + reportsDirectory);
+                reportCachedExecution(TaskOutcome.FLAKY, testTaskOutput);
             } else if (success) {
                 if (testTaskOutput.getTotalTests() == 0) {
                     log.info("No tests found, not storing to cache");
