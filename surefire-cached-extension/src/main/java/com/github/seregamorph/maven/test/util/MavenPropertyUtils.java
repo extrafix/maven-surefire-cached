@@ -30,6 +30,12 @@ public final class MavenPropertyUtils {
         return propertyValue;
     }
 
+    /**
+     * Return true if and only if value is "true" (case sensitive), otherwise false.
+     *
+     * @param value
+     * @return
+     */
     public static boolean isTrue(String value) {
         return "true".equals(value);
     }

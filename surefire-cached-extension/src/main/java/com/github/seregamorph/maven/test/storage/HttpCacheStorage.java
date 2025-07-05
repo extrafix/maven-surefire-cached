@@ -2,7 +2,6 @@ package com.github.seregamorph.maven.test.storage;
 
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import com.github.seregamorph.maven.test.common.ServerProtocolVersion;
-import com.github.seregamorph.maven.test.extension.PropertySource;
 import com.github.seregamorph.maven.test.util.ResponseBodyUtils;
 import java.io.IOException;
 import java.net.URI;
@@ -30,13 +29,13 @@ public class HttpCacheStorage implements CacheStorage {
     private final URI baseUrl;
     private final boolean checkServerVersion;
     private final OkHttpClient client;
-    private final PropertySource propertySource;
+    private final String cacheHashPrefix;
 
     public HttpCacheStorage(HttpCacheStorageConfig config) {
         this.baseUrl = config.baseUrl();
         this.checkServerVersion = config.checkServerVersion();
         this.client = createHttpClient(config);
-        this.propertySource = config::getProperty;
+        this.cacheHashPrefix = config.cacheHashPrefix();
     }
 
     private static OkHttpClient createHttpClient(HttpCacheStorageConfig config) {
@@ -112,12 +111,11 @@ public class HttpCacheStorage implements CacheStorage {
     }
 
     private String getEntryUri(CacheEntryKey cacheEntryKey, String fileName) {
-        String hashPrefix = propertySource.getProperty("cacheHashPrefix");
         return baseUrl
             + "/" + cacheEntryKey.pluginName()
             + "/" + cacheEntryKey.groupArtifactId().groupId()
             + "/" + cacheEntryKey.groupArtifactId().artifactId()
-            + "/" + (hashPrefix == null ? "" : hashPrefix + "-") + cacheEntryKey.hash()
+            + "/" + (cacheHashPrefix == null ? "" : cacheHashPrefix + "-") + cacheEntryKey.hash()
             + "/" + fileName;
     }
 
