@@ -21,7 +21,7 @@ Add to the `.mvn/extensions.xml` of your project:
     <extension>
         <groupId>com.github.seregamorph</groupId>
         <artifactId>surefire-cached-extension</artifactId>
-        <version>0.20</version>
+        <version>0.21</version>
     </extension>
 </extensions>
 ```
