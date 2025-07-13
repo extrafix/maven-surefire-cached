@@ -67,12 +67,20 @@ If no configuration is provided, the default configuration is used
   "failsafe": {
     "artifacts": {
       "failsafe-reports": {
-        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/failsafe-summary.xml"]
+        "includes": [
+          "failsafe-reports/TEST-*.xml",
+          "failsafe-reports/failsafe-summary.xml"
+        ]
       }
     }
   }
 }
 ```
+`inputProperties` are properties and environment variables (defined with `env.` prefix) that are taken into calculation
+of cache entity key. `inputIgnoredProperties` are properties and environment variables that are included as
+meta-information for the cache entity, but not taken into calculation of hash. It can be convenient to have all
+this meta-information to find the origin of the cache entity (e.g. GitHub pipeline and commit hash that produced it).
+
 It's possible to customize parameters overriding (no appending) default. E.g. specify modules which should be
 excluded from hash calculation (like modules with `git.properties` containing build timestamp and commit hash). Or
 custom artifacts to be cached (separate for surefire and failsafe):
@@ -91,7 +99,10 @@ custom artifacts to be cached (separate for surefire and failsafe):
   "surefire": {
     "artifacts": {
       "surefire-reports": {
-        "includes": ["surefire-reports/TEST-*.xml", "surefire-reports/testng-results.xml"]
+        "includes": [
+          "surefire-reports/TEST-*.xml",
+          "surefire-reports/testng-results.xml"
+        ]
       },
       "jacoco": {
         "includes": ["jacoco-surefire.exec"]
@@ -101,7 +112,11 @@ custom artifacts to be cached (separate for surefire and failsafe):
   "failsafe": {
     "artifacts": {
       "failsafe-reports": {
-        "includes": ["failsafe-reports/TEST-*.xml", "failsafe-reports/failsafe-summary.xml", "failsafe-reports/testng-results.xml"]
+        "includes": [
+          "failsafe-reports/TEST-*.xml",
+          "failsafe-reports/failsafe-summary.xml",
+          "failsafe-reports/testng-results.xml"
+        ]
       },
       "jacoco": {
         "includes": ["jacoco-failsafe.exec"]
