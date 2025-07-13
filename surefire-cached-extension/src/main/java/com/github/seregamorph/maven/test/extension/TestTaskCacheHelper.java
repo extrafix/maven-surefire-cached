@@ -12,6 +12,7 @@ import com.github.seregamorph.maven.test.storage.CacheStorage;
 import com.github.seregamorph.maven.test.util.AntPathMatcher;
 import com.github.seregamorph.maven.test.util.HashUtils;
 import com.github.seregamorph.maven.test.util.MavenPropertyUtils;
+import com.github.seregamorph.maven.test.util.PropertySource;
 import java.io.File;
 import java.time.Instant;
 import java.util.List;
@@ -48,11 +49,11 @@ public class TestTaskCacheHelper {
             .collect(Collectors.toCollection(TreeSet::new));
 
         this.metrics = new CacheServiceMetrics();
-        CacheStorageFactory cacheStorageFactory = new CacheStorageFactory(propertyName ->
-            MavenPropertyUtils.getProperty(session, propertyName));
+        PropertySource propertySource = propertyName -> MavenPropertyUtils.getProperty(session, propertyName);
+        CacheStorageFactory cacheStorageFactory = new CacheStorageFactory(propertySource);
         this.cacheStorage = cacheStorageFactory.createCacheStorage();
-        // todo configurable failureThreshold
-        this.cacheService = new CacheService(cacheStorage, metrics, 4);
+        int cacheFailureThreshold = Integer.parseInt(propertySource.getProperty("cacheFailureThreshold", "4"));
+        this.cacheService = new CacheService(cacheStorage, metrics, cacheFailureThreshold);
         this.cacheReport = new CacheReport();
     }
 
