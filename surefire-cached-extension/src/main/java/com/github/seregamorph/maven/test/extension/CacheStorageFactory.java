@@ -38,22 +38,26 @@ class CacheStorageFactory {
         }
         //noinspection HttpUrlsUsage
         if (cacheStorageUrl.startsWith("http://") || cacheStorageUrl.startsWith("https://")) {
-            boolean checkServerVersion = isTrue(getProperty("cacheCheckServerVersion", "true"));
-            Duration connectTimeout = Duration.ofSeconds(Integer.parseInt(
-                getProperty("cacheConnectTimeoutSec", "5")));
-            Duration readTimeout = Duration.ofSeconds(Integer.parseInt(
-                getProperty("cacheReadTimeoutSec", "10")));
-            Duration writeTimeout = Duration.ofSeconds(Integer.parseInt(
-                getProperty("cacheWriteTimeoutSec", "10")));;
-            @Nullable String cacheHashPrefix = getProperty("cacheHashPrefix", null);
-            HttpCacheStorageConfig httpCacheStorageConfig = new HttpCacheStorageConfig(
-                URI.create(cacheStorageUrl), checkServerVersion,
-                connectTimeout, readTimeout, writeTimeout,
-                cacheHashPrefix);
-            return new HttpCacheStorage(httpCacheStorageConfig);
+            return createHttpCacheStorage(cacheStorageUrl);
         }
 
         return new FileCacheStorage(new File(cacheStorageUrl));
+    }
+
+    private HttpCacheStorage createHttpCacheStorage(String cacheStorageUrl) {
+        boolean checkServerVersion = isTrue(getProperty("cacheCheckServerVersion", "true"));
+        Duration connectTimeout = Duration.ofSeconds(Integer.parseInt(
+            getProperty("cacheConnectTimeoutSec", "5")));
+        Duration readTimeout = Duration.ofSeconds(Integer.parseInt(
+            getProperty("cacheReadTimeoutSec", "10")));
+        Duration writeTimeout = Duration.ofSeconds(Integer.parseInt(
+            getProperty("cacheWriteTimeoutSec", "10")));
+        @Nullable String cacheHashPrefix = getProperty("cacheHashPrefix", null);
+        HttpCacheStorageConfig httpCacheStorageConfig = new HttpCacheStorageConfig(
+            URI.create(cacheStorageUrl), checkServerVersion,
+            connectTimeout, readTimeout, writeTimeout,
+            cacheHashPrefix);
+        return new HttpCacheStorage(httpCacheStorageConfig);
     }
 
     private String getProperty(String propertyName, String defaultValue) {
