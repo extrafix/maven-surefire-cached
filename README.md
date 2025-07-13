@@ -208,7 +208,7 @@ Other parameters will be obtained from the environment variables (like `AWS_REGI
 
 Depending on the authorization provider these environment variables may be used
 * `AWS_ACCESS_KEY_ID`
-* `AWS_SECRET_KEY_ID`
+* `AWS_SECRET_ACCESS_KEY`
 
 For the other options (including loading from `~/.aws/credentials`) see
 [AWS documentation](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials-chain.html)

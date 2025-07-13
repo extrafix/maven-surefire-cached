@@ -1,5 +1,7 @@
 package com.github.seregamorph.maven.test.extension;
 
+import static com.github.seregamorph.maven.test.extension.TestTaskCacheHelper.filterPrivate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -27,5 +29,16 @@ class TestTaskCacheHelperTest {
 
         assertFalse(TestTaskCacheHelper.isIncludeToCacheEntry(List.of("com.acme:lib1", "com.acme:lib"), artifact));
         assertFalse(TestTaskCacheHelper.isIncludeToCacheEntry(List.of("com.acme:*"), artifact));
+    }
+
+    @Test
+    public void shouldFilterPrivate() {
+        assertEquals("******", filterPrivate("deploy.password", "abcdef0123456789"));
+        assertEquals("******", filterPrivate("env.NEXUS_PASSWORD", "abcdef0123456789"));
+        assertEquals("******", filterPrivate("env.AWS_SECRET_ACCESS_KEY", "abcdef0123456789"));
+        // note: in Maven 3 "env." prefix is optional, in Maven 4 - mandatory
+        assertEquals("******", filterPrivate("AWS_SESSION_TOKEN", "abcdef0123456789"));
+        assertEquals("1.2", filterPrivate("project.version", "1.2"));
+        assertEquals("refs/pull/1234/merge", filterPrivate("env.GITHUB_REF", "refs/pull/1234/merge"));
     }
 }

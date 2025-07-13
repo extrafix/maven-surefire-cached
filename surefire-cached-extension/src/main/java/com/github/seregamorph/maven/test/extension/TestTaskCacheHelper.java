@@ -107,14 +107,14 @@ public class TestTaskCacheHelper {
         for (String ignoredProperty : testPluginConfig.getInputIgnoredProperties()) {
             String value = MavenPropertyUtils.getProperty(session, project, ignoredProperty);
             if (value != null) {
-                testTaskInput.addIgnoredProperty(ignoredProperty, value);
+                testTaskInput.addIgnoredProperty(ignoredProperty, filterPrivate(ignoredProperty, value));
             }
         }
 
         for (String property : testPluginConfig.getInputProperties()) {
             String value = MavenPropertyUtils.getProperty(session, project, property);
             if (value != null) {
-                testTaskInput.addProperty(property, value);
+                testTaskInput.addProperty(property, filterPrivate(property, value));
             }
         }
 
@@ -140,7 +140,8 @@ public class TestTaskCacheHelper {
                 // a classes directory (when "test" command is executed).
                 // The trick is we calculate hash of files which is the same in both cases (jar manifest is ignored)
                 File file = artifact.getFile();
-                String hash = fileHashCache.getClasspathElementHash(file, testPluginConfig.getExcludeClasspathResources());
+                String hash = fileHashCache.getClasspathElementHash(file,
+                    testPluginConfig.getExcludeClasspathResources());
                 GroupArtifactId groupArtifactId = groupArtifactId(artifact);
                 String classifier = artifact.getClassifier();
                 String classifierSuffix = classifier == null || classifier.isEmpty() ? "" : ":" + classifier;
@@ -171,6 +172,27 @@ public class TestTaskCacheHelper {
         testTaskInput.setExcludes(call(delegate, List.class, "getExcludes"));
         // todo filtered getProperties
         return testTaskInput;
+    }
+
+    static String filterPrivate(String propertyName, String value) {
+        // avoid storing private environment values to cache entities
+        if (propertyName.endsWith("_KEY")
+            || propertyName.endsWith("_TOKEN")
+            || propertyName.endsWith("_PASSWORD")
+            || propertyName.endsWith("_SECRET")
+            || propertyName.endsWith("-key")
+            || propertyName.endsWith("-token")
+            || propertyName.endsWith("-password")
+            || propertyName.endsWith("-secret")
+            || propertyName.endsWith(".key")
+            || propertyName.endsWith(".token")
+            || propertyName.endsWith(".password")
+            || propertyName.endsWith(".secret")
+        ) {
+            return "******";
+        }
+
+        return value;
     }
 
     static boolean isIncludeToCacheEntry(List<String> excludeModules, Artifact artifact) {
