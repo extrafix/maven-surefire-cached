@@ -108,14 +108,22 @@ public class TestTaskCacheHelper {
         for (String ignoredProperty : testPluginConfig.getInputIgnoredProperties()) {
             String value = MavenPropertyUtils.getProperty(session, project, ignoredProperty);
             if (value != null) {
-                testTaskInput.addIgnoredProperty(ignoredProperty, filterPrivate(ignoredProperty, value));
+                // avoid storing private environment values to cache entities
+                String filteredValue = isPrivate(ignoredProperty) ? "******" : value;
+                testTaskInput.addIgnoredProperty(ignoredProperty, filteredValue);
             }
         }
 
         for (String property : testPluginConfig.getInputProperties()) {
             String value = MavenPropertyUtils.getProperty(session, project, property);
             if (value != null) {
-                testTaskInput.addProperty(property, filterPrivate(property, value));
+                if (isPrivate(property)) {
+                    // fail fast as all input data is printed in json
+                    throw new IllegalStateException("Property [" + property + "] is declared as cache input, "
+                        + "but it's considered as a secret value (according to name pattern), hence cannot be used. "
+                        + "Please either remove it from the list of properties or give it another name.");
+                }
+                testTaskInput.addProperty(property, value);
             }
         }
 
@@ -175,9 +183,8 @@ public class TestTaskCacheHelper {
         return testTaskInput;
     }
 
-    static String filterPrivate(String propertyName, String value) {
-        // avoid storing private environment values to cache entities
-        if (propertyName.endsWith("_KEY")
+    static boolean isPrivate(String propertyName) {
+        return propertyName.endsWith("_KEY")
             || propertyName.endsWith("_TOKEN")
             || propertyName.endsWith("_PASSWORD")
             || propertyName.endsWith("_SECRET")
@@ -188,12 +195,7 @@ public class TestTaskCacheHelper {
             || propertyName.endsWith(".key")
             || propertyName.endsWith(".token")
             || propertyName.endsWith(".password")
-            || propertyName.endsWith(".secret")
-        ) {
-            return "******";
-        }
-
-        return value;
+            || propertyName.endsWith(".secret");
     }
 
     static boolean isIncludeToCacheEntry(List<String> excludeModules, Artifact artifact) {

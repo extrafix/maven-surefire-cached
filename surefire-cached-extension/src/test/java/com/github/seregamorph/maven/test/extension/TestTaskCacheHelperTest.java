@@ -1,7 +1,6 @@
 package com.github.seregamorph.maven.test.extension;
 
-import static com.github.seregamorph.maven.test.extension.TestTaskCacheHelper.filterPrivate;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.github.seregamorph.maven.test.extension.TestTaskCacheHelper.isPrivate;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -33,12 +32,13 @@ class TestTaskCacheHelperTest {
 
     @Test
     public void shouldFilterPrivate() {
-        assertEquals("******", filterPrivate("deploy.password", "abcdef0123456789"));
-        assertEquals("******", filterPrivate("env.NEXUS_PASSWORD", "abcdef0123456789"));
-        assertEquals("******", filterPrivate("env.AWS_SECRET_ACCESS_KEY", "abcdef0123456789"));
+        assertTrue(isPrivate("deploy.password"));
+        assertTrue(isPrivate("env.NEXUS_PASSWORD"));
+        assertTrue(isPrivate("env.AWS_SECRET_ACCESS_KEY"));
         // note: in Maven 3 "env." prefix is optional, in Maven 4 - mandatory
-        assertEquals("******", filterPrivate("AWS_SESSION_TOKEN", "abcdef0123456789"));
-        assertEquals("1.2", filterPrivate("project.version", "1.2"));
-        assertEquals("refs/pull/1234/merge", filterPrivate("env.GITHUB_REF", "refs/pull/1234/merge"));
+        assertTrue(isPrivate("AWS_SESSION_TOKEN"));
+
+        assertFalse(isPrivate("project.version"));
+        assertFalse(isPrivate("env.GITHUB_REF"));
     }
 }
