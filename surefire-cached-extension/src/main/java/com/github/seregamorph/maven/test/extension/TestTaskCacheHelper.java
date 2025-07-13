@@ -48,7 +48,9 @@ public class TestTaskCacheHelper {
             .collect(Collectors.toCollection(TreeSet::new));
 
         this.metrics = new CacheServiceMetrics();
-        this.cacheStorage = new CacheStorageFactory(session).createCacheStorage();
+        CacheStorageFactory cacheStorageFactory = new CacheStorageFactory(propertyName ->
+            MavenPropertyUtils.getProperty(session, propertyName));
+        this.cacheStorage = cacheStorageFactory.createCacheStorage();
         // todo configurable failureThreshold
         this.cacheService = new CacheService(cacheStorage, metrics, 4);
         this.cacheReport = new CacheReport();
