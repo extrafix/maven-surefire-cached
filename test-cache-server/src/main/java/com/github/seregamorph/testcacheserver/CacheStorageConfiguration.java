@@ -16,6 +16,9 @@ public class CacheStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(CacheStorageConfiguration.class);
 
+    // TODO S3CacheStorage is already in the classpath from surefire-cached-common module
+    // Configure it if needed instead of FileCacheStorage
+
     @Bean
     public CacheStorage cacheStorage() {
         String userHome = System.getProperty("user.home");
