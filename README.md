@@ -180,10 +180,7 @@ Build your project with the extension using the remote cache
 mvn clean verify -DcacheStorageUrl=http://localhost:8080/cache
 ```
 
-Actuator endpoints are available at http://localhost:8080/actuator, see http://localhost:8080/actuator/prometheus
-for metrics.
-
-TODO grafana dashboard WiP
+See also [cache monitoring](#monitoring) chapter.
 
 ## Using S3 from Maven
 It's possible to access S3 directly from Maven build (no HTTP service required).
@@ -269,14 +266,38 @@ with own implementation [CachedMavenPluginManager](surefire-cached-extension/src
 All mojos are delegating to default behaviour except Surefire and Failsafe plugins. They are wrapped to caching logic,
 which calculates task inputs (classpath elements hash codes) and reuses existing cached test result when available.
 
+## Monitoring
+If you run a cache server, it's possible to scrape Prometheus metrics via http://localhost:8080/actuator/prometheus
+
+See sample Grafana Dashboard:
+<img src="doc/grafana_dashboard.png" alt="Grafana Dashboard" width="700"/>
+
+Use these queries to build cache dashboards (TODO provide JSON to import to Grafana):
+#### Surefire plugin Saved/Spent/Overlap serial sec/sec
+Queries:
+* `rate(sum(cache_saved_time_seconds_total{pluginName="surefire-cached"})[2m])`
+* `rate(sum(cache_spent_time_seconds_total{pluginName="surefire-cached"})[2m])`
+* `rate(sum(cache_overlap_time_seconds_total{pluginName="surefire-cached"})[2m])`
+
+#### Failsafe plugin Saved/Spent/Overlap serial sec/sec
+Queries:
+* `rate(sum(cache_saved_time_seconds_total{pluginName="failsafe-cached"})[2m])`
+* `rate(sum(cache_spent_time_seconds_total{pluginName="failsafe-cached"})[2m])`
+* `rate(sum(cache_overlap_time_seconds_total{pluginName="failsafe-cached"})[2m])`
+
+#### Reads/writes MB/sec
+Queries:
+* reads `rate(sum(get_cache_size_total)[2m])/1048576`
+* writes `rate(sum(put_cache_size_total)[2m])/1048576`
+
 ## Related projects
 ### Turbo reactor
 The default Maven multi-module build does not do an efficient multi-core CPU utilization.
 See [turbo-builder](https://github.com/seregamorph/maven-turbo-reactor) for more details. This extension is
-compatible with maven-surefire-cached extension.
+compatible with `maven-surefire-cached` extension.
 
 ### Test distribution
 By default Maven executes unit and integration tests (via surefire and failsafe plugins) in a single execution,
 however at large scale it makes sense to split huge test suites to smaller pieces (test distribution).
 See [test-distribution](https://github.com/seregamorph/test-distribution) for more details. This extension
-is also compatible with maven-surefire-cached extension.
+is also compatible with `maven-surefire-cached` extension.
