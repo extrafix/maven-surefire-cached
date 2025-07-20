@@ -273,6 +273,9 @@ See sample Grafana Dashboard:
 <img src="doc/grafana_dashboard.png" alt="Grafana Dashboard" width="700"/>
 
 Use these queries to build cache dashboards (TODO provide JSON to import to Grafana):
+<details>
+  <summary>Click to expand</summary>
+
 #### Surefire plugin Saved/Spent/Overlap serial sec/sec
 Queries:
 * `rate(sum(cache_saved_time_seconds_total{pluginName="surefire-cached"})[2m])`
@@ -289,6 +292,8 @@ Queries:
 Queries:
 * reads `rate(sum(get_cache_size_total)[2m])/1048576`
 * writes `rate(sum(put_cache_size_total)[2m])/1048576`
+
+</details>
 
 ## Related projects
 ### Turbo reactor
