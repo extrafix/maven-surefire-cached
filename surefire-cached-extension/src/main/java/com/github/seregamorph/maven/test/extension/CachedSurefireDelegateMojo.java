@@ -89,12 +89,13 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     }
 
     private void reportCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput, int deletedCacheEntries) {
-        cacheReport.addExecutionResult(getGroupArtifactId(project), pluginName,
-            result, testTaskOutput.getTotalTimeSeconds(), deletedCacheEntries);
+        GroupArtifactId groupArtifactId = getGroupArtifactId(project);
+        ModuleTestResult moduleTestResult = new ModuleTestResult(groupArtifactId, result,
+                testTaskOutput.getTotalTimeSeconds(), deletedCacheEntries);
+        cacheReport.addExecutionResult(groupArtifactId, pluginName, moduleTestResult);
 
         String message = result.message(testTaskOutput);
-        log.info("Cached execution {}:{} {}{}", project.getGroupId(), project.getArtifactId(),
-            result, message == null ? "" : " " + message);
+        log.info("Cached execution {} {}{}", groupArtifactId, result, message == null ? "" : " " + message);
     }
 
     @Override

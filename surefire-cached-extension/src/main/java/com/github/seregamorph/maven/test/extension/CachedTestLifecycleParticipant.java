@@ -82,8 +82,8 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         for (PluginName pluginName : Arrays.asList(PluginName.SUREFIRE_CACHED, PluginName.FAILSAFE_CACHED)) {
             Map<TaskOutcome, AggResult> pluginResult = new TreeMap<>();
             int deleted = 0;
-            List<CacheReport.ModuleTestResult> executionResults = cacheReport.getExecutionResults(pluginName);
-            for (CacheReport.ModuleTestResult executionResult : executionResults) {
+            List<ModuleTestResult> executionResults = cacheReport.getExecutionResults(pluginName);
+            for (ModuleTestResult executionResult : executionResults) {
                 pluginResult.computeIfAbsent(executionResult.getResult(), $ -> new AggResult())
                         .add(executionResult.getGroupArtifactId(), executionResult.getTotalTimeSeconds());
                 deleted += executionResult.getDeletedCacheEntries();

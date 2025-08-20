@@ -4,8 +4,6 @@ import static java.util.Collections.emptyList;
 
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.PluginName;
-import com.github.seregamorph.maven.test.core.TaskOutcome;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -29,14 +27,12 @@ public class CacheReport {
     public void addExecutionResult(
         GroupArtifactId groupArtifactId,
         PluginName pluginName,
-        TaskOutcome result,
-        BigDecimal totalTimeSeconds,
-        int deletedCacheEntries
+        ModuleTestResult moduleTestResult
     ) {
         synchronized (executionResults) {
             executionResults.computeIfAbsent(groupArtifactId, k -> new TreeMap<>())
                 .computeIfAbsent(pluginName, k -> new ArrayList<>())
-                .add(new ModuleTestResult(groupArtifactId, result, totalTimeSeconds, deletedCacheEntries));
+                .add(moduleTestResult);
         }
     }
 
@@ -48,49 +44,4 @@ public class CacheReport {
         }
     }
 
-    public static final class ModuleTestResult {
-
-        private final GroupArtifactId groupArtifactId;
-        private final TaskOutcome result;
-        private final BigDecimal totalTimeSeconds;
-        private final int deletedCacheEntries;
-
-        public ModuleTestResult(
-            GroupArtifactId groupArtifactId,
-            TaskOutcome result,
-            BigDecimal totalTimeSeconds,
-            int deletedCacheEntries
-        ) {
-            this.groupArtifactId = groupArtifactId;
-            this.result = result;
-            this.totalTimeSeconds = totalTimeSeconds;
-            this.deletedCacheEntries = deletedCacheEntries;
-        }
-
-        public GroupArtifactId getGroupArtifactId() {
-            return groupArtifactId;
-        }
-
-        public TaskOutcome getResult() {
-            return result;
-        }
-
-        public BigDecimal getTotalTimeSeconds() {
-            return totalTimeSeconds;
-        }
-
-        public int getDeletedCacheEntries() {
-            return deletedCacheEntries;
-        }
-
-        @Override
-        public String toString() {
-            return "ModuleTestResult{" +
-                "groupArtifactId=" + groupArtifactId +
-                ", result=" + result +
-                ", totalTimeSeconds=" + totalTimeSeconds +
-                ", deletedCacheEntries=" + deletedCacheEntries +
-                '}';
-        }
-    }
 }
