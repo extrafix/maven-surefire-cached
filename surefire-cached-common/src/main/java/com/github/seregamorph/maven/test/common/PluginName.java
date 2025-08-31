@@ -1,13 +1,14 @@
 package com.github.seregamorph.maven.test.common;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import javax.annotation.Nonnull;
 
 /**
  * @author Sergey Chernov
  */
 public final class PluginName implements Comparable<PluginName>{
 
-    // implementation notice: the enum is not used because it does not allow auto-convertion in spring webmvc
+    // implementation notice: the enum is not used because it does not allow auto-conversion in spring webmvc
 
     public static final PluginName SUREFIRE_CACHED = new PluginName("surefire-cached");
     public static final PluginName FAILSAFE_CACHED = new PluginName("failsafe-cached");
@@ -30,6 +31,7 @@ public final class PluginName implements Comparable<PluginName>{
      * @param pluginName
      * @return
      */
+    @Nonnull
     public static PluginName valueOf(String pluginName) {
         if (SUREFIRE_CACHED.name().equals(pluginName)) {
             return SUREFIRE_CACHED;
