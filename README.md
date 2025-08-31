@@ -266,6 +266,16 @@ with own implementation [CachedMavenPluginManager](surefire-cached-extension/src
 All mojos are delegating to default behaviour except Surefire and Failsafe plugins. They are wrapped to caching logic,
 which calculates task inputs (classpath elements hash codes) and reuses existing cached test result when available.
 
+### Supported versions
+`Java` 8+
+`Maven` 3.8.x, 3.9.x and 4.0.x
+`maven-surefire-plugin`/`maven-failsafe-plugin` `2.22.x`..`3.5.x`
+
+Supported test frameworks (all that work via `maven-surefire`):
+* `JUnit 4`
+* `JUnit 5 Jupiter` (and other based on `JUnit 5 platform`)
+* `TestNG` (both bare TestNG and JUnit platform [testng-engine](https://github.com/junit-team/testng-engine))
+
 ## Monitoring
 If you run a cache server, it's possible to scrape Prometheus metrics via http://localhost:8080/actuator/prometheus
 
