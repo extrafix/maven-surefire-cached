@@ -22,7 +22,7 @@
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <maven.install.skip>true</maven.install.skip>
 
-        <spring-boot.version>3.5.3</spring-boot.version>
+        <spring-boot.version>3.5.6</spring-boot.version>
     </properties>
 
     <dependencyManagement>
