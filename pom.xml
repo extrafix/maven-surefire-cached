@@ -48,18 +48,18 @@
         <project.build.outputTimestamp>2025-01-01T01:00:00Z</project.build.outputTimestamp>
 
         <maven.version>4.0.0-rc-3</maven.version>
-        <maven-compiler-plugin.version>3.12.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.14.1</maven-compiler-plugin.version>
         <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <maven-javadoc-plugin.version>3.6.0</maven-javadoc-plugin.version>
         <maven-deploy-plugin.version>3.1.4</maven-deploy-plugin.version>
-        <maven-surefire.version>3.5.3</maven-surefire.version>
+        <maven-surefire.version>3.5.4</maven-surefire.version>
         <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
 
         <jackson.version>2.19.1</jackson.version>
-        <junit-jupiter.version>5.12.1</junit-jupiter.version>
+        <junit-jupiter.version>5.12.2</junit-jupiter.version>
         <slf4j.version>2.0.17</slf4j.version>
     </properties>
 
