@@ -85,11 +85,11 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
             List<ModuleTestResult> executionResults = cacheReport.getExecutionResults(pluginName);
             for (ModuleTestResult executionResult : executionResults) {
                 pluginResult.computeIfAbsent(executionResult.getResult(), $ -> new AggResult())
-                        .add(executionResult.getGroupArtifactId(), executionResult.getTotalTimeSeconds());
+                    .add(executionResult.getGroupArtifactId(), executionResult.getTotalTimeSeconds());
                 deleted += executionResult.getDeletedCacheEntries();
             }
             if (!pluginResult.isEmpty()) {
-                AtomicBoolean headerPrinted =  new AtomicBoolean(false);
+                AtomicBoolean headerPrinted = new AtomicBoolean(false);
                 pluginResult.forEach((k, v) -> {
                     if (k.isPrint()) {
                         String suffix = k.suffix();

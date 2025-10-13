@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * @author Sergey Chernov
  */
-public final class GroupArtifactId implements Comparable<GroupArtifactId>{
+public final class GroupArtifactId implements Comparable<GroupArtifactId> {
 
     private final String groupId;
     private final String artifactId;

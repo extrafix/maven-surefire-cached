@@ -11,7 +11,7 @@ public final class ServerProtocolVersion {
      */
     public static final int MIN_SERVER_PROTOCOL_VERSION = 1;
 
-    public static final String HEADER_SERVER_PROTOCOL_VERSION =  "Server-Protocol-Version";
+    public static final String HEADER_SERVER_PROTOCOL_VERSION = "Server-Protocol-Version";
 
     private ServerProtocolVersion() {
     }

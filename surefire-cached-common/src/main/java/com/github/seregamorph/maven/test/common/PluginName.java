@@ -6,7 +6,7 @@ import javax.annotation.Nonnull;
 /**
  * @author Sergey Chernov
  */
-public final class PluginName implements Comparable<PluginName>{
+public final class PluginName implements Comparable<PluginName> {
 
     // implementation notice: the enum is not used because it does not allow auto-conversion in spring webmvc
 

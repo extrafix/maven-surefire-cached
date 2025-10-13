@@ -13,7 +13,7 @@ public class ServerProtocolVersionInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         response.addHeader(ServerProtocolVersion.HEADER_SERVER_PROTOCOL_VERSION,
-                Integer.toString(ServerProtocolVersion.SERVER_PROTOCOL_VERSION));
+            Integer.toString(ServerProtocolVersion.SERVER_PROTOCOL_VERSION));
         return true;
     }
 }

@@ -14,8 +14,8 @@ public final class ByteSizeFormatUtils {
     private static final BigDecimal UNIT_SIZE = BigDecimal.valueOf(1024);
 
     /**
-     * Formats a byte size into a human-readable string with the appropriate unit (B, KB, MB, GB).
-     * The value is rounded to 2 decimal places.
+     * Formats a byte size into a human-readable string with the appropriate unit (B, KB, MB, GB). The value is rounded
+     * to 2 decimal places.
      *
      * @param bytes the number of bytes to format
      * @return a human-readable string representation of the byte size

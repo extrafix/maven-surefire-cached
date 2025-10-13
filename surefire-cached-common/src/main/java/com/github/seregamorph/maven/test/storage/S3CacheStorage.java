@@ -1,6 +1,12 @@
 package com.github.seregamorph.maven.test.storage;
 
+import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
+
 import com.github.seregamorph.maven.test.common.CacheEntryKey;
+import java.io.IOException;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,16 +17,8 @@ import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.InvalidObjectStateException;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.time.Instant;
-import java.time.ZonedDateTime;
-
-import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
-
 /**
- * Cache storage for AWS S3.
- * Can be used directly from Maven extension or in the cache web server.
+ * Cache storage for AWS S3. Can be used directly from Maven extension or in the cache web server.
  *
  * @author Sergey Chernov
  */
@@ -41,7 +39,8 @@ public class S3CacheStorage implements CacheStorage {
     public byte[] read(CacheEntryKey cacheEntryKey, String fileName) throws CacheStorageException {
         String awsKey = cacheEntryKey + "/" + fileName;
         try {
-            try (ResponseInputStream<GetObjectResponse> object = s3Client.getObject(b -> b.bucket(config.getBucket()).key(awsKey))) {
+            try (ResponseInputStream<GetObjectResponse> object =
+                         s3Client.getObject(b -> b.bucket(config.getBucket()).key(awsKey))) {
                 byte[] bytes = IOUtils.toByteArray(object);
                 String expiresString = object.response().expiresString();
                 ZonedDateTime expires = parseExpires(expiresString);

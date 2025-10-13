@@ -4,8 +4,8 @@ import com.github.seregamorph.maven.test.common.CacheEntryKey;
 import javax.annotation.Nullable;
 
 /**
- * Cache storage reads and writes cache entities locally or remotely. It can also be delegate
- * filtering implementation e.g. to pack/unpack.
+ * Cache storage reads and writes cache entities locally or remotely. It can also be delegate filtering implementation
+ * e.g. to pack/unpack.
  *
  * @author Sergey Chernov
  */

@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 import org.apache.commons.io.IOUtils;
 
 /**
- * Wrapping cache storage that packs/unpacks entities to save storage space.
- * May be efficient in combination with in-memory storages.
+ * Wrapping cache storage that packs/unpacks entities to save storage space. May be efficient in combination with
+ * in-memory storages.
  *
  * @author Sergey Chernov
  */
