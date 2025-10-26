@@ -26,6 +26,7 @@ class TestTaskOutputTest {
             0,
             0,
             0,
+            0,
             Map.of(
                 "jacoco",
                 new OutputArtifact(
@@ -47,6 +48,7 @@ class TestTaskOutputTest {
         assertEquals(testTestOutput.getTotalErrors(), restored.getTotalErrors());
         assertEquals(testTestOutput.getTotalFailures(), restored.getTotalFailures());
         assertEquals(testTestOutput.getTotalTestcaseFlakyErrors(), restored.getTotalTestcaseFlakyErrors());
+        assertEquals(testTestOutput.getTotalTestcaseFlakyFailures(), restored.getTotalTestcaseFlakyFailures());
         assertEquals(testTestOutput.getTotalTestcaseErrors(), restored.getTotalTestcaseErrors());
         assertEquals(testTestOutput.getArtifacts().get("jacoco").getFileName(),
             restored.getArtifacts().get("jacoco").getFileName());
@@ -92,6 +94,7 @@ class TestTaskOutputTest {
         assertEquals(0, restored.getTotalErrors());
         assertEquals(0, restored.getTotalFailures());
         assertEquals(0, restored.getTotalTestcaseFlakyErrors());
+        assertEquals(0, restored.getTotalTestcaseFlakyFailures());
         assertEquals(0, restored.getTotalTestcaseErrors());
         assertEquals("jacoco.exec",
             restored.getArtifacts().get("jacoco").getFileName());
@@ -142,6 +145,7 @@ class TestTaskOutputTest {
         assertEquals(0, restored.getTotalErrors());
         assertEquals(0, restored.getTotalFailures());
         assertEquals(1, restored.getTotalTestcaseFlakyErrors());
+        assertEquals(0, restored.getTotalTestcaseFlakyFailures());
         assertEquals(2, restored.getTotalTestcaseErrors());
         assertEquals("jacoco.exec",
             restored.getArtifacts().get("jacoco").getFileName());

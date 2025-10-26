@@ -31,6 +31,7 @@ public final class TestTaskOutput {
     private final int totalErrors;
     private final int totalFailures;
     private final int totalTestcaseFlakyErrors;
+    private final int totalTestcaseFlakyFailures;
     private final int totalTestcaseErrors;
     // alias -> artifact
     private final Map<String, OutputArtifact> artifacts;
@@ -46,6 +47,7 @@ public final class TestTaskOutput {
         int totalErrors,
         int totalFailures,
         int totalTestcaseFlakyErrors,
+        int totalTestcaseFlakyFailures,
         int totalTestcaseErrors,
         Map<String, OutputArtifact> artifacts
     ) {
@@ -58,6 +60,7 @@ public final class TestTaskOutput {
         this.totalErrors = totalErrors;
         this.totalFailures = totalFailures;
         this.totalTestcaseFlakyErrors = totalTestcaseFlakyErrors;
+        this.totalTestcaseFlakyFailures = totalTestcaseFlakyFailures;
         this.totalTestcaseErrors = totalTestcaseErrors;
         this.artifacts = artifacts;
     }
@@ -98,6 +101,10 @@ public final class TestTaskOutput {
         return totalTestcaseFlakyErrors;
     }
 
+    public int getTotalTestcaseFlakyFailures() {
+        return totalTestcaseFlakyFailures;
+    }
+
     public int getTotalTestcaseErrors() {
         return totalTestcaseErrors;
     }
@@ -118,6 +125,7 @@ public final class TestTaskOutput {
             ", totalErrors=" + totalErrors +
             ", totalFailures=" + totalFailures +
             ", totalTestcaseFlakyErrors=" + totalTestcaseFlakyErrors +
+            ", totalTestcaseFlakyFailures=" + totalTestcaseFlakyFailures +
             ", totalTestcaseErrors=" + totalTestcaseErrors +
             ", artifacts=" + artifacts +
             '}';

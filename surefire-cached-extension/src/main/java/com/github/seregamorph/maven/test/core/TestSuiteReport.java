@@ -20,6 +20,7 @@ public final class TestSuiteReport {
     private final int errors;
     private final int failures;
     private final int testcaseFlakyErrors;
+    private final int testcaseFlakyFailures;
     private final int testcaseErrors;
 
     public TestSuiteReport(
@@ -29,6 +30,7 @@ public final class TestSuiteReport {
         int errors,
         int failures,
         int testcaseFlakyErrors,
+        int testcaseFlakyFailures,
         int testcaseErrors
     ) {
         this.name = name;
@@ -37,6 +39,7 @@ public final class TestSuiteReport {
         this.errors = errors;
         this.failures = failures;
         this.testcaseFlakyErrors = testcaseFlakyErrors;
+        this.testcaseFlakyFailures = testcaseFlakyFailures;
         this.testcaseErrors = testcaseErrors;
     }
 
@@ -58,6 +61,7 @@ public final class TestSuiteReport {
 
         NodeList testcaseList = rootElement.getElementsByTagName("testcase");
         int testcaseFlakyErrors = 0;
+        int testcaseFlakyFailures = 0;
         int testcaseErrors = 0;
         for (int i = 0; i < testcaseList.getLength(); i++) {
             Element testcaseNode = (Element) testcaseList.item(i);
@@ -65,11 +69,15 @@ public final class TestSuiteReport {
             NodeList flakyErrorList = testcaseNode.getElementsByTagName("flakyError");
             testcaseFlakyErrors += flakyErrorList.getLength();
 
+            NodeList flakyFailureList = testcaseNode.getElementsByTagName("flakyFailure");
+            testcaseFlakyFailures += flakyFailureList.getLength();
+
             NodeList errorList = testcaseNode.getElementsByTagName("error");
             testcaseErrors += errorList.getLength();
         }
 
-        return new TestSuiteReport(name, timeSeconds, tests, errors, failures, testcaseFlakyErrors, testcaseErrors);
+        return new TestSuiteReport(name, timeSeconds, tests, errors, failures,
+            testcaseFlakyErrors, testcaseFlakyFailures, testcaseErrors);
     }
 
     public String name() {
@@ -96,6 +104,10 @@ public final class TestSuiteReport {
         return testcaseFlakyErrors;
     }
 
+    public int testcaseFlakyFailures() {
+        return testcaseFlakyFailures;
+    }
+
     public int testcaseErrors() {
         return testcaseErrors;
     }
@@ -109,6 +121,7 @@ public final class TestSuiteReport {
             ", errors=" + errors +
             ", failures=" + failures +
             ", testcaseFlakyErrors=" + testcaseFlakyErrors +
+            ", testcaseFlakyFailures=" + testcaseFlakyFailures +
             ", testcaseErrors=" + testcaseErrors +
             '}';
     }

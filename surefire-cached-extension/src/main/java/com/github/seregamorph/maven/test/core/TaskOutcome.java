@@ -20,6 +20,7 @@ public enum TaskOutcome {
         @Override
         public String message(TestTaskOutput testTaskOutput) {
             return "(flaky errors " + testTaskOutput.getTotalTestcaseFlakyErrors()
+                + ", flaky failures " + testTaskOutput.getTotalTestcaseFlakyFailures()
                 + ", failures " + testTaskOutput.getTotalTestcaseErrors() + ")";
         }
     },

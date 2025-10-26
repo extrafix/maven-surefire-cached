@@ -69,8 +69,8 @@
         <flakyError message="failed to start gRPC Mock server" type="org.grpcmock.exception.GrpcMockException">
             <stackTrace><![CDATA[org.grpcmock.exception.GrpcMockException: failed to start gRPC Mock server
 	at org.grpcmock.GrpcMock.start(GrpcMock.java:117)
-	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setupGrpcMock(DefaultSalesforceIntegrationSubscriptionServiceTest.java:192)
-	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setUp(DefaultSalesforceIntegrationSubscriptionServiceTest.java:50)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setupGrpcMock(FlakyTest.java:192)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setUp(FlakyTest.java:50)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
 	at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:141)
 	at org.testng.internal.invokers.MethodInvocationHelper.invokeMethodConsideringTimeout(MethodInvocationHelper.java:71)
@@ -105,11 +105,11 @@ Caused by: java.io.IOException: Failed to bind to address 0.0.0.0/0.0.0.0:46185
 	... 28 more
 Caused by: io.grpc.netty.shaded.io.netty.channel.unix.Errors$NativeIoException: bind(..) failed: Address already in use
 ]]></stackTrace>
-            <system-out><![CDATA[>>> Failed DefaultSalesforceIntegrationSubscriptionServiceTest.testGetSubscriptionId_MicroserviceEnabled >>>
+            <system-out><![CDATA[>>> Failed FlakyTest.testGetSubscriptionId_MicroserviceEnabled >>>
 org.grpcmock.exception.GrpcMockException: failed to start gRPC Mock server
 	at org.grpcmock.GrpcMock.start(GrpcMock.java:117)
-	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setupGrpcMock(DefaultSalesforceIntegrationSubscriptionServiceTest.java:192)
-	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setUp(DefaultSalesforceIntegrationSubscriptionServiceTest.java:50)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setupGrpcMock(FlakyTest.java:192)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setUp(FlakyTest.java:50)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
@@ -171,8 +171,8 @@ Caused by: io.grpc.netty.shaded.io.netty.channel.unix.Errors$NativeIoException: 
     <testcase name="" classname="com.github.seregamorph.testsmartcontext.demo.FlakyTest" time="3.884">
         <error message="failed to start gRPC Mock server" type="org.grpcmock.exception.GrpcMockException"><![CDATA[org.grpcmock.exception.GrpcMockException: failed to start gRPC Mock server
 	at org.grpcmock.GrpcMock.start(GrpcMock.java:117)
-	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setupGrpcMock(DefaultSalesforceIntegrationSubscriptionServiceTest.java:192)
-	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setUp(DefaultSalesforceIntegrationSubscriptionServiceTest.java:50)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setupGrpcMock(FlakyTest.java:192)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyTest.setUp(FlakyTest.java:50)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
 	at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:141)
 	at org.testng.internal.invokers.MethodInvocationHelper.invokeMethodConsideringTimeout(MethodInvocationHelper.java:71)

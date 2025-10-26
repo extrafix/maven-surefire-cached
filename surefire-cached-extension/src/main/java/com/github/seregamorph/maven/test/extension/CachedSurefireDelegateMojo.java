@@ -171,7 +171,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
                 log.warn("Tests failed, not storing to cache. See {}", reportsDirectory);
                 reportCachedExecution(TaskOutcome.FAILED, testTaskOutput);
             } else if (testTaskOutput.getTotalTestcaseErrors() > 0 ||
-                !cacheIfTestcaseFlakyErrors && testTaskOutput.getTotalTestcaseFlakyErrors() > 0) {
+                !cacheIfTestcaseFlakyErrors && (testTaskOutput.getTotalTestcaseFlakyErrors() > 0
+                    || testTaskOutput.getTotalTestcaseFlakyFailures() > 0)) {
                 log.warn("Tests have testcase failures or flaky errors, not storing to cache. See {}",
                     reportsDirectory);
                 reportCachedExecution(TaskOutcome.FLAKY, testTaskOutput);
@@ -274,6 +275,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         int totalErrors = 0;
         int totalFailures = 0;
         int totalTestcaseFlakyErrors = 0;
+        int totalTestcaseFlakyFailures = 0;
         int totalTestcaseErrors = 0;
         for (File testReport : testReports) {
             TestSuiteReport testSuiteSummary = TestSuiteReport.fromFile(testReport);
@@ -283,11 +285,13 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             totalErrors += testSuiteSummary.errors();
             totalFailures += testSuiteSummary.failures();
             totalTestcaseFlakyErrors += testSuiteSummary.testcaseFlakyErrors();
+            totalTestcaseFlakyFailures += testSuiteSummary.testcaseFlakyFailures();
             totalTestcaseErrors += testSuiteSummary.testcaseErrors();
             if (testSuiteSummary.errors() > 0 || testSuiteSummary.failures() > 0
                 || testSuiteSummary.testcaseErrors() > 0) {
                 log.warn("{} has errors or failures, skipping cache", testReport);
-            } else if (testSuiteSummary.testcaseFlakyErrors() > 0) {
+            } else if (testSuiteSummary.testcaseFlakyErrors() > 0
+                || testSuiteSummary.testcaseFlakyFailures() > 0) {
                 log.warn("{} has flaky errors", testReport);
             }
         }
@@ -296,7 +300,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         Map<String, OutputArtifact> artifacts = new TreeMap<>();
         return new TestTaskOutput(startTime, endTime, getTotalTimeSeconds(startTime, endTime),
             totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures,
-            totalTestcaseFlakyErrors, totalTestcaseErrors,
+            totalTestcaseFlakyErrors, totalTestcaseFlakyFailures, totalTestcaseErrors,
             artifacts);
     }
 
