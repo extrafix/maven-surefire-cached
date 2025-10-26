@@ -70,7 +70,7 @@ class CacheStorageFactory {
     private HttpCacheStorage createHttpCacheStorage(String cacheStorageUrl) {
         boolean checkServerVersion = isTrue(propertySource.getProperty("cacheCheckServerVersion", "false"));
         Duration connectTimeout = Duration.ofSeconds(Integer.parseInt(
-            propertySource.getProperty("cacheConnectTimeoutSec", "5")));
+            propertySource.getProperty("cacheConnectTimeoutSec", "10")));
         Duration readTimeout = Duration.ofSeconds(Integer.parseInt(
             propertySource.getProperty("cacheReadTimeoutSec", "10")));
         Duration writeTimeout = Duration.ofSeconds(Integer.parseInt(
