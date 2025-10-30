@@ -59,6 +59,10 @@ public final class FailsafeSummaryReport {
 
         Element failureMessageElement = getTag(rootElement, "failureMessage");
         String failureMessage = failureMessageElement == null ? null : failureMessageElement.getTextContent();
+        if (failureMessage != null && failureMessage.trim().isEmpty()) {
+            // successful reports have empty failureMessage tag
+            failureMessage = null;
+        }
 
         boolean timeout = "true".equals(rootElement.getAttribute("timeout"));
 

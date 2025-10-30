@@ -43,7 +43,8 @@ class IntegrationTestCachedMojo extends AbstractCachedSurefireMojo {
 
         FailsafeSummaryReport report = FailsafeSummaryReport.fromFile(summaryFile);
         return new TestTaskOutput(startTime, endTime, totalTimeSeconds,
-            totalTimeSeconds, report.getCompleted(), report.getErrors(), report.getFailures(), report.getFailureMessage(),
+            totalTimeSeconds, report.getCompleted(),
+            report.getErrors(), report.getFailures(), report.getFailureMessage(),
             report.getFlakes(), 0, 0, new TreeMap<>());
     }
 }

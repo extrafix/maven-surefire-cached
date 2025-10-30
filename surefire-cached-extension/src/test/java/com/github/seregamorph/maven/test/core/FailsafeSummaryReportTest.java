@@ -1,7 +1,9 @@
 package com.github.seregamorph.maven.test.core;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.File;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,22 @@ class FailsafeSummaryReportTest {
         assertEquals(3, testSuiteReport.getFailures());
         assertEquals(4, testSuiteReport.getSkipped());
         assertEquals(5, testSuiteReport.getFlakes());
+        assertThat(testSuiteReport.getFailureMessage())
+            .startsWith("org.apache.maven.surefire.booter.SurefireBooterForkException: The forked VM "
+                + "terminated without properly saying goodbye. VM crash or System.exit called?");
+    }
+
+    @Test
+    public void shouldParseFailsafeSummarySuccessReport() {
+        var testSuiteReport = FailsafeSummaryReport.fromFile(getResourceFile(
+            "failsafe-reports/failsafe-summary-success.xml"));
+
+        assertEquals(16, testSuiteReport.getCompleted());
+        assertEquals(0, testSuiteReport.getErrors());
+        assertEquals(0, testSuiteReport.getFailures());
+        assertEquals(0, testSuiteReport.getSkipped());
+        assertEquals(0, testSuiteReport.getFlakes());
+        assertNull(testSuiteReport.getFailureMessage());
     }
 
     private static File getResourceFile(String name) {
