@@ -1,6 +1,7 @@
 package com.github.seregamorph.maven.test.common;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -101,6 +102,16 @@ public final class TestTaskOutput {
 
     public Map<String, OutputArtifact> getArtifacts() {
         return artifacts;
+    }
+
+    @JsonIgnore
+    public boolean hasFailures() {
+        return totalErrors > 0 || totalFailures > 0;
+    }
+
+    @JsonIgnore
+    public boolean hasFlakyFailures() {
+        return totalTestcaseFlakyErrors > 0 || totalTestcaseFlakyFailures > 0;
     }
 
     @Override
