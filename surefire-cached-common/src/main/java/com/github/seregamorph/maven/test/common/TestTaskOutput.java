@@ -18,10 +18,6 @@ public final class TestTaskOutput {
      * Time between startTime and endTime of test task
      */
     private final BigDecimal totalTimeSeconds;
-    /**
-     * Total test classes (counted by number of TEST-*.xml reports)
-     */
-    private final int totalClasses;
     /*
      Time in seconds from TEST-*.xml reports.
      TODO check why it does not match real test time.
@@ -41,7 +37,6 @@ public final class TestTaskOutput {
         Instant startTime,
         Instant endTime,
         BigDecimal totalTimeSeconds,
-        int totalClasses,
         BigDecimal totalTestTimeSeconds,
         int totalTests,
         int totalErrors,
@@ -54,7 +49,6 @@ public final class TestTaskOutput {
         this.startTime = startTime;
         this.endTime = endTime;
         this.totalTimeSeconds = totalTimeSeconds;
-        this.totalClasses = totalClasses;
         this.totalTestTimeSeconds = totalTestTimeSeconds;
         this.totalTests = totalTests;
         this.totalErrors = totalErrors;
@@ -75,10 +69,6 @@ public final class TestTaskOutput {
 
     public BigDecimal getTotalTimeSeconds() {
         return totalTimeSeconds;
-    }
-
-    public int getTotalClasses() {
-        return totalClasses;
     }
 
     public BigDecimal getTotalTestTimeSeconds() {
@@ -119,7 +109,6 @@ public final class TestTaskOutput {
             "startTime=" + startTime +
             ", endTime=" + endTime +
             ", totalTimeSeconds=" + totalTimeSeconds +
-            ", totalClasses=" + totalClasses +
             ", totalTestTimeSeconds=" + totalTestTimeSeconds +
             ", totalTests=" + totalTests +
             ", totalErrors=" + totalErrors +

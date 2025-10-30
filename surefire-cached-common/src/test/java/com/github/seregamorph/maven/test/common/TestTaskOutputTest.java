@@ -19,7 +19,6 @@ class TestTaskOutputTest {
             Instant.now().minus(Duration.ofSeconds(10)),
             Instant.now(),
             new BigDecimal("1.1"),
-            10,
             new BigDecimal("1.0"),
             100,
             0,
@@ -42,7 +41,6 @@ class TestTaskOutputTest {
         assertEquals(testTestOutput.getStartTime(), restored.getStartTime());
         assertEquals(testTestOutput.getEndTime(), restored.getEndTime());
         assertEquals(testTestOutput.getTotalTimeSeconds(), restored.getTotalTimeSeconds());
-        assertEquals(testTestOutput.getTotalClasses(), restored.getTotalClasses());
         assertEquals(testTestOutput.getTotalTestTimeSeconds(), restored.getTotalTestTimeSeconds());
         assertEquals(testTestOutput.getTotalTests(), restored.getTotalTests());
         assertEquals(testTestOutput.getTotalErrors(), restored.getTotalErrors());
@@ -68,7 +66,6 @@ class TestTaskOutputTest {
               "startTime" : "2025-06-30T17:10:34.721504Z",
               "endTime" : "2025-06-30T17:10:44.722564Z",
               "totalTimeSeconds" : 1.1,
-              "totalClasses" : 10,
               "totalTestTimeSeconds" : 1.0,
               "totalTests" : 100,
               "totalErrors" : 0,
@@ -88,7 +85,6 @@ class TestTaskOutputTest {
         assertEquals(Instant.parse("2025-06-30T17:10:34.721504Z"), restored.getStartTime());
         assertEquals(Instant.parse("2025-06-30T17:10:44.722564Z"), restored.getEndTime());
         assertEquals(new BigDecimal("1.1"), restored.getTotalTimeSeconds());
-        assertEquals(10, restored.getTotalClasses());
         assertEquals(new BigDecimal("1.0"), restored.getTotalTestTimeSeconds());
         assertEquals(100, restored.getTotalTests());
         assertEquals(0, restored.getTotalErrors());
@@ -114,7 +110,6 @@ class TestTaskOutputTest {
               "startTime" : "2025-06-30T17:10:34.721504Z",
               "endTime" : "2025-06-30T17:10:44.722564Z",
               "totalTimeSeconds" : 1.1,
-              "totalClasses" : 10,
               "totalTestTimeSeconds" : 1.0,
               "totalTests" : 100,
               "totalErrors" : 0,
@@ -139,7 +134,6 @@ class TestTaskOutputTest {
         assertEquals(Instant.parse("2025-06-30T17:10:34.721504Z"), restored.getStartTime());
         assertEquals(Instant.parse("2025-06-30T17:10:44.722564Z"), restored.getEndTime());
         assertEquals(new BigDecimal("1.1"), restored.getTotalTimeSeconds());
-        assertEquals(10, restored.getTotalClasses());
         assertEquals(new BigDecimal("1.0"), restored.getTotalTestTimeSeconds());
         assertEquals(100, restored.getTotalTests());
         assertEquals(0, restored.getTotalErrors());

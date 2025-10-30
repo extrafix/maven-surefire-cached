@@ -269,7 +269,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             testReports = new File[0];
         }
 
-        int totalClasses = 0;
         BigDecimal totalTestTimeSeconds = BigDecimal.ZERO;
         int totalTests = 0;
         int totalErrors = 0;
@@ -279,7 +278,6 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         int totalTestcaseErrors = 0;
         for (File testReport : testReports) {
             TestSuiteReport testSuiteSummary = TestSuiteReport.fromFile(testReport);
-            totalClasses++;
             totalTestTimeSeconds = totalTestTimeSeconds.add(testSuiteSummary.timeSeconds());
             totalTests += testSuiteSummary.tests();
             totalErrors += testSuiteSummary.errors();
@@ -299,7 +297,7 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
         // artifacts are filled before saving
         Map<String, OutputArtifact> artifacts = new TreeMap<>();
         return new TestTaskOutput(startTime, endTime, getTotalTimeSeconds(startTime, endTime),
-            totalClasses, totalTestTimeSeconds, totalTests, totalErrors, totalFailures,
+            totalTestTimeSeconds, totalTests, totalErrors, totalFailures,
             totalTestcaseFlakyErrors, totalTestcaseFlakyFailures, totalTestcaseErrors,
             artifacts);
     }

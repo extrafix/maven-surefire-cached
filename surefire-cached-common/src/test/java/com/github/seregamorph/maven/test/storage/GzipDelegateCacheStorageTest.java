@@ -17,7 +17,6 @@ class GzipDelegateCacheStorageTest {
           "startTime" : "2025-05-10T18:55:14.282376Z",
           "endTime" : "2025-05-10T18:55:24.093039Z",
           "totalTimeSeconds" : 9.810,
-          "totalClasses" : 5,
           "totalTestTimeSeconds" : 0.954,
           "totalTests" : 70,
           "totalErrors" : 0,
