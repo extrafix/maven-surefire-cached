@@ -1,6 +1,5 @@
 package com.github.seregamorph.maven.test.extension;
 
-import com.github.seregamorph.maven.test.common.PluginName;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -106,15 +105,11 @@ public class CachedMavenPluginManager implements MavenPluginManager {
             || "org.apache.maven.plugin.surefire.SurefirePlugin".equals(mojo.getClass().getName())) {
             // we should normally generate a proxy here, but in the maven-core there is only one known call of
             // getConfiguredMojo method with mojoInterface=Mojo.class
-            return (T) new CachedSurefireDelegateMojo(testTaskCacheHelper,
-                testTaskCacheHelper.getCacheService(), testTaskCacheHelper.getCacheReport(),
-                session, session.getCurrentProject(),
-                (Mojo) mojo, PluginName.SUREFIRE_CACHED);
+            return (T) new SurefireCachedMojo(testTaskCacheHelper,
+                session, session.getCurrentProject(), (Mojo) mojo);
         } else if ("org.apache.maven.plugin.failsafe.IntegrationTestMojo".equals(mojo.getClass().getName())) {
-            return (T) new CachedSurefireDelegateMojo(testTaskCacheHelper,
-                testTaskCacheHelper.getCacheService(), testTaskCacheHelper.getCacheReport(),
-                session, session.getCurrentProject(),
-                (Mojo) mojo, PluginName.FAILSAFE_CACHED);
+            return (T) new IntegrationTestCachedMojo(testTaskCacheHelper,
+                session, session.getCurrentProject(), (Mojo) mojo);
         }
         return mojo;
     }
@@ -122,8 +117,8 @@ public class CachedMavenPluginManager implements MavenPluginManager {
     @Override
     public void releaseMojo(Object mojo, MojoExecution mojoExecution) {
         Object mojoToRelease = mojo;
-        if (mojo instanceof CachedSurefireDelegateMojo) {
-            CachedSurefireDelegateMojo delegateMojo = (CachedSurefireDelegateMojo) mojo;
+        if (mojo instanceof AbstractCachedSurefireMojo) {
+            AbstractCachedSurefireMojo delegateMojo = (AbstractCachedSurefireMojo) mojo;
             mojoToRelease = delegateMojo.getDelegate();
         }
         delegate().releaseMojo(mojoToRelease, mojoExecution);

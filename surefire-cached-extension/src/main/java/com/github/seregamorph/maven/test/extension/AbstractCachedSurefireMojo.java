@@ -42,9 +42,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Sergey Chernov
  */
-public class CachedSurefireDelegateMojo extends AbstractMojo {
+abstract class AbstractCachedSurefireMojo extends AbstractMojo {
 
-    private static final Logger log = LoggerFactory.getLogger(CachedSurefireDelegateMojo.class);
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     private final TestTaskCacheHelper testTaskCacheHelper;
     private final CacheService cacheService;
@@ -57,18 +57,16 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
     private final File projectBuildDirectory;
     private final File reportsDirectory;
 
-    public CachedSurefireDelegateMojo(
+    AbstractCachedSurefireMojo(
         TestTaskCacheHelper testTaskCacheHelper,
-        CacheService cacheService,
-        CacheReport cacheReport,
         MavenSession session,
         MavenProject project,
         Mojo delegate,
         PluginName pluginName
     ) {
         this.testTaskCacheHelper = testTaskCacheHelper;
-        this.cacheService = cacheService;
-        this.cacheReport = cacheReport;
+        this.cacheService = testTaskCacheHelper.getCacheService();
+        this.cacheReport = testTaskCacheHelper.getCacheReport();
         this.session = session;
         this.project = project;
         this.delegate = delegate;

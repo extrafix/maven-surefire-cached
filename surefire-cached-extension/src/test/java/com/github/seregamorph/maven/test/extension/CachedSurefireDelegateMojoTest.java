@@ -54,12 +54,10 @@ public class CachedSurefireDelegateMojoTest {
         when(((ContextEnabled) delegate).getPluginContext()).thenReturn(Collections.emptyMap());
         var testTaskCacheHelper = new TestTaskCacheHelper();
         testTaskCacheHelper.init(session);
-        var pluginName = PluginName.SUREFIRE_CACHED;
-        var cachedDelegateMojo = new CachedSurefireDelegateMojo(testTaskCacheHelper,
-            testTaskCacheHelper.getCacheService(), testTaskCacheHelper.getCacheReport(),
-            session, project, delegate, pluginName);
+        var cachedDelegateMojo = new SurefireCachedMojo(testTaskCacheHelper,
+            session, project, delegate);
 
-        var config = cachedDelegateMojo.loadEffectiveTestPluginConfig(pluginName);
+        var config = cachedDelegateMojo.loadEffectiveTestPluginConfig(PluginName.SUREFIRE_CACHED);
         assertEquals(List.of("com.acme:core"), config.getExcludeModules());
         assertEquals(List.of("META-INF/MANIFEST.MF", "META-INF/maven/plugin.xml",
             "META-INF/maven/**/plugin-help.xml"), config.getExcludeClasspathResources());
