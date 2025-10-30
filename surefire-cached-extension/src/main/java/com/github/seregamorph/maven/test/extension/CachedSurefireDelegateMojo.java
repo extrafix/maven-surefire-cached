@@ -163,7 +163,8 @@ public class CachedSurefireDelegateMojo extends AbstractMojo {
             log.error("Test execution failed", e);
             throw e;
         } finally {
-            TestTaskOutput testTaskOutput = getTaskOutput(startTime, Instant.now());
+            Instant endTime = Instant.now();
+            TestTaskOutput testTaskOutput = getTaskOutput(startTime, endTime);
             MoreFileUtils.write(taskOutputFile, JsonSerializers.serialize(testTaskOutput));
             // note that failsafe plugin does not throw exceptions on test failures
             boolean cacheIfTestcaseFlakyErrors = isTrue(getProperty(session, "cacheIfTestcaseFlakyErrors"));
