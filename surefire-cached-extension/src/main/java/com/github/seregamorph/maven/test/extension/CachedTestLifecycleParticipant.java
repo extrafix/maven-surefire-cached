@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -42,21 +43,29 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
     private static final Logger logger = LoggerFactory.getLogger(CachedTestLifecycleParticipant.class);
 
-    private static final class AggResult {
-
-        private final SortedSet<GroupArtifactId> modules = new TreeSet<>();
+    private static class ModuleResult {
 
         @JsonInclude(JsonInclude.Include.NON_EMPTY)
         private final SortedSet<String> flakyTests = new TreeSet<>();
 
+        public SortedSet<String> getFlakyTests() {
+            return flakyTests;
+        }
+    }
+
+    private static class AggResult {
+
+        private final SortedMap<GroupArtifactId, ModuleResult> modules = new TreeMap<>();
+
         private BigDecimal totalTimeSec = BigDecimal.ZERO;
 
         void add(GroupArtifactId groupArtifactId, ModuleTestResult moduleTestResult) {
-            modules.add(groupArtifactId);
             totalTimeSec = totalTimeSec.add(moduleTestResult.getTotalTimeSeconds());
-            flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseFlakyErrors()));
-            flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseFlakyFailures()));
-            flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseErrors()));
+            ModuleResult moduleResult = new ModuleResult();
+            moduleResult.flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseFlakyErrors()));
+            moduleResult.flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseFlakyFailures()));
+            moduleResult.flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseErrors()));
+            modules.put(groupArtifactId, moduleResult);
         }
 
         private static List<String> formatFlakyFailures(List<FlakyFailure> flakyFailures) {
@@ -65,7 +74,7 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
                 .collect(Collectors.toList());
         }
 
-        public SortedSet<GroupArtifactId> getModules() {
+        public SortedMap<GroupArtifactId, ModuleResult> getModules() {
             return modules;
         }
 
@@ -75,10 +84,6 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
         public BigDecimal getTotalTimeSec() {
             return totalTimeSec;
-        }
-
-        public SortedSet<String> getFlakyTests() {
-            return flakyTests;
         }
     }
 
