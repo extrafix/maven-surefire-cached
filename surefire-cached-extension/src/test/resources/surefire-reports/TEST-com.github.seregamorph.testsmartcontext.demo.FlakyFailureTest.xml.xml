@@ -61,7 +61,7 @@
       <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
       <property name="java.class.version" value="61.0"/>
     </properties>
-    <testcase name="transactionalMethods_shouldNotSelfCall" classname="projects.pt.server.architecture.transactional.TransactionalMethodsCallersArchTest" time="0.608">
+    <testcase name="transactionalMethods_shouldNotSelfCall" classname="com.github.seregamorph.testsmartcontext.demo.FlakyFailureTest" time="0.608">
       <flakyFailure message="Architecture Violation [Priority: MEDIUM] - Rule &apos;methods that annotated with @Transactional should be public and should not be final and should not be static and should overrides only an interface method if any and should not has class constructor direct calls (only via DI), because this is required to manage transactions with PROXY advice mode&apos; was violated (1 times):&#10;Constructor Class &lt;com.miro.domain.OrganizationDataDeleters$AllTablesOrganizationDataDeleter&gt; is being called.&#10;Constructor &lt;com.miro.domain.OrganizationDataDeleters.&lt;init&gt;(java.util.List)&gt; calls constructor &lt;com.miro.domain.OrganizationDataDeleters$AllTablesOrganizationDataDeleter.&lt;init&gt;(java.util.List)&gt; in (OrganizationDataDeleters.kt:16)" type="java.lang.AssertionError">
       <stackTrace><![CDATA[java.lang.AssertionError:
 Architecture Violation [Priority: MEDIUM] - Rule 'methods that annotated with @Transactional should be public and should not be final and should not be static and should overrides only an interface method if any and should not has class constructor direct calls (only via DI), because this is required to manage transactions with PROXY advice mode' was violated (1 times):
@@ -70,7 +70,7 @@ Constructor <com.acme.domain.OrganizationDataDeleters.<init>(java.util.List)> ca
 	at com.tngtech.archunit.lang.ArchRule$Assertions.assertNoViolation(ArchRule.java:94)
 	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:86)
 	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.check(ArchRule.java:165)
-	at projects.pt.server.architecture.transactional.TransactionalMethodsCallersArchTest.transactionalMethods_shouldNotSelfCall(TransactionalMethodsCallersArchTest.java:124)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyFailureTest.transactionalMethods_shouldNotSelfCall(TransactionalMethodsCallersArchTest.java:124)
 	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
 	at org.testng.internal.invokers.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:141)
 	at org.testng.internal.invokers.MethodInvocationHelper$1.runTestMethod(MethodInvocationHelper.java:260)
@@ -105,7 +105,7 @@ Constructor <com.acme.domain.OrganizationDataDeleters.<init>(java.util.List)> ca
 	at com.tngtech.archunit.lang.ArchRule$Assertions.assertNoViolation(ArchRule.java:94)
 	at com.tngtech.archunit.lang.ArchRule$Assertions.check(ArchRule.java:86)
 	at com.tngtech.archunit.lang.ArchRule$Factory$SimpleArchRule.check(ArchRule.java:165)
-	at projects.pt.server.architecture.transactional.TransactionalMethodsCallersArchTest.transactionalMethods_shouldNotSelfCall(TransactionalMethodsCallersArchTest.java:124)
+	at com.github.seregamorph.testsmartcontext.demo.FlakyFailureTest.transactionalMethods_shouldNotSelfCall(TransactionalMethodsCallersArchTest.java:124)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)

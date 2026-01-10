@@ -73,7 +73,7 @@ public final class TestSuiteReport {
         }
 
         // test class name
-        String name = rootElement.getAttribute("name");
+        String testSuiteName = rootElement.getAttribute("name");
         BigDecimal timeSeconds = new BigDecimal(rootElement.getAttribute("time"));
         int tests = Integer.parseInt(rootElement.getAttribute("tests"));
         int errors = Integer.parseInt(rootElement.getAttribute("errors"));
@@ -86,22 +86,25 @@ public final class TestSuiteReport {
         for (int i = 0; i < testcaseList.getLength(); i++) {
             Element testcaseNode = (Element) testcaseList.item(i);
 
-            testcaseFlakyErrors.addAll(getTestcaseFailures(testcaseNode, "flakyError"));
-            testcaseFlakyFailures.addAll(getTestcaseFailures(testcaseNode, "flakyFailure"));
-            testcaseErrors.addAll(getTestcaseFailures(testcaseNode, "error"));
+            testcaseFlakyErrors.addAll(getTestcaseFailures(testSuiteName, testcaseNode, "flakyError"));
+            testcaseFlakyFailures.addAll(getTestcaseFailures(testSuiteName, testcaseNode, "flakyFailure"));
+            testcaseErrors.addAll(getTestcaseFailures(testSuiteName, testcaseNode, "error"));
         }
 
-        return new TestSuiteReport(name, timeSeconds, tests, errors, failures,
+        return new TestSuiteReport(testSuiteName, timeSeconds, tests, errors, failures,
             testcaseFlakyErrors, testcaseFlakyFailures, testcaseErrors);
     }
 
-    private static List<TestcaseFailure> getTestcaseFailures(Element testcaseNode, String tagName) {
+    private static List<TestcaseFailure> getTestcaseFailures(String testSuiteName, Element testcaseNode, String tagName) {
         List<TestcaseFailure> failures = new ArrayList<>();
         NodeList failureTagList = testcaseNode.getElementsByTagName(tagName);
         for (int j = 0; j < failureTagList.getLength(); j++) {
-            String testcaseClassname = testcaseNode.getAttribute("classname");
             String testcaseName = testcaseNode.getAttribute("name");
-            Testcase testcase = new Testcase(testcaseClassname, testcaseName);
+            // Note: we use testSuiteName (testsuite "name" attribute)
+            // instead of failure tag "classname" attribute as it can be wrong
+            // (e.g. for JUnit 4 reports "classname" and "name" attributes have
+            // the same value of method name)
+            Testcase testcase = new Testcase(testSuiteName, testcaseName);
 
             Element failureNode = (Element) failureTagList.item(j);
             String failureType = failureNode.getAttribute("type");
