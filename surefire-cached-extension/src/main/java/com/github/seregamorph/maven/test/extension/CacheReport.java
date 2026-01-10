@@ -1,14 +1,12 @@
 package com.github.seregamorph.maven.test.extension;
 
-import static java.util.Collections.emptyList;
-
 import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.common.PluginName;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 /**
  * @author Sergey Chernov
@@ -36,12 +34,16 @@ public class CacheReport {
         }
     }
 
-    public List<ModuleTestResult> getExecutionResults(PluginName pluginName) {
+    public Map<GroupArtifactId, List<ModuleTestResult>> getExecutionResults(PluginName pluginName) {
+        Map<GroupArtifactId, List<ModuleTestResult>> result = new TreeMap<>();
         synchronized (executionResults) {
-            return executionResults.values().stream()
-                .flatMap(m -> m.getOrDefault(pluginName, emptyList()).stream())
-                .collect(Collectors.toList());
+            executionResults.forEach((groupArtifactId, pluginResults) -> {
+                List<ModuleTestResult> moduleTestResults = pluginResults.get(pluginName);
+                if (moduleTestResults != null) {
+                    result.put(groupArtifactId, moduleTestResults);
+                }
+            });
         }
+        return result;
     }
-
 }

@@ -86,7 +86,7 @@ abstract class AbstractCachedSurefireMojo extends AbstractMojo {
 
     private void reportCachedExecution(TaskOutcome result, TestTaskOutput testTaskOutput, int deletedCacheEntries) {
         GroupArtifactId groupArtifactId = getGroupArtifactId(project);
-        ModuleTestResult moduleTestResult = new ModuleTestResult(groupArtifactId, result,
+        ModuleTestResult moduleTestResult = new ModuleTestResult(result,
             testTaskOutput.getTotalTimeSeconds(), deletedCacheEntries,
             testTaskOutput.getTestcaseFlakyErrors(), testTaskOutput.getTestcaseFlakyFailures(),
             testTaskOutput.getTestcaseErrors());

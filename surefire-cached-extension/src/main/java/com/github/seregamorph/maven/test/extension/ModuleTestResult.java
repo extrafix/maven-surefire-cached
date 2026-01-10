@@ -1,7 +1,6 @@
 package com.github.seregamorph.maven.test.extension;
 
 import com.github.seregamorph.maven.test.common.FlakyFailure;
-import com.github.seregamorph.maven.test.common.GroupArtifactId;
 import com.github.seregamorph.maven.test.core.TaskOutcome;
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,7 +10,6 @@ import java.util.List;
  */
 public final class ModuleTestResult {
 
-    private final GroupArtifactId groupArtifactId;
     private final TaskOutcome result;
     private final BigDecimal totalTimeSeconds;
     private final int deletedCacheEntries;
@@ -20,7 +18,6 @@ public final class ModuleTestResult {
     private final List<FlakyFailure> testcaseErrors;
 
     public ModuleTestResult(
-        GroupArtifactId groupArtifactId,
         TaskOutcome result,
         BigDecimal totalTimeSeconds,
         int deletedCacheEntries,
@@ -28,17 +25,12 @@ public final class ModuleTestResult {
         List<FlakyFailure> testcaseFlakyFailures,
         List<FlakyFailure> testcaseErrors
     ) {
-        this.groupArtifactId = groupArtifactId;
         this.result = result;
         this.totalTimeSeconds = totalTimeSeconds;
         this.deletedCacheEntries = deletedCacheEntries;
         this.testcaseFlakyErrors = testcaseFlakyErrors;
         this.testcaseFlakyFailures = testcaseFlakyFailures;
         this.testcaseErrors = testcaseErrors;
-    }
-
-    public GroupArtifactId getGroupArtifactId() {
-        return groupArtifactId;
     }
 
     public TaskOutcome getResult() {
@@ -68,8 +60,7 @@ public final class ModuleTestResult {
     @Override
     public String toString() {
         return "ModuleTestResult{" +
-            "groupArtifactId=" + groupArtifactId +
-            ", result=" + result +
+            "result=" + result +
             ", totalTimeSeconds=" + totalTimeSeconds +
             ", deletedCacheEntries=" + deletedCacheEntries +
             ", testcaseFlakyErrors=" + testcaseFlakyErrors +

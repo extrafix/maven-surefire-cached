@@ -51,8 +51,8 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
 
         private BigDecimal totalTimeSec = BigDecimal.ZERO;
 
-        void add(ModuleTestResult moduleTestResult) {
-            modules.add(moduleTestResult.getGroupArtifactId());
+        void add(GroupArtifactId groupArtifactId, ModuleTestResult moduleTestResult) {
+            modules.add(groupArtifactId);
             totalTimeSec = totalTimeSec.add(moduleTestResult.getTotalTimeSeconds());
             flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseFlakyErrors()));
             flakyTests.addAll(formatFlakyFailures(moduleTestResult.getTestcaseFlakyFailures()));
@@ -117,11 +117,16 @@ public class CachedTestLifecycleParticipant extends AbstractMavenLifecyclePartic
         for (PluginName pluginName : Arrays.asList(PluginName.SUREFIRE_CACHED, PluginName.FAILSAFE_CACHED)) {
             Map<TaskOutcome, AggResult> pluginResult = new TreeMap<>();
             int deleted = 0;
-            List<ModuleTestResult> executionResults = cacheReport.getExecutionResults(pluginName);
-            for (ModuleTestResult executionResult : executionResults) {
-                pluginResult.computeIfAbsent(executionResult.getResult(), $ -> new AggResult())
-                    .add(executionResult);
-                deleted += executionResult.getDeletedCacheEntries();
+            Map<GroupArtifactId, List<ModuleTestResult>> pluginExecutionResults =
+                cacheReport.getExecutionResults(pluginName);
+            for (Map.Entry<GroupArtifactId, List<ModuleTestResult>> entry : pluginExecutionResults.entrySet()) {
+                GroupArtifactId groupArtifactId = entry.getKey();
+                List<ModuleTestResult> moduleTestResults = entry.getValue();
+                for (ModuleTestResult executionResult : moduleTestResults) {
+                    pluginResult.computeIfAbsent(executionResult.getResult(), $ -> new AggResult())
+                        .add(groupArtifactId, executionResult);
+                    deleted += executionResult.getDeletedCacheEntries();
+                }
             }
             if (!pluginResult.isEmpty()) {
                 AtomicBoolean headerPrinted = new AtomicBoolean(false);
