@@ -86,7 +86,9 @@ public final class TestSuiteReport {
         for (int i = 0; i < testcaseList.getLength(); i++) {
             Element testcaseNode = (Element) testcaseList.item(i);
 
+            // Any other than AssertionError
             testcaseFlakyErrors.addAll(getTestcaseFailures(testSuiteName, testcaseNode, "flakyError"));
+            // AssertionError
             testcaseFlakyFailures.addAll(getTestcaseFailures(testSuiteName, testcaseNode, "flakyFailure"));
             testcaseErrors.addAll(getTestcaseFailures(testSuiteName, testcaseNode, "error"));
         }

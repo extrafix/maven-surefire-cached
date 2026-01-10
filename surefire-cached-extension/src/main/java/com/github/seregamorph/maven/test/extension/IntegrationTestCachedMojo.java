@@ -61,7 +61,7 @@ class IntegrationTestCachedMojo extends AbstractCachedSurefireMojo {
             testcaseErrors.addAll(formatFailures(testSuiteSummary.testcaseErrors()));
         }
 
-        if (report.getFlakes() > 0 && testcaseFlakyErrors.isEmpty()) {
+        if (report.getFlakes() > 0 && testcaseFlakyErrors.isEmpty() && testcaseFlakyFailures.isEmpty()) {
             // this can happen e.g. if TEST-*.xml reports are not enabled
             testcaseFlakyErrors.add(new FlakyFailure("failsafe-summary.xml", "flakes"));
         }
